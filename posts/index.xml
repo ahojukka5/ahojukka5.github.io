@@ -1,0 +1,158 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/posts/</link>
+    <description>Recent content in Posts on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Uusimman tiedoston löytäminen</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</link>
+      <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</guid>
+      <description>&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
+lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
+esimerkiksi &lt;code&gt;ls -lasrt&lt;/code&gt;, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
+Tämä voidaan kuitenkin automatisoida aika näppärästi. Esittelen tässä aika
+näppärin aliaksen mitä itse käytän.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>SSH-tunnelin pitäminen ylhäällä autossh:lla</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/</guid>
+      <description>&lt;p&gt;Pätkivissä internet-yhteyksissä ssh-tunnelien pitäminen ylhäällä voi osoittautua
+melko työlääksi touhuksi. Tämän ongelman voi kuitenkin ratkaista käynnistämällä
+autossh-ohjelman systemd:llä. Tällä tavalla tunneli luodaan automaattisesti kun
+tietokone käynnistetään sekä pidetään ylhäällä aina kun intenert-yhteys löytyy.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Varmuuskopioiden varmentaminen</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-04-backup-verification/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-04-backup-verification/</guid>
+      <description>&lt;p&gt;Kun varmuuskopiointi on kerran saatu toimimaan, on vähän liiankin helppoa
+unohtaa koko asia. Kuten kaikilla asioilla, myös varmuuskopiolla on taipumusta
+mennä aikanaan rikki, esimerkiksi kun ohjelmistoja päivitetään, voikin käydä
+niin että varmuuskopiointia ei enää ajeta. Salasanat tuppaavat unohtumaan kun
+niitä ei tarvita eikä käytetä. Tai sitten vaan unohtuu tai ei ole tiedossa
+kuinka koko varmuuskopio tarvittaessa palautetaan. Tätä asiaa on syytä
+harjoitella mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
+oikeasti tarvitsisi.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Makefile ja ympäristömuuttujat</title>
+      <link>https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/</link>
+      <pubDate>Wed, 03 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/</guid>
+      <description>&lt;p&gt;Makefilet ovat varsin kätevä tapa automatisoida erilaisia prosesseja. Monesti
+myös tulee tarvetta käyttää erilaisia ympäristömuuttujia Makefileissä. Niiden
+käytössä kuitenkin piilee iso riski, joka voi pahimmillaan maksaa kaikki datasi.
+Esittelen tässä joitakin keinoja, joilla voit varmistaa, että ympäristömuuttujat
+todella ovat määriteltyjä.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Pandocin suodattimien käyttö</title>
+      <link>https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/</link>
+      <pubDate>Sun, 31 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/</guid>
+      <description>&lt;p&gt;Aiemmassa postauksessa tarkastelin Pandocin AST:tä. Siihen voi esimerkiksi
+tallentaa &lt;code&gt;CodeBlock&lt;/code&gt;-noden, johon sisältyy ohjelmakoodia. Esittelen tässä
+lyhyesti, kuinka voidaan vaikuttaa yksityiskohtaisesti siihen, miltä AST:stä
+renderöity lopputulos näyttää LaTeXilla. Käytännön tasolla, &lt;code&gt;CodeBlock&lt;/code&gt; pitää
+muuttaa &lt;code&gt;RawBlock&lt;/code&gt;-nodeksi käyttämällä Pandocin suodattimia.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Pandoc-konvertoijan datatyypeistä</title>
+      <link>https://ahojukka5.github.io/2020/2020-05-29-pandoc-converters-data-types/</link>
+      <pubDate>Fri, 29 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-05-29-pandoc-converters-data-types/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://en.wikipedia.org/wiki/Pandoc&#34;&gt;Pandoc&lt;/a&gt; on universaali dokumenttikonvertoija. Sillä voi kääntää
+dokumentteja eri formaattien väilllä, esimerkiksi blogimaailmasta tutusta
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Markdown&#34;&gt;Markdown&lt;/a&gt;-formaatista &lt;a href=&#34;https://en.wikipedia.org/wiki/HTML&#34;&gt;HTML&lt;/a&gt;-formaattiin, ja toisaalta samasta
+lähteestä myös &lt;a href=&#34;https://en.wikipedia.org/wiki/LaTeX&#34;&gt;LaTeX&lt;/a&gt;-formaattiin, ja niin edelleen. Kuinka se sen
+tekee? Pandoc parsii dokumentin &lt;a href=&#34;https://en.wikipedia.org/wiki/Abstract_syntax_tree&#34;&gt;abstraktiksi syntaksipuuksi&lt;/a&gt; tai AST:ksi
+(englanniksi &amp;ldquo;abstract syntax tree&amp;rdquo;), jonka jälkeen se kirjoittaa tämän edelleen
+haluttuun formaattiin. Olen tutkiskellut tuota Pandocin AST:tä sekä eri
+dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Ohjelmointikielien tehokkuudesta, Julia vs. C&#43;&#43;</title>
+      <link>https://ahojukka5.github.io/2020/2020-05-21-julia-perfromance-calc-bw/</link>
+      <pubDate>Thu, 21 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-05-21-julia-perfromance-calc-bw/</guid>
+      <description>&lt;p&gt;Ajattelin kirjoittaa lyhyen blogisarjan Julia-ohjelmointikielestä, lähinnä
+tehokkuusnäkökulmasta. Tarkoituksena on tuoda esille joitakin pointteja jotka
+vaikuttavat ohjelmien suoritusnopeuteen.&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Wrapping C&#43;&#43; libraries to Julia: part 1</title>
+      <link>https://ahojukka5.github.io/2019/wrapping-cpp-libraries-to-julia-part-1/</link>
+      <pubDate>Tue, 24 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/wrapping-cpp-libraries-to-julia-part-1/</guid>
+      <description>
+Ability to wrap old program codes to use them in new programming environments is
+an essential task for efficient code reuse. In this blog post, I will present a
+minimum working example on how to compile and wrap a shared C ++ library with
+CxxWrap.jl.
+
+</description>
+    </item>
+    
+    <item>
+      <title>Parametric FEM simulations using JuliaFEM and Gmsh</title>
+      <link>https://ahojukka5.github.io/2019/2019-09-17-parametric-fem-simulations-using-juliafem-and-gmsh/</link>
+      <pubDate>Tue, 17 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/2019-09-17-parametric-fem-simulations-using-juliafem-and-gmsh/</guid>
+      <description>The JuliaFEM project develops open-source software for reliable, scalable, distributed Finite Element Method. Gmsh is an open-source 3D finite element mesh generator with a built-in CAD engine and post-processor. In this blog post, I will demonstrate how to create a simple geometry, mesh it using Gmsh Julia API and transfer the mesh after that to a format JuliaFEM understands. Because the mesh is created programmatically, it is possible to parametrize to make an automatic workflow.</description>
+    </item>
+    
+    <item>
+      <title>Use of vibration data to predict machine failure using deep learning</title>
+      <link>https://ahojukka5.github.io/2019/lstm-autoencoders/</link>
+      <pubDate>Sun, 17 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/lstm-autoencoders/</guid>
+      <description>
+This blog post demonstrates how to use LSTM Autoencoder to detect anomalies
+from the time series data. Data set is FEMTO Bearing Data Set, which contains
+acceleration measurements for bearings.
+
+</description>
+    </item>
+    
+    <item>
+      <title>Blogging using Jupyter notebooks</title>
+      <link>https://ahojukka5.github.io/2019/blogging-using-jupyter-notebooks/</link>
+      <pubDate>Sun, 20 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/blogging-using-jupyter-notebooks/</guid>
+      <description>Hello world!
+   In&amp;nbsp;[4]: 1+1     Out[4]: 2      \begin{equation} F\left(t\right)=\int_{0}^{t}\frac{1}{2}x^{2}\,\mathrm{d}x \end{equation}    In&amp;nbsp;[5]: using Plots      In&amp;nbsp;[9]: x = range(0, stop=2*pi, length=50) y = sin.(x) plot(x, y)     Out[9]:             0  1  2  3  4  5  6  -1.</description>
+    </item>
+    
+  </channel>
+</rss>

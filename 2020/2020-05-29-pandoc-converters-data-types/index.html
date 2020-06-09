@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Pandoc-konvertoijan datatyypeistä</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Pandoc-konvertoijan datatyypeistä
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p><a href="https://en.wikipedia.org/wiki/Pandoc">Pandoc</a> on universaali dokumenttikonvertoija. Sillä voi kääntää
+dokumentteja eri formaattien väilllä, esimerkiksi blogimaailmasta tutusta
+<a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>-formaatista <a href="https://en.wikipedia.org/wiki/HTML">HTML</a>-formaattiin, ja toisaalta samasta
+lähteestä myös <a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a>-formaattiin, ja niin edelleen. Kuinka se sen
+tekee? Pandoc parsii dokumentin <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">abstraktiksi syntaksipuuksi</a> tai AST:ksi
+(englanniksi &ldquo;abstract syntax tree&rdquo;), jonka jälkeen se kirjoittaa tämän edelleen
+haluttuun formaattiin. Olen tutkiskellut tuota Pandocin AST:tä sekä eri
+dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.</p>
+<p>Olen pitkään tutkinut mahdollisuutta kirjoittaa monella alustalla yhtä aikaa.
+Tieteellisessä maailmassa kirjoitellaan LaTeXilla ja internet-maailmassa
+Markdownilla. Myös muitakin formaatteja on, esimerkiksi Microsoftin formaatit ja
+reStructuredText, mutta pääosin näin. Täydellisessä formaatissa yhdistyisi
+LaTeXin monipuolisuus ja markdownin luettavuus. Lisäksi toivelistalla on että
+siinä voisi evaluoida ohjelmakoodia ja testata sen tuloste.</p>
+<p>Pandoc ei varsinaisesti ole formaatti mutta sen avulla nämä tavoitteet alkavat
+yhdistymään. On nimittäin niin, että Pandocin AST:n ja sitä kautta dokumentin
+formaatin voi kuvailla <a href="https://en.wikipedia.org/wiki/JSON">JSON</a>-formaatissa ja sitä voi suoraan manipuloida
+filttereillä sopivan lopputuloksen saavuttamiseksi. Joten, valitsemalla tai
+ohjelmoimalla sopivia filttereita, tehtävä on siis periaatteessa mahdollinen,
+vai onko?</p>
+<p>Pandocin toimintaa voi tutkia komennolla</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -s markdown -t latex tiedosto.md
+</code></pre></div><p>tai</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -s latex -t markdown tiedosto.tex
+</code></pre></div><p>Mentiinpä kumpaan suuntaan tahansa, olisi toivottavaa että pandoc osaisi parsia
+tuloksen AST:hen kunnolla. Käytännössä kuitenkin varmaan on niin, että LaTeXista
+on helpompaa tehdä markdown kuin toisin päin. Perustavanlaatuisia kysymyksiä siis
+on (ainakin) kaksi:</p>
+<ol>
+<li>kuinka saada tieto Pandocin AST:hen, ja</li>
+<li>kuinka saada tieto kirjoitettua Pandocin AST:stä.</li>
+</ol>
+<p>Tarkastelen tässä yksityiskohtaisesti kuinka esittää ohjelmakoodia, kuvia ja
+yhtälöitä. Muitakin rakenteita AST:ssä toki on, mutta nämä ovat ne yleisimmät
+jotka aiheuttavat päänvaivaa eri formaattien välillä.</p>
+<h2 id="koodiblokit-codeblock">Koodiblokit (CodeBlock)</h2>
+<p>Tarkastellaan ensimmäisenä koodiblokkia. Kirjoitetaan yksinkertainen SQL-kysely:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="color:#e6db74">```sql
+</span><span style="color:#e6db74"></span><span style="color:#66d9ef">SELECT</span> <span style="color:#e6db74">&#34;Hello, world!&#34;</span>;
+<span style="color:#e6db74">```</span>
+</code></pre></div><p>Tallennetaan tiedostoon, esimerkiksi <code>hello.md</code>. Pandocin konversio sen natiiviin AST-formaattiin saadaan:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t native hello.md
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[CodeBlock (&#34;&#34;,[&#34;sql&#34;],[]) &#34;SELECT \&#34;Hello, world!\&#34;;&#34;]
+</code></pre></div><p>Tässähän heti herää kysymys: mitä ovat nuo tyhjät placeholderit
+CodeBlock-nodessa Pandocin AST:ssä?</p>
+<p>LaTeX-formaatissa tämä olisi</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t latex hello.md
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{Shaded}
+<span style="color:#66d9ef">\begin</span>{Highlighting}[]
+<span style="color:#66d9ef">\KeywordTok</span>{SELECT} <span style="color:#66d9ef">\OtherTok</span>{&#34;Hello, world!&#34;}<span style="color:#66d9ef">\NormalTok</span>{;}
+<span style="color:#66d9ef">\end</span>{Highlighting}
+<span style="color:#66d9ef">\end</span>{Shaded}
+</code></pre></div><p>Palaamme tähän myöhemmin. Keskitytään ensin kuitenkin tuohon natiiviin
+formaattiin.</p>
+<p>Komennolla</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t markdown hello.md
+</code></pre></div><p>Saamme saman Markdown-tiedoston kirjoitettua uudelleen. Näyttäisi, että Pandoc
+käyttää hieman modifoitua versiota normaalista Markdownista.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">```{.sql}
+SELECT &#34;Hello, world!&#34;;
+```
+</code></pre></div><p>Vaatii hieman salapoliisityötä selvittää, mitä nuo natiiviformaatin puuttuvat
+palaset ovat. Konvertoidaan Pandocin AST JSON-formaattiin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t json hello.md | python -m json.tool
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;blocks&#34;</span>: [
+    {
+      <span style="color:#f92672">&#34;t&#34;</span>: <span style="color:#e6db74">&#34;CodeBlock&#34;</span>,
+      <span style="color:#f92672">&#34;c&#34;</span>: [[<span style="color:#e6db74">&#34;&#34;</span>, [<span style="color:#e6db74">&#34;sql&#34;</span>], []], <span style="color:#e6db74">&#34;SELECT \&#34;Hello, world!\&#34;;&#34;</span>]
+    }
+  ],
+  <span style="color:#f92672">&#34;pandoc-api-version&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">1</span>],
+  <span style="color:#f92672">&#34;meta&#34;</span>: {}
+}
+</code></pre></div><p>AST koostuu listasta <code>&quot;blocks&quot;</code>, jossa on lueteltu objekti avaimilla <code>t</code> ja <code>c</code>.
+Googlettelemalla selviää, että nuo <code>c</code> (content?) listan palaset <a href="https://pandoc.org/scripting-1.11.html">ovat</a>
+<code>(id, classes, namevals)</code>. Muokataan annettua JSON-tiedostoa hieman:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;blocks&#34;</span>: [
+    {
+      <span style="color:#f92672">&#34;t&#34;</span>: <span style="color:#e6db74">&#34;CodeBlock&#34;</span>,
+      <span style="color:#f92672">&#34;c&#34;</span>: [
+        [
+          <span style="color:#e6db74">&#34;my-id&#34;</span>,
+          [<span style="color:#e6db74">&#34;sql&#34;</span>, <span style="color:#e6db74">&#34;text&#34;</span>],
+          [
+            [<span style="color:#e6db74">&#34;a&#34;</span>, <span style="color:#e6db74">&#34;b&#34;</span>],
+            [<span style="color:#e6db74">&#34;c&#34;</span>, <span style="color:#e6db74">&#34;d&#34;</span>]
+          ]
+        ],
+        <span style="color:#e6db74">&#34;SELECT \&#34;Hello, world!\&#34;;&#34;</span>
+      ]
+    }
+  ],
+  <span style="color:#f92672">&#34;pandoc-api-version&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">1</span>],
+  <span style="color:#f92672">&#34;meta&#34;</span>: {}
+}
+</code></pre></div><p>Nyt käännettäessä AST takaisin Markdowniksi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f json -t markdown hello.json
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">```{#my-id .sql .text a=&#34;b&#34; c=&#34;d&#34;}
+SELECT &#34;Hello, world!&#34;;
+```
+</code></pre></div><p>Natiivina tämä on:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f json -t native hello.json
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[CodeBlock (&#34;my-id&#34;,[&#34;sql&#34;,&#34;text&#34;],[(&#34;a&#34;,&#34;b&#34;),(&#34;c&#34;,&#34;d&#34;)]) &#34;SELECT \&#34;Hello, world!\&#34;;&#34;]
+</code></pre></div><p>On siis ainakin onnistuneesti löydetty, kuinka tuo Pandocin AST:n CodeBlock
+voidaan täyttää Markdown-formaatilla!</p>
+<p>Enempää ei voida parsimiselle tehdä. Toivottavaa olisi, että esimerkiksi markdown</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">```{#listing:lst1 .sql caption=&#34;SQL-kysely, &#34;Hello, World!&#34;&#34;}
+SELECT &#34;Hello, world!&#34;;
+```
+</code></pre></div><p>Eli natiiviformaattina</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[CodeBlock (&#34;listing:lst1&#34;,[&#34;sql&#34;],[(&#34;caption&#34;,&#34;SQL-kysely, \&#34;Hello, World!\&#34;&#34;)]) &#34;SELECT \&#34;Hello, world!\&#34;;&#34;]
+</code></pre></div><p>Muuttuisi muotoon</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{listing}
+<span style="color:#66d9ef">\caption</span>{SQL-kysely &#34;Hello, World!&#34;}
+<span style="color:#66d9ef">\begin</span>{tcolorbox}
+<span style="color:#66d9ef">\begin</span>{minted}{sql}
+SELECT &#34;Hello, world!&#34;;
+<span style="color:#66d9ef">\end</span>{minted}
+<span style="color:#66d9ef">\end</span>{tcolorbox}
+<span style="color:#66d9ef">\label</span>{listing:lst1}
+<span style="color:#66d9ef">\end</span>{listing}
+</code></pre></div><p>Pandocin AST:ssä ei varmaankaan voi helposti esitellä uusia lohkoja, joten yllä
+kuvattua <code>listing -&gt; tcolorbor -&gt; minted</code> rakennetta ei voi kuvata suoraan
+AST:hen. Mainittu LaTeX-koodi pitää siis jotenkin ujuttuu AST:n nodeen.</p>
+<p>On nimittäin niin, että AST:stä löytyy <code>RawBlock</code>, johon voi tallentaa suoraan LaTeX-koodia:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">RawBlock (Format &#34;latex&#34;) &#34;\\begin{listing}\n\\caption{SQL-kysely \&#34;Hello, World!\&#34;}\n\\begin{tcolorbox}\n\\begin{minted}{sql}\nSELECT \&#34;Hello, world!\&#34;;\n\\end{minted}\n\\end{tcolorbox}\n\\label{listing:lst1}\n\\end{listing}&#34;]
+</code></pre></div><p>Nämä eri AST:n rakennuspalikat on määritelty Pandocin sisäisessä projektissa
+<a href="https://github.com/jgm/pandoc-types">pandoc-types</a>, ja projektin <a href="https://hackage.haskell.org/package/pandoc-types-1.20/docs/Text-Pandoc-Definition.html">dokumentaatiosta</a>
+voi myös yrittää selvitellä näiden rakennuspalasten nimiä ja tyyppejä.
+Esimerkiksi tämä mainittu <code>CodeBlock</code> rakentuu seuraavasti:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">data CodeBlock Attr Text
+Code block (literal) with attributes
+</code></pre></div><p>Ja tässä <code>Attr</code> on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">type Attr = (Text, [Text], [(Text, Text)])
+Attributes: identifier, classes, key-value pairs
+</code></pre></div><p>Inlinekoodi menee seuraavasti:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">koodi <span style="color:#e6db74">`f(x) = x`</span>
+</code></pre></div><p>Joka Pandocin natiivina</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;koodi&#34;,Space,Code (&#34;&#34;,[],[]) &#34;f(x) = x&#34;]]
+</code></pre></div><p><code>Code</code> nodessa näyttäisi oleva sama <code>Attr</code>, eli esimerkiksi seuraava on validia
+AST-syntaksia (koodipätkän tunniste &ldquo;koodi1&rdquo;, ohjelmointikieli &ldquo;julia&rdquo;, lisäksi
+key-value pari &ldquo;evaluate&rdquo; = &ldquo;false&rdquo;):</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;koodi&#34;,Space,Code (&#34;koodi1&#34;,[&#34;julia&#34;],[(&#34;evaluate&#34;, &#34;false&#34;)]) &#34;f(x) = x&#34;]]
+</code></pre></div><p>Pandocin Markdown-formaatissa tämä olisi</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">koodi <span style="color:#e6db74">`f(x) = x`</span>{#koodi1 .julia evaluate=&#34;false&#34;}
+</code></pre></div><p>Tämä on kuitenkin sellaista formaattia, ettei sitä markdown-parserit ihan
+kakistelematta niele. Esimerkiksi GitHub ei näitä ylimääräisiä parametreja
+tunnista mitenkään. Se on kuitenkin mielenkiintoinen laajennos ja
+huomionarvoista on, että mikäli markdownista haluaa LaTeXiin mennä, niin
+<em>jonnekin</em> on pakko laittaa ylimääräinen metatieto jota tarvitaan kun
+hienosäädetään renderöintiä. Esimerkiksi markdown ei tue millään tavoin otsikon
+laittamista koodiblokkiin saatikka sen sisällyttämistä esimerkiksi kelluvaan
+<code>listing</code> ympäristöön. Annetun metadatan perusteella voisin esimerkiksi viitata
+koodiin sen id-numeron perusteella tai suorittaa koodin ennen sen renderöimistä.
+Nämä ovat varsin mielenkiintoisia ajatuksia ja palaan näihin kun tutkimukseni
+Pandocin kanssa etenevät.</p>
+<h2 id="kuvat-image">Kuvat (Image)</h2>
+<p>Tarkastellaan seuraavaksi kuvien ominaisuuksia. LaTeXissa kuvan latominen menisi
+tyypillisesti näin.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{figure}
+<span style="color:#66d9ef">\centering</span>
+<span style="color:#66d9ef">\includegraphics</span>{hello.png}
+<span style="color:#66d9ef">\caption</span>{Kuvan otsikko}<span style="color:#66d9ef">\label</span>{fig:kuva}
+<span style="color:#66d9ef">\end</span>{figure}
+</code></pre></div><p>Tässä näkyy myös konkreettisesti, mikä Markdownissa on pielessä. Kuviin,
+kaavoihin ja muihin vastaaviin pitäisi viitata niiden tunnisteen perusteella,
+mutta koska Markdownissa ei viittausjärjestelmä ole niin pitkälle kehittynyt
+kuin LaTeXissa, sen sijaan että kirjoitettaisiin &ldquo;LaTeXissa kuvan latominen
+menisi listauksen 1 mukaisesti&rdquo;, käytetään kaikenlaisia muita ilmaisuja kuten
+&ldquo;alla olevan mukaisesti&rdquo;, &ldquo;seuraavalla tavalla&rdquo;, ja niin edelleen.</p>
+<p>Mikäli kuvaa tällaisenaan yrittää tarjota Markdown-formaatissa, menisi se
+Pandocin AST:hen <code>RawBlock</code>-tyyppisenä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[RawBlock (Format &#34;latex&#34;) &#34;\\begin{figure}\n\\centering\n\\includegraphics{hello.png}\n\\label{fig:kuva}\\caption{Kuvan otsikko}\n\\end{figure}&#34;]
+</code></pre></div><p>Tämä <code>RawBlock</code> varmaankin renderöityy LaTeXissa ihan hyvin ja sellaisenaan.
+Ongelmaksi tulee ettei se tarkoita Markdownissa yhtään mitään. Myöskään
+LaTeX-formaatista tarjoiltuna AST ei näytä kovin hyvältä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[RawBlock (Format &#34;latex&#34;) &#34;\\centering&#34;
+,Para [Image (&#34;&#34;,[],[]) [Str &#34;Kuvan&#34;,Space,Str &#34;otsikko&#34;] (&#34;hello.png&#34;,&#34;fig:&#34;),SoftBreak,Span (&#34;fig:kuva&#34;,[],[(&#34;label&#34;,&#34;fig:kuva&#34;)]) [Str &#34;[fig:kuva]&#34;]]]
+</code></pre></div><p>Jos Markdownista tarjoaa kuvan seuraavalla tavalla:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">![<span style="color:#f92672">kuvateksti</span>](<span style="color:#a6e22e">kuva.png</span>)
+</code></pre></div><p>Saadaan</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Image (&#34;&#34;,[],[]) [Str &#34;kuvateksti&#34;] (&#34;kuva.png&#34;,&#34;fig:&#34;)]]
+</code></pre></div><p>Lämpenee. Dokumentaation perusteella tämä rakenne on hieman samantyyppinen kuin <code>Code</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Image Attr [Inline] Target
+Image: alt text (list of inlines), target
+</code></pre></div><p>Ensimmäisessä <code>Attr</code>-osiossa on siis yksilöivä id, luokat ja key-value parit,
+sen jälkeen tulee <code>Inline</code>-blokki joka voidaan käyttää esimerkiksi kuvatekstiin,
+ja lopuksi tulee <code>Target</code> joka on muotoa <code>(url, title)</code>. Eli jos tämän
+natiiviformaatissa mankeloi niin että jokaisessa kentässä on jotakin, niin
+saadaan.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Image (&#34;kuva1&#34;,[&#34;kissakuvat&#34;],[(&#34;show&#34;, &#34;true&#34;)]) [Str &#34;kuvateksti&#34;] (&#34;kuva.png&#34;,&#34;fig:kuvatitle&#34;)]]
+</code></pre></div><p>Nyt kuva LaTeX-formaatissa on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{figure}
+<span style="color:#66d9ef">\hypertarget</span>{kuva1}{
+<span style="color:#66d9ef">\centering</span>
+<span style="color:#66d9ef">\includegraphics</span>{kuva.png}
+<span style="color:#66d9ef">\caption</span>{kuvateksti}<span style="color:#66d9ef">\label</span>{kuva1}
+}
+<span style="color:#66d9ef">\end</span>{figure}
+</code></pre></div><p>Kaikkea dataa ei käytetä kaikkien kirjoittajien toimesta. Key-value pari <code>:show =&gt; true</code> on vain täytteenä. Periaatteessa pandocin LaTeX-kirjoittajassa voi olla
+erilaisia optioita joilla voi hienosäätää, miltä kuva näyttää. Esimerkiksi tässä
+tilanteessa puuttuu kontrolli siitä, käytetäänkö <code>\centering</code>-komentoa kuvan
+keskittämiseen vai ei. Pandocin LaTeX-kirjoittaja lisää sen automaattisesti.
+Mutta hienosäätöä varten meillä pitäisi olla <code>Image</code>-noden parametrilistassa
+sopivia asetuksia, joita LaTeX-kirjoittaja sitten voisi käyttää hyödykseen.
+<code>centering: true</code> olisi eräs varsin hyvä esimerkki tällaisesta.</p>
+<p><code>Target</code> on käytännössä sama kuin HTML-kielen hyperlinkki, ja näyttäisi että
+ainakaan LaTeX-kirjoittaja ei käytä tuota <code>title</code>-tietoa mihinkään.</p>
+<p>Markdownissa tämä <code>Image</code>-node on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">![<span style="color:#f92672">kuvateksti</span>](<span style="color:#a6e22e">kuva.png &#39;kuvatitle&#39;</span>){#kuva1 .kissakuvat show=&#34;true&#34;}
+</code></pre></div><p>HTML-kielellä</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">figure</span>&gt;
+  &lt;<span style="color:#f92672">img</span>
+    <span style="color:#a6e22e">src</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kuva.png&#34;</span>
+    <span style="color:#a6e22e">title</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kuvatitle&#34;</span>
+    <span style="color:#a6e22e">alt</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kuvateksti&#34;</span>
+    <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kuva1&#34;</span>
+    <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;kissakuvat&#34;</span>
+    <span style="color:#a6e22e">data-show</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;true&#34;</span>
+  /&gt;
+  &lt;<span style="color:#f92672">figcaption</span>&gt;kuvateksti&lt;/<span style="color:#f92672">figcaption</span>&gt;
+&lt;/<span style="color:#f92672">figure</span>&gt;
+</code></pre></div><p>Pandocin AST:ssä <code>Image</code> on inline-elementti eikä block-elementti, kuten <code>CodeBlock</code>.</p>
+<h2 id="yhtälöt">Yhtälöt</h2>
+<p>Yhtälöiden latominen on eräs LaTeXin tärkeimpiä, jos ei tärkein ominaisuus.
+Tarkastellaan, mitä tapoja Pandocin AST tarjoaa. LaTeXissa yhtälön ladonta
+tekstin sekaan menee suurinpiirtein näin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex">Yhtälössä
+<span style="color:#66d9ef">\begin</span>{equation}
+f(x) = y <span style="color:#66d9ef">\label</span>{eq:kaava}
+<span style="color:#66d9ef">\end</span>{equation}
+ei ole virhettä.
+</code></pre></div><p>Jos yhtälö kirjoitetaan tuolla tavalla Markdowniin, esitystapa Pandocin AST:ssä on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;Yhtälössä&#34;,SoftBreak,RawInline (Format &#34;tex&#34;) &#34;\\begin{equation}\nf(x) = y \\label{eq:kaava}\n\\end{equation}&#34;,SoftBreak,Str &#34;ei&#34;,Space,Str &#34;ole&#34;,Space,Str &#34;virhett\228.&#34;]]
+</code></pre></div><p>LaTeXista parsittuna se on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;Yhtälössä&#34;,SoftBreak,Math DisplayMath &#34;f(x) = y \\label{eq:kaava}&#34;,SoftBreak,Str &#34;ei&#34;,Space,Str &#34;ole&#34;,Space,Str &#34;virhett\228.&#34;]]
+</code></pre></div><p>LaTeXilla inline-yhtälö kirjoitetaan <code>$</code>-merkeillä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex">Yhtälö <span style="color:#e6db74">$</span>f<span style="color:#f92672">(</span>x<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> x^<span style="color:#ae81ff">2</span><span style="color:#e6db74">$</span> on hieno yhtälö.
+</code></pre></div><p>Pandocin AST:hen se parsiutuu:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;Yhtälö&#34;,Space,Math InlineMath &#34;f(x) = x^2&#34;,Space,Str &#34;on&#34;,Space,Str &#34;hieno&#34;,Space,Str &#34;yhtälö.&#34;]]
+</code></pre></div><p>Meillä on siis AST:ssä node</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Math MathType Text
+</code></pre></div><p>Jossa <code>MathType</code> on joko <code>InlineMath</code> tai <code>DisplayMath</code>. Markdownissa
+<code>DisplayMath</code> blokki tehdään <code>$$</code>-syntaksilla ja <code>InlineMath</code> sitten
+<code>$</code>-syntaksilla.</p>
+<p>Joissakin Markdown-implementaatioissa olen nähnyt että yhtälöt kirjoitetaan
+backtickeillä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown"><span style="color:#e6db74">```math
+</span><span style="color:#e6db74"></span>f(x) = x^2
+<span style="color:#e6db74">```</span>
+</code></pre></div><p>Pandocin AST:ssä tämä tallentuu <code>CodeBlock</code>-nodeen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[CodeBlock (&#34;&#34;,[&#34;math&#34;],[]) &#34;f(x) = x^2&#34;]
+</code></pre></div><p>Yhtälöön viittaus <code>\eqref</code>-komennolla, eli</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">Katso yhtälöä \eqref{eq:testi}.
+</code></pre></div><p>kääntyy LaTeX-formaattiin sellaisenaan, ja näyttäytyy Pandocin AST:ssä
+<code>RawInline</code>-lohkona.</p>
+<p>Teknisesti, jos tarkoitus on ainoastaan tehdä LaTeX-dokumenttia Markdownilla,
+niin olisi perusteltua käyttää LaTeX-ympäristöjä Markdownin seassa. Mutta
+silloin ongelmaksi kyllä muodostuu, ettei sillä tavalla tehtyä <code>RawBlock</code>:ia voi
+hyödyntää missään muussa formaatissa.</p>
+<p>Meillä täytyy olla järkeviä tapoja viitata kaavoihin. Eräs työkalu ei vain
+kaavoihin viittaukseen, vaan ristiviittauksiin yleisesti ottaen on
+[pandoc-crossref][pandoc-cross-ref].</p>
+<p>Matematiikan ladonta tulee todennäköisesti olemaan kaikista konstikkainta, sillä
+matemattisia rakenteita on hyvinkin monimutkaisia ja pitäisi olla mahdollista
+esimerkiksi viitata yhtälöryhmän yksittäiseen yhtälöön jotenkin luontevasti.
+HTML-sivuille voi matematiikkaa latoa ainakin MathJaXin ja KaTeXin avulla, mutta
+niiden ominaisuudet eivät ole lähimaillakaan mitä LaTeXissa on totuttu näkemään.</p>
+<p>Toisin sanoen, ei kannata edes odottaa, että matematiikka internetissä olevassa
+hypertekstidokumentissa, mikä Markdownistakin lopulta generoidaan, olisi niin
+laadukasta kuin mitä se LaTeX-dokumentissa on. Tavoiteltavaa kuitenkin on, että
+Markdownissa voisi kirjoittaa yhtälön sillä tavalla, että kaikki tarpeellinen
+metadata voidaan viedä LaTeX-dokumenttiin jossa sitä sitten hyödynnetään.</p>
+<h2 id="html">HTML</h2>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">Hei, maailma!
+
+&lt;div&gt;
+    &lt;p&gt;Tässä sitä nyt on, &lt;b&gt;HTML-koodia&lt;/b&gt;&lt;/p&gt;
+&lt;/div&gt;
+</code></pre></div><p>Tämä on natiiviformaatissa</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;Hei,&#34;,Space,Str &#34;maailma!&#34;]
+,Div (&#34;&#34;,[],[])
+ [CodeBlock (&#34;&#34;,[],[]) &#34;&lt;p&gt;T\228ss\228 sit\228 nyt on, &lt;b&gt;HTML-koodia&lt;/b&gt;&lt;/p&gt;&#34;]]
+</code></pre></div><p>Pandocissa itse asiassa on sekä <code>Div</code> että <code>Span</code> ympäristöt, sekä tietenkin
+<code>Para</code> ja <code>Strong</code>, joten tämä kyseinen kokeilu pitäisi olla täysin kuvattavissa
+AST:ssä.</p>
+<p>Kun käännetään natiiviformaatista takaisin HTML-koodiksi, lopputulos ei ole kovinkaan hyvä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">p</span>&gt;Hei, maailma!&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;<span style="color:#f92672">div</span>&gt;
+&lt;<span style="color:#f92672">pre</span>&gt;&lt;<span style="color:#f92672">code</span>&gt;&amp;lt;p&amp;gt;Tässä sitä nyt on, &amp;lt;b&amp;gt;HTML-koodia&amp;lt;/b&amp;gt;&amp;lt;/p&amp;gt;&lt;/<span style="color:#f92672">code</span>&gt;&lt;/<span style="color:#f92672">pre</span>&gt;
+&lt;/<span style="color:#f92672">div</span>&gt;
+</code></pre></div><p>Markdownista</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">Hei, maailma!
+
+::: {#paragraph1 .stuff text_quality=&#34;crap&#34;}
+Tassa sita nyt on, <span style="font-style:italic">*HTML-koodia*</span>.
+:::
+</code></pre></div><p>Tässä <code>Div</code>-ympäristö saadaan kolmella tai useammalla kaksoispisteellä. Tulos
+natiivissa formaatissa on:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[Para [Str &#34;Hei,&#34;,Space,Str &#34;maailma!&#34;]
+,Div (&#34;paragraph1&#34;,[&#34;stuff&#34;],[(&#34;text_quality&#34;,&#34;crap&#34;)])
+ [Para [Str &#34;Tassa&#34;,Space,Str &#34;sita&#34;,Space,Str &#34;nyt&#34;,Space,Str &#34;on,&#34;,Space,Emph [Str &#34;HTML-koodia&#34;],Str &#34;.&#34;]]]
+</code></pre></div><p>Tämä edelleen HTML-formaatissa on</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#f92672">p</span>&gt;Hei, maailma!&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;<span style="color:#f92672">div</span> <span style="color:#a6e22e">id</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;paragraph1&#34;</span> <span style="color:#a6e22e">class</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;stuff&#34;</span> <span style="color:#a6e22e">data-text_quality</span><span style="color:#f92672">=</span><span style="color:#e6db74">&#34;crap&#34;</span>&gt;
+&lt;<span style="color:#f92672">p</span>&gt;Tassa sita nyt on, &lt;<span style="color:#f92672">em</span>&gt;HTML-koodia&lt;/<span style="color:#f92672">em</span>&gt;.&lt;/<span style="color:#f92672">p</span>&gt;
+&lt;/<span style="color:#f92672">div</span>&gt;
+</code></pre></div><p>Tämä kääntyy natiiviksi täysin hyvin. On myöskin mahdollista saada tästä
+<code>RawBlock</code>- ja <code>RawInline</code>-esityksiä formaatilla html:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[RawBlock (Format &#34;html&#34;) &#34;&lt;p&gt;&#34;
+,Plain [Str &#34;Hei,&#34;,Space,Str &#34;maailma!&#34;]
+,RawBlock (Format &#34;html&#34;) &#34;&lt;/p&gt;&#34;
+,Div (&#34;paragraph1&#34;,[&#34;stuff&#34;],[(&#34;data-text_quality&#34;,&#34;crap&#34;)])
+ [RawBlock (Format &#34;html&#34;) &#34;&lt;p&gt;&#34;
+ ,Plain [Str &#34;Tassa&#34;,Space,Str &#34;sita&#34;,Space,Str &#34;nyt&#34;,Space,Str &#34;on,&#34;,Space,RawInline (Format &#34;html&#34;) &#34;&lt;em&gt;&#34;,Str &#34;HTML-koodia&#34;,RawInline (Format &#34;html&#34;) &#34;&lt;/em&gt;&#34;,Str &#34;.&#34;]
+ ,RawBlock (Format &#34;html&#34;) &#34;&lt;/p&gt;&#34;]]
+</code></pre></div><h2 id="yhteenveto">Yhteenveto</h2>
+<p>Tässä ei suinkaan ollut kaikki mahdolliset nodet mitä Pandocin AST tarjoaa.
+Siellä näyttäisi olevan muita tärkeitä nodeja kuten <code>Meta</code>, joka tallentaa
+Markdown-dokumentin alussa olevat muuttujat. Sitten on <code>Para</code>, <code>BlockQuote</code>,
+<code>OrderedList</code>, <code>BulletedList</code>, <code>Header</code>, <code>Table</code> ynnä muuta sellaisia
+lohkoelementtejä. Inline-elementtejä on sitten <code>Str</code>, <code>Emph</code>, <code>Strong</code>, <code>Cite</code>,
+<code>Link</code>, <code>Note</code>, <code>Span</code> ja niin edelleen.</p>
+<p>Dokumenttien onnistuneessa konversiossa kyse on lähinnä kolmesta asiasta.
+Ensinnäkin, onko Pandocin AST:ssä kaikki tarpeelliset rakenteet dokumenttien
+onnistuneeseen kuvaamiseen? Vastaisin että kyllä, sillä viimekädessä Pandociin
+voidaan implementoida puuttuvia rakenteita, tai käyttää formaattispesifejä
+<code>RawInline</code> ja <code>RawBlock</code> elementtejä.</p>
+<p>Seuraava kysymys on, että mikä tiedostoformaatti tukee näitä kaikkia rakenteita
+jotta Pandoc voisi sen perusteella parsia dokumentin täydellisesti omaan
+abstraktiin syntaksipuuhun? Todennäköisesti XML on tätä tavoitetta melko
+lähellä, mutta se ei ole formaattina sellaista, jota mielellään kirjoittaa.
+Markdown on nykyään hyvin yleinen formaatti sen yksinkertaisuuden vuoksi, mutta
+kuten tässäkin nähtiin, esimerkiksi matemaattisten kaavojen ladonta voi tuottaa
+päänvaivaa.</p>
+<p>Ja kolmas kysymys on, että mitenkä tämä AST sitten kirjoitetaan jollekin
+toiselle kielelle? Tämä ei varmastikaan ole todellinen ongelma, sillä AST:n
+kirjoittaminen mihin tahansa formaattiin on triviaali, joskin työläs,
+toimenpide. Kaikki formaatit tukevat jonkinlaista kommentointimahdollisuutta,
+jolla ylimääräistä metadataa, jota ei dokumentissa voida kuitenkaan hyödyntää,
+saadaan tallennettua myös toiseen formaattiin.</p>
+<p>Todella monimutkaisissa osuuksissa voimme varmaankin ainakin edetä niin, että
+osuus kirjoitetaan <code>RawBlock</code>-noden avulla useilla eri formaateilla, ja sitten
+käytetään sopivaa filtteriä joka poistaa osan nodeista riippuen mihin
+formaattiin AST:tä ollaan kirjoittamassa. Tällä tavalla voimme myös varioida
+dokumenttia, sillä PDF ei tarvitse kaikkea sitä tietoa, mitä yleisesti ottaen
+hypertekstidokumentissa esiintyy, ja toisaalta myös toisin päin on vastaava:
+hypertekstidokumenttiin ei tarvita kaikkia niitä osioita, jotka luontevasti
+esiintyvät PDF-dokumentissa.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

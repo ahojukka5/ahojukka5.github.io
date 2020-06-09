@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Wrapping C&#43;&#43; libraries to Julia: part 1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Wrapping C&#43;&#43; libraries to Julia: part 1
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                {% include_relative wrapping.html %}
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is a short note how to get started of wrapping C++ libraries to Julia. Two approaches exists: the use of <a href="https://github.com/JuliaInterop/Cxx.jl">Cxx.jl</a> or use of <a href="https://github.com/JuliaInterop/CxxWrap.jl">CxxWrap.jl</a>. This first blog post contains a minimum working example, how to create a shared library and wrap it to Julia.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">cd</span><span class="p">(</span><span class="n">tempdir</span><span class="p">())</span>
+<span class="n">pwd</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[1]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#34;/tmp&#34;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Normally it makes sense to define wrapper in a separate file, but like said, let's keep things as simple as possible first.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">hello_content</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">#include &lt;string&gt;</span>
+
+<span class="s">std::string greet()</span>
+<span class="s">{</span>
+<span class="s">   return &quot;hello, world&quot;;</span>
+<span class="s">}</span>
+
+<span class="s">// Wrapper start</span>
+
+<span class="s">#include &quot;jlcxx/jlcxx.hpp&quot;</span>
+
+<span class="s">JLCXX_MODULE define_julia_module(jlcxx::Module&amp; mod)</span>
+<span class="s">{</span>
+<span class="s">  mod.method(&quot;greet&quot;, &amp;greet);</span>
+<span class="s">}</span>
+<span class="s">&quot;&quot;&quot;</span>
+
+<span class="n">open</span><span class="p">(</span><span class="s">&quot;hello.cpp&quot;</span><span class="p">,</span> <span class="s">&quot;w&quot;</span><span class="p">)</span> <span class="k">do</span> <span class="n">fid</span> <span class="n">write</span><span class="p">(</span><span class="n">fid</span><span class="p">,</span> <span class="n">hello_content</span><span class="p">)</span> <span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[2]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>204</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Header files for Julia and CxxWrap is needed to compile code to object file.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">using</span> <span class="n">CxxWrap</span>
+<span class="n">cxxwrap_include_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">dirname</span><span class="p">(</span><span class="n">pathof</span><span class="p">(</span><span class="n">CxxWrap</span><span class="p">)),</span> <span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;deps&quot;</span><span class="p">,</span> <span class="s">&quot;usr&quot;</span><span class="p">,</span> <span class="s">&quot;include&quot;</span><span class="p">)</span>
+<span class="n">julia_include_path</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">Sys</span><span class="o">.</span><span class="n">BINDIR</span><span class="p">,</span> <span class="n">Base</span><span class="o">.</span><span class="n">INCLUDEDIR</span><span class="p">,</span> <span class="s">&quot;julia&quot;</span><span class="p">)</span>
+<span class="n">cxxwrap_include_path</span><span class="p">,</span> <span class="n">julia_include_path</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[3]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(&#34;/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/include&#34;, &#34;/opt/julia-1.2.0/include/julia&#34;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">run</span><span class="p">(</span><span class="sb">`g++ -c -I</span><span class="si">$cxxwrap_include_path</span><span class="sb"> -I</span><span class="si">$julia_include_path</span><span class="sb"> -fPIC hello.cpp`</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[4]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Process(`<span class="ansi-underline">g++</span> <span class="ansi-underline">-c</span> <span class="ansi-underline">-I/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/include</span> <span class="ansi-underline">-I/opt/julia-1.2.0/include/julia</span> <span class="ansi-underline">-fPIC</span> <span class="ansi-underline">hello.cpp</span>`, ProcessExited(0))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then we can build the shared library:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">cxxwrap_libfile</span> <span class="o">=</span> <span class="n">CxxWrap</span><span class="o">.</span><span class="n">libcxxwrap_julia</span>
+<span class="n">cxxwrap_libpath</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">cxxwrap_libfile</span><span class="p">)</span>
+<span class="n">julia_libpath</span> <span class="o">=</span> <span class="n">abspath</span><span class="p">(</span><span class="n">julia_include_path</span><span class="p">,</span> <span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;..&quot;</span><span class="p">,</span> <span class="s">&quot;lib&quot;</span><span class="p">)</span>
+<span class="n">cxxwrap_libfile</span><span class="p">,</span> <span class="n">cxxwrap_libpath</span><span class="p">,</span> <span class="n">julia_libpath</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[5]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(&#34;/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/lib/libcxxwrap_julia.so&#34;, &#34;/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/lib&#34;, &#34;/opt/julia-1.2.0/lib&#34;)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">run</span><span class="p">(</span><span class="sb">`g++ hello.o -shared -o libhello.so -L/opt/julia/lib -Wl,-rpath,</span><span class="si">$cxxwrap_libpath</span><span class="sb">: </span><span class="si">$cxxwrap_libfile</span><span class="sb"> -ljulia`</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Process(`<span class="ansi-underline">g++</span> <span class="ansi-underline">hello.o</span> <span class="ansi-underline">-shared</span> <span class="ansi-underline">-o</span> <span class="ansi-underline">libhello.so</span> <span class="ansi-underline">-L/opt/julia/lib</span> <span class="ansi-underline">-Wl,-rpath,/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/lib:</span> <span class="ansi-underline">/home/jukka/.julia/packages/CxxWrap/sarOk/deps/usr/lib/libcxxwrap_julia.so</span> <span class="ansi-underline">-ljulia</span>`, ProcessExited(0))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="p">;</span><span class="n">ls</span> <span class="o">-</span><span class="n">l</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">libhello</span><span class="o">.</span><span class="n">so</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>-rwxrwxr-x 1 jukka jukka 82160 syys  26 16:03 /tmp/libhello.so
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There it is! The last thing to do is to write a short Julia code which utilizes a shared library:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">module</span> <span class="n">CppHello</span>
+  <span class="k">using</span> <span class="n">CxxWrap</span>
+  <span class="nd">@wrapmodule</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">,</span><span class="s">&quot;libhello&quot;</span><span class="p">))</span>
+
+  <span class="k">function</span> <span class="n">__init__</span><span class="p">()</span>
+    <span class="nd">@initcxx</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[8]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Main.CppHello</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">CppHello</span><span class="o">.</span><span class="n">greet</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[9]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&#34;hello, world&#34;</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Of course, several things can be done more efficiently. For example, usually wrapper should be written to separate file and the whole process of compiling a shared library should be done using Makefile. We get into these improvements in further blog posts.</p>
+
+</div>
+</div>
+</div>
+ 
+
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

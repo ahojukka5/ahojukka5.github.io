@@ -1,0 +1,186 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/</link>
+    <description>Recent content in Tags on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>bash</title>
+      <link>https://ahojukka5.github.io/tags/bash/</link>
+      <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/bash/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>linux</title>
+      <link>https://ahojukka5.github.io/tags/linux/</link>
+      <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/linux/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>autossh</title>
+      <link>https://ahojukka5.github.io/tags/autossh/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/autossh/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>duplicity</title>
+      <link>https://ahojukka5.github.io/tags/duplicity/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/duplicity/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>ssh tunnel</title>
+      <link>https://ahojukka5.github.io/tags/ssh-tunnel/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/ssh-tunnel/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>systemd</title>
+      <link>https://ahojukka5.github.io/tags/systemd/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/systemd/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>verify</title>
+      <link>https://ahojukka5.github.io/tags/verify/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/verify/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>filters</title>
+      <link>https://ahojukka5.github.io/tags/filters/</link>
+      <pubDate>Sun, 31 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/filters/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>pandoc</title>
+      <link>https://ahojukka5.github.io/tags/pandoc/</link>
+      <pubDate>Sun, 31 May 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/pandoc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43;</title>
+      <link>https://ahojukka5.github.io/tags/c&#43;&#43;/</link>
+      <pubDate>Tue, 24 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>wrapping</title>
+      <link>https://ahojukka5.github.io/tags/wrapping/</link>
+      <pubDate>Tue, 24 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/wrapping/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>gmsh</title>
+      <link>https://ahojukka5.github.io/tags/gmsh/</link>
+      <pubDate>Tue, 17 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/gmsh/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>juliafem</title>
+      <link>https://ahojukka5.github.io/tags/juliafem/</link>
+      <pubDate>Tue, 17 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/juliafem/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>parametric simulations</title>
+      <link>https://ahojukka5.github.io/tags/parametric-simulations/</link>
+      <pubDate>Tue, 17 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/parametric-simulations/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>partial differential equations</title>
+      <link>https://ahojukka5.github.io/tags/partial-differential-equations/</link>
+      <pubDate>Tue, 17 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/partial-differential-equations/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>deep learning</title>
+      <link>https://ahojukka5.github.io/tags/deep-learning/</link>
+      <pubDate>Sun, 17 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/deep-learning/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>lstm networks</title>
+      <link>https://ahojukka5.github.io/tags/lstm-networks/</link>
+      <pubDate>Sun, 17 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/lstm-networks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vibration data</title>
+      <link>https://ahojukka5.github.io/tags/vibration-data/</link>
+      <pubDate>Sun, 17 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/vibration-data/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>jupyter notebook</title>
+      <link>https://ahojukka5.github.io/tags/jupyter-notebook/</link>
+      <pubDate>Sun, 20 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/jupyter-notebook/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

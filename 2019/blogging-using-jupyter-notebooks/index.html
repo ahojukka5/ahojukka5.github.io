@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Blogging using Jupyter notebooks</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Blogging using Jupyter notebooks
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Hello world!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="mi">1</span><span class="o">+</span><span class="mi">1</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[4]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>2</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+\begin{equation}
+F\left(t\right)=\int_{0}^{t}\frac{1}{2}x^{2}\,\mathrm{d}x
+\end{equation}
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">using</span> <span class="n">Plots</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">pi</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">sin</span><span class="o">.</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[9]:</div>
+
+
+
+<div class="output_svg output_subarea output_execute_result">
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="400" viewBox="0 0 2400 1600">
+<defs>
+  <clipPath id="clip0800">
+    <rect x="0" y="0" width="2000" height="2000"/>
+  </clipPath>
+</defs>
+<defs>
+  <clipPath id="clip0801">
+    <rect x="0" y="0" width="2400" height="1600"/>
+  </clipPath>
+</defs>
+<polygon clip-path="url(#clip0801)" points="
+0,1600 2400,1600 2400,0 0,0 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<defs>
+  <clipPath id="clip0802">
+    <rect x="480" y="0" width="1681" height="1600"/>
+  </clipPath>
+</defs>
+<polygon clip-path="url(#clip0801)" points="
+189.504,1503.47 2321.26,1503.47 2321.26,47.2441 189.504,47.2441 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<defs>
+  <clipPath id="clip0803">
+    <rect x="189" y="47" width="2133" height="1457"/>
+  </clipPath>
+</defs>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  249.837,1503.47 249.837,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  569.912,1503.47 569.912,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  889.987,1503.47 889.987,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  1210.06,1503.47 1210.06,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  1530.14,1503.47 1530.14,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  1850.21,1503.47 1850.21,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  2170.29,1503.47 2170.29,47.2441 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  189.504,1462.61 2321.26,1462.61 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  189.504,1118.99 2321.26,1118.99 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  189.504,775.359 2321.26,775.359 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  189.504,431.732 2321.26,431.732 
+  "/>
+<polyline clip-path="url(#clip0803)" style="stroke:#000000; stroke-width:2; stroke-opacity:0.1; fill:none" points="
+  189.504,88.1051 2321.26,88.1051 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,1503.47 2321.26,1503.47 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,1503.47 189.504,47.2441 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  249.837,1503.47 249.837,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  569.912,1503.47 569.912,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  889.987,1503.47 889.987,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1210.06,1503.47 1210.06,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1530.14,1503.47 1530.14,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1850.21,1503.47 1850.21,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  2170.29,1503.47 2170.29,1481.63 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,1462.61 221.48,1462.61 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,1118.99 221.48,1118.99 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,775.359 221.48,775.359 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,431.732 221.48,431.732 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  189.504,88.1051 221.48,88.1051 
+  "/>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 249.837, 1557.47)" x="249.837" y="1557.47">0</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 569.912, 1557.47)" x="569.912" y="1557.47">1</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 889.987, 1557.47)" x="889.987" y="1557.47">2</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1210.06, 1557.47)" x="1210.06" y="1557.47">3</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1530.14, 1557.47)" x="1530.14" y="1557.47">4</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 1850.21, 1557.47)" x="1850.21" y="1557.47">5</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:middle;" transform="rotate(0, 2170.29, 1557.47)" x="2170.29" y="1557.47">6</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 165.504, 1480.11)" x="165.504" y="1480.11">-1.0</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 165.504, 1136.49)" x="165.504" y="1136.49">-0.5</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 165.504, 792.859)" x="165.504" y="792.859">0.0</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 165.504, 449.232)" x="165.504" y="449.232">0.5</text>
+</g>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:end;" transform="rotate(0, 165.504, 105.605)" x="165.504" y="105.605">1.0</text>
+</g>
+<polyline clip-path="url(#clip0803)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+  249.837,775.359 290.879,687.475 331.922,601.034 372.965,517.456 414.007,438.112 455.05,364.305 496.093,297.249 537.135,238.042 578.178,187.659 619.221,146.925 
+  660.263,116.511 701.306,96.9144 742.349,88.4582 783.391,91.2808 824.434,105.336 865.477,130.393 906.519,166.04 947.562,211.692 988.605,266.6 1029.65,329.862 
+  1070.69,400.438 1111.73,477.171 1152.78,558.8 1193.82,643.985 1234.86,731.327 1275.9,819.392 1316.95,906.734 1357.99,991.919 1399.03,1073.55 1440.07,1150.28 
+  1481.12,1220.86 1522.16,1284.12 1563.2,1339.03 1604.24,1384.68 1645.29,1420.33 1686.33,1445.38 1727.37,1459.44 1768.42,1462.26 1809.46,1453.8 1850.5,1434.21 
+  1891.54,1403.79 1932.59,1363.06 1973.63,1312.68 2014.67,1253.47 2055.71,1186.41 2096.76,1112.61 2137.8,1033.26 2178.84,949.685 2219.88,863.244 2260.93,775.359 
+  
+  "/>
+<polygon clip-path="url(#clip0801)" points="
+1958.43,251.724 2249.26,251.724 2249.26,130.764 1958.43,130.764 
+  " fill="#ffffff" fill-rule="evenodd" fill-opacity="1"/>
+<polyline clip-path="url(#clip0801)" style="stroke:#000000; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1958.43,251.724 2249.26,251.724 2249.26,130.764 1958.43,130.764 1958.43,251.724 
+  "/>
+<polyline clip-path="url(#clip0801)" style="stroke:#009af9; stroke-width:4; stroke-opacity:1; fill:none" points="
+  1982.43,191.244 2126.43,191.244 
+  "/>
+<g clip-path="url(#clip0801)">
+<text style="fill:#000000; fill-opacity:1; font-family:Arial,Helvetica Neue,Helvetica,sans-serif; font-size:48px; text-anchor:start;" transform="rotate(0, 2150.43, 208.744)" x="2150.43" y="208.744">y1</text>
+</g>
+</svg>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+ 
+
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

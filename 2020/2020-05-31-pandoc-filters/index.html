@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Pandocin suodattimien käyttö</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Pandocin suodattimien käyttö
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Aiemmassa postauksessa tarkastelin Pandocin AST:tä. Siihen voi esimerkiksi
+tallentaa <code>CodeBlock</code>-noden, johon sisältyy ohjelmakoodia. Esittelen tässä
+lyhyesti, kuinka voidaan vaikuttaa yksityiskohtaisesti siihen, miltä AST:stä
+renderöity lopputulos näyttää LaTeXilla. Käytännön tasolla, <code>CodeBlock</code> pitää
+muuttaa <code>RawBlock</code>-nodeksi käyttämällä Pandocin suodattimia.</p>
+<p>Käytetään tässä esimerkkinä seuraavaa SQL-kyselyä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-markdown" data-lang="markdown">```{#sql1 .sql caption=&#34;Hankala SQL-kysely: 1+1.&#34;}
+SELECT 1+1&#34;;
+```
+</code></pre></div><p>Tämä näkyy Pandocin AST:ssä tallennettuna:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[CodeBlock (&#34;sql1&#34;,[&#34;sql&#34;],[(&#34;caption&#34;,&#34;Hankala SQL-kysely: 1+1.&#34;)]) &#34;SELECT 1+1;&#34;]
+</code></pre></div><p>Teknisesti siinä on kaikki tarpeellinen. <code>sql1</code> on lohkon id-numero ja <code>[&quot;sql&quot;]</code>
+viittaa periaatteessa lohkon luokkiin, käytännössä sillä tunnistetaan mikä
+ohjelmointikieli on kyseessä. Id-numeron ja luokkien jälkeen annetaan key-value
+arvoja, jotka voivat olla mitä tahansa. Esimerkiksi <code>caption</code>-avain on minun
+itseni keksimä eikä se tee yhtään mitään, vielä, mutta se voisi esimerkiksi
+kirjoittaa listauksen otsikon kun node renderöidään LaTeX-formaattiin. Lopuksi
+tulee varsinainen lohkon sisältö.</p>
+<p>Nyt tarkoituksena olisi saada tämä AST:ssä näkyvä node kirjoitettua esimerkiksi
+LaTeX-formaattiin. Pandocissa on valmiiksi LaTeX-kirjoittaja, ja tämä node sillä
+renderöitynä näyttää seuraavalta.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\hypertarget</span>{sql1}{
+<span style="color:#66d9ef">\label</span>{sql1}}
+<span style="color:#66d9ef">\begin</span>{Shaded}
+<span style="color:#66d9ef">\begin</span>{Highlighting}[]
+<span style="color:#66d9ef">\KeywordTok</span>{SELECT} <span style="color:#66d9ef">\DecValTok</span>{1}<span style="color:#66d9ef">\NormalTok</span>{+}<span style="color:#66d9ef">\DecValTok</span>{1}<span style="color:#66d9ef">\NormalTok</span>{;}
+<span style="color:#66d9ef">\end</span>{Highlighting}
+<span style="color:#66d9ef">\end</span>{Shaded}
+</code></pre></div><p>Komennot, joilla konversiot siis tehtiin, ovat</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t native codeblock.md &gt; codeblock.native
+pandoc -f native -t latex codeblock.native &gt; codeblock.tex
+</code></pre></div><p>Haluaisin käyttää LaTeXissa tuon lohkon renderöimiseen jotakin muuta ympäristöä
+kuin tarjottua <code>Shaded</code> ja <code>Highlighting</code>. Esimerkiksi <code>minted</code>. Tätä tavoitetta
+voisi lähestyä varmaan useammallakin eri tavalla. Ensimmäisenä tulee mieleen
+että jossakin syvällä <a href="https://github.com/jgm/pandoc">lähdekoodin</a> syövereissä täytyy olla
+<a href="https://en.wikipedia.org/wiki/Haskell_(programming_language)">Haskellilla</a> naputeltuna Pandocin <a href="https://github.com/jgm/pandoc/blob/be9e93d4aeb37db8e07d2735527f9afc324ac70d/src/Text/Pandoc/Writers/LaTeX.hs">LaTeX-writer</a>,
+jota voisi muokata. Tällaisia kirjoittajia voi varmasti myös tehdä itse uusia.
+Tämä tuskin kuitenkaan on oikea tapa edetä, sillä pääpiirteittäin LaTeX
+kirjoitetaan aivan oikein. Tässä halutaan nyt uudelleenkirjoittaa vain
+yksittäinen node.</p>
+<p>AST:n nodesta pitäisi päästä vaikkapa seuraavaan:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{listing}
+<span style="color:#66d9ef">\caption</span>{Hankala SQL-kysely: 1+1.}
+<span style="color:#66d9ef">\begin</span>{tcolorbox}
+<span style="color:#66d9ef">\begin</span>{minted}{sql}
+SELECT 1+1;
+<span style="color:#66d9ef">\end</span>{minted}
+<span style="color:#66d9ef">\end</span>{tcolorbox}
+<span style="color:#66d9ef">\label</span>{listing:sql1}
+<span style="color:#66d9ef">\end</span>{listing}
+</code></pre></div><p>Kuten edellisessä kirjoituksessa esiselvityksessä kävi ilmi, ei Pandocin AST:ssä
+ole kaikille mahdollisille rakenteille omia tyyppejä, joten nähdäkseni ainoa
+järkevä vaihtoehto on vaihtaa <code>CodeBlock</code>-tyyppi <code>RawBlock</code>-tyyppiin,
+parametrilla <code>latex</code>, sekä tallentaa LaTeX-koodi suoraan siihen. Eli, uusi solmu
+AST-puussa olisi seuraavanlainen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">[RawBlock (Format &#34;latex&#34;) &#34;
+\\begin{listing}
+\\caption{Hankala SQL-kysely: 1+1.}
+\\begin{tcolorbox}
+\\begin{minted}{sql}
+SELECT 1+1;
+\\end{minted}
+\\end{tcolorbox}
+\\label{listing:sql1}
+\\end{listing}&#34;]
+</code></pre></div><p>Pandoc tukee suodattimia, joiden tarkoituksena on muokata AST:tä ennen sen
+kirjoittamista. Suodattimia voi kirjoittaa millä tahansa ohjelmointikielellä, ja
+ne ottavat sisälle AST:n JSON-version ja antavat ulos uuden version AST:stä,
+jossa filtteriä on käytetty.</p>
+<p>Tässä tapauksessa AST on JSON-formaatissa:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;blocks&#34;</span>: [
+    {
+      <span style="color:#f92672">&#34;t&#34;</span>: <span style="color:#e6db74">&#34;CodeBlock&#34;</span>,
+      <span style="color:#f92672">&#34;c&#34;</span>: [
+        [<span style="color:#e6db74">&#34;sql1&#34;</span>, [<span style="color:#e6db74">&#34;sql&#34;</span>], [[<span style="color:#e6db74">&#34;caption&#34;</span>, <span style="color:#e6db74">&#34;Hankala SQL-kysely: 1+1.&#34;</span>]]],
+        <span style="color:#e6db74">&#34;SELECT 1+1;&#34;</span>
+      ]
+    }
+  ],
+  <span style="color:#f92672">&#34;pandoc-api-version&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">1</span>],
+  <span style="color:#f92672">&#34;meta&#34;</span>: {}
+}
+</code></pre></div><p>Tehtäväksi jää tehdä esimerkiksi Python-skripti, joka lukee JSON-tiedoston ja
+muokkaa sitä. Yksinkertainen implementaatio tähän olisi esimerkiksi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> json
+<span style="color:#f92672">import</span> sys
+
+__template__ <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;&#34;
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">begin{listing}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">caption{</span><span style="color:#e6db74">% r</span><span style="color:#e6db74">aw %}{</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">}{</span><span style="color:#e6db74">% e</span><span style="color:#e6db74">ndraw %}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">begin{tcolorbox}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">begin{minted}{</span><span style="color:#e6db74">% r</span><span style="color:#e6db74">aw %}{</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">}{</span><span style="color:#e6db74">% e</span><span style="color:#e6db74">ndraw %}
+</span><span style="color:#e6db74"></span><span style="color:#e6db74">%s</span><span style="color:#e6db74">
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">end{minted}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">end{tcolorbox}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">label{listing:</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">}
+</span><span style="color:#e6db74"></span><span style="color:#ae81ff">\\</span><span style="color:#e6db74">end{listing}
+</span><span style="color:#e6db74">&#34;&#34;&#34;</span>
+
+ast <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>loads(sys<span style="color:#f92672">.</span>stdin<span style="color:#f92672">.</span>read())
+<span style="color:#66d9ef">for</span> block <span style="color:#f92672">in</span> ast[<span style="color:#e6db74">&#34;blocks&#34;</span>]:
+    <span style="color:#66d9ef">if</span> block[<span style="color:#e6db74">&#34;t&#34;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;CodeBlock&#34;</span>:
+        ((identifier, classes, kvpairs), code) <span style="color:#f92672">=</span> block[<span style="color:#e6db74">&#34;c&#34;</span>]
+        block[<span style="color:#e6db74">&#34;t&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;RawBlock&#34;</span>
+        args <span style="color:#f92672">=</span> dict(kvpairs)
+        params <span style="color:#f92672">=</span> (args[<span style="color:#e6db74">&#34;caption&#34;</span>], classes[<span style="color:#ae81ff">0</span>], code, identifier)
+        block[<span style="color:#e6db74">&#34;c&#34;</span>] <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;latex&#34;</span>, __template__<span style="color:#f92672">.</span>strip() <span style="color:#f92672">%</span> params]
+
+<span style="color:#66d9ef">print</span>(json<span style="color:#f92672">.</span>dumps(ast))
+</code></pre></div><p>Nyt saamme AST:n oikeaan muotoon</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cat codeblock.json | ./pandoc-codeblock-minted.py | python -m json.tool
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
+  <span style="color:#f92672">&#34;blocks&#34;</span>: [
+    {
+      <span style="color:#f92672">&#34;t&#34;</span>: <span style="color:#e6db74">&#34;RawBlock&#34;</span>,
+      <span style="color:#f92672">&#34;c&#34;</span>: [
+        <span style="color:#e6db74">&#34;latex&#34;</span>,
+        <span style="color:#e6db74">&#34;\\begin{listing}\n\\caption{Hankala SQL-kysely: 1+1.}\n\\begin{tcolorbox}\n\\begin{minted}{sql}\nSELECT 1+1;\n\\end{minted}\n\\end{tcolorbox}\n\\label{listing:sql1}\n\\end{listing}&#34;</span>
+      ]
+    }
+  ],
+  <span style="color:#f92672">&#34;pandoc-api-version&#34;</span>: [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">17</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">1</span>],
+  <span style="color:#f92672">&#34;meta&#34;</span>: {}
+}
+</code></pre></div><p>Ja nyt kun käytetään tätä skriptiä Pandocin suodattimena, saadaan odotettu
+lopputulos:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">pandoc -f markdown -t latex --filter<span style="color:#f92672">=</span>./pandoc-codeblock-minted.py codeblock.md
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-latex" data-lang="latex"><span style="color:#66d9ef">\begin</span>{listing}
+<span style="color:#66d9ef">\caption</span>{Hankala SQL-kysely: 1+1.}
+<span style="color:#66d9ef">\begin</span>{tcolorbox}
+<span style="color:#66d9ef">\begin</span>{minted}{sql}
+SELECT 1+1;
+<span style="color:#66d9ef">\end</span>{minted}
+<span style="color:#66d9ef">\end</span>{tcolorbox}
+<span style="color:#66d9ef">\label</span>{listing:sql1}
+<span style="color:#66d9ef">\end</span>{listing}
+</code></pre></div><p>Suodatin toimii, mutta se on hieman purkkavirityksen oloinen. Vähintäänkin
+pitäisi tarkastella, onko kaikki parametrit annettu ja sen perusteella muokata
+formaattia. Esimerkiksi, jos käyttäjä ei ole antanut otsikkoa, ohjelmointikielen
+nimeä tai tunnistetta, pitäisi vasteesta poistaa asianmukaiset rivit. Lisäksi
+pitäisi jotenkin kontrolloida, että suodatinta käytetään ainostaan mikäli AST:tä
+ollaan kirjoittamassa LaTeX-formaattiin.</p>
+<p>Löytyy myös valmiita projekteja kuten <a href="https://pypi.org/project/pandocfilters/">pandoc-filters</a> ja
+<a href="https://pypi.org/project/panflute/">panflute</a> joita ilman muuta kannattaa hyödyntää, jos suodattimia
+kirjoittaa JSON-formaatissa esimerkiksi Pythonilla. Valmiitakin suodattimia
+löytyy, ja esimerkiksi minted-ympäristön kirjoittamiseen on valmis suodatin.</p>
+<p>Kun AST:tä parsitaan JSONista, ei ohjelmointikielellä periaatteessa ole
+merkitystä. Voi käyttää sitä ohjelmointikieltä minkä parissa parhaiten viihtyy.
+Jotkin ohjelmointikielet voivat olla toista parempia JSON-datan käsittelyssä.
+Python on tässä varmastikin edukseen.</p>
+<p>Eräs mielenkiintoinen ajatus olisi ajaa dokumentissa olevia koodiblokkeja sitä
+mukaan kun niitä tulee AST:ssä vastaan. Tämä edellyttäisi sopivan eristetyn
+leikkikentän rakentamista, joten suodatin on silloin järkevintä toteuttaa sillä
+ohjelmointikielellä mitä aikoo suorittaa.</p>
+<p>Pandociin on rakennettu myös Lua-suodattimet. Lua on käännetty ohjelmaan
+sisälle, mistä on tiettyjä tehokkuusetuja, sillä Lua-suodattimilla ei
+JSON-tiedostoa tarvitse parsia. Jos Lua-ohjelmointikieltä sattuu osaamaan tai
+sitä haluaa oppia, niin Lua olisi se parempi tapa rakennella suodatin.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

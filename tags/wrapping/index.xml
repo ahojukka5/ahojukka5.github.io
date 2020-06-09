@@ -1,0 +1,30 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>wrapping on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/wrapping/</link>
+    <description>Recent content in wrapping on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Tue, 24 Sep 2019 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/wrapping/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Wrapping C&#43;&#43; libraries to Julia: part 1</title>
+      <link>https://ahojukka5.github.io/2019/wrapping-cpp-libraries-to-julia-part-1/</link>
+      <pubDate>Tue, 24 Sep 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/wrapping-cpp-libraries-to-julia-part-1/</guid>
+      <description>
+Ability to wrap old program codes to use them in new programming environments is
+an essential task for efficient code reuse. In this blog post, I will present a
+minimum working example on how to compile and wrap a shared C ++ library with
+CxxWrap.jl.
+
+</description>
+    </item>
+    
+  </channel>
+</rss>

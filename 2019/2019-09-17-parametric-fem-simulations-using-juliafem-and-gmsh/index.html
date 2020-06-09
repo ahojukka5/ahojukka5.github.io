@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Parametric FEM simulations using JuliaFEM and Gmsh</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Parametric FEM simulations using JuliaFEM and Gmsh
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                
+The JuliaFEM project develops open-source software for reliable, scalable,
+distributed Finite Element Method. Gmsh is an open-source 3D finite element mesh
+generator with a built-in CAD engine and post-processor. In this blog post, I
+will demonstrate how to create a simple geometry, mesh it using Gmsh Julia API
+and transfer the mesh after that to a format JuliaFEM understands. Because the
+mesh is created programmatically, it is possible to parametrize to make an
+automatic workflow. Further possibilities are then to attach this automated
+workflow to, for example, optimization loop.
+
+{% include_relative notebook.html %}
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="{{site.baseurl}}/assets/images/parametric-fem-simulations-using-juliafem-and-gmsh/model.png"></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Use Gmsh to create model.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">import</span> <span class="n">Gmsh</span><span class="o">:</span> <span class="n">gmsh</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">setNumber</span><span class="p">(</span><span class="s">&quot;General.Terminal&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;plate_with_hole&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">lc</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPoint</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">lc</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addLine</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addLine</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addLine</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addLine</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addCircleArc</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addCurveLoop</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">addPlaneSurface</span><span class="p">([</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">extrude</span><span class="p">([(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[2]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>7-element Array{Tuple{Int32,Int32},1}:
+ (2, 32)
+ (3, 1) 
+ (2, 15)
+ (2, 19)
+ (2, 23)
+ (2, 27)
+ (2, 31)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">19</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">31</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">15</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">27</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">32</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">addPhysicalGroup</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[3]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;LEFT&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;RIGHT&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&quot;TOP&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="s">&quot;DOWN&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&quot;FRONT&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="s">&quot;BACK&quot;</span><span class="p">)</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">setPhysicalName</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;PLATE&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+<span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Info    : Meshing 1D...
+Info    : Meshing curve 1 (Line)
+Info    : Meshing curve 2 (Line)
+Info    : Meshing curve 3 (Line)
+Info    : Meshing curve 4 (Line)
+Info    : Meshing curve 5 (Circle)
+Info    : Meshing curve 7 (Line)
+Info    : Meshing curve 8 (Line)
+Info    : Meshing curve 9 (Circle)
+Info    : Meshing curve 10 (Line)
+Info    : Meshing curve 11 (Line)
+Info    : Meshing curve 13 (Line)
+Info    : Meshing curve 14 (Line)
+Info    : Meshing curve 18 (Line)
+Info    : Meshing curve 22 (Line)
+Info    : Meshing curve 26 (Line)
+Info    : Done meshing 1D (0.00172 s)
+Info    : Meshing 2D...
+Info    : Meshing surface 1 (Plane, Delaunay)
+Info    : Meshing surface 15 (Surface, MeshAdapt)
+Info    : Meshing surface 19 (Surface, MeshAdapt)
+Info    : Meshing surface 23 (Surface, MeshAdapt)
+Info    : Meshing surface 27 (Surface, MeshAdapt)
+Info    : Meshing surface 31 (Surface, MeshAdapt)
+Info    : Meshing surface 32 (Plane, Delaunay)
+Info    : Done meshing 2D (0.016156 s)
+Info    : Meshing 3D...
+Info    : 3D Meshing 1 volumes with 1 connected components
+Info    : Tetrahedrization of 320 points in 0.005657 seconds
+Info    : Reconstructing mesh...
+Info    :  - Creating surface mesh
+Info    :  - Identifying boundary edges
+Info    :  - Recovering boundary
+Info    :  - Added 4 Steiner points
+Info    : Done reconstructing mesh (0.019033 s)
+Info    : Found region 1
+Info    : 0 points created - worst tet radius 0.984173 (points removed 0 0)
+Info    : 3D point insertion terminated (316 points created):
+Info    :  - 0 Delaunay cavities modified for star shapeness
+Info    :  - 0 points could not be inserted
+Info    :  - 830 tetrahedra created in 3.7e-05 sec. (22432432 tets/s)
+Info    : Done meshing 3D (0.034424 s)
+Info    : Optimizing 3D mesh...
+Info    : Optimizing volume 1
+Info    : Optimization starts (volume = 7.27039) with worst = 0.300757 / average = 0.715182:
+Info    : 0.00 &lt; quality &lt; 0.10 :         0 elements
+Info    : 0.10 &lt; quality &lt; 0.20 :         0 elements
+Info    : 0.20 &lt; quality &lt; 0.30 :         0 elements
+Info    : 0.30 &lt; quality &lt; 0.40 :        10 elements
+Info    : 0.40 &lt; quality &lt; 0.50 :        18 elements
+Info    : 0.50 &lt; quality &lt; 0.60 :        11 elements
+Info    : 0.60 &lt; quality &lt; 0.70 :       165 elements
+Info    : 0.70 &lt; quality &lt; 0.80 :       608 elements
+Info    : 0.80 &lt; quality &lt; 0.90 :        18 elements
+Info    : 0.90 &lt; quality &lt; 1.00 :         0 elements
+Info    : No ill-shaped tets in the mesh :-)
+Info    : 0.00 &lt; quality &lt; 0.10 :         0 elements
+Info    : 0.10 &lt; quality &lt; 0.20 :         0 elements
+Info    : 0.20 &lt; quality &lt; 0.30 :         0 elements
+Info    : 0.30 &lt; quality &lt; 0.40 :        10 elements
+Info    : 0.40 &lt; quality &lt; 0.50 :        18 elements
+Info    : 0.50 &lt; quality &lt; 0.60 :        11 elements
+Info    : 0.60 &lt; quality &lt; 0.70 :       165 elements
+Info    : 0.70 &lt; quality &lt; 0.80 :       608 elements
+Info    : 0.80 &lt; quality &lt; 0.90 :        18 elements
+Info    : 0.90 &lt; quality &lt; 1.00 :         0 elements
+Info    : Done optimizing 3D mesh (0.00118 s)
+Info    : 318 vertices 1547 elements
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Nodes can be extracted using <code>getNodes()</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">node_ids</span><span class="p">,</span> <span class="n">node_coords</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">getNodes</span><span class="p">()</span>
+<span class="n">length</span><span class="p">(</span><span class="n">node_ids</span><span class="p">),</span> <span class="n">length</span><span class="p">(</span><span class="n">node_coords</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[6]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(318, 954)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">node_ids</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">node_coords</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">9</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[7]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(UInt64[0x000000000000013d, 0x0000000000000001, 0x0000000000000002], [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 5.0, 0.0, 0.0])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>While it's not strictly necessary, let's create dictionary of nodes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">nodes</span> <span class="o">=</span> <span class="kt">Dict</span><span class="p">(</span><span class="n">node_ids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="n">node_coords</span><span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">node_ids</span><span class="p">))</span>
+<span class="n">nodes</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[8]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Dict{UInt64,Array{Float64,1}} with 318 entries:
+  0x0000000000000120 =&gt; [4.14173, 2.16239, 0.3]
+  0x0000000000000132 =&gt; [1.63987, 3.86227, 0.3]
+  0x000000000000000b =&gt; [1.5, 0.0, 0.0]
+  0x0000000000000086 =&gt; [2.14902, 4.58079, 0.0]
+  0x000000000000009e =&gt; [4.68156, 1.73755, 0.0]
+  0x00000000000000a0 =&gt; [3.46932, 2.44776, 0.0]
+  0x00000000000000d7 =&gt; [1.60496, 2.7289, 0.3]
+  0x000000000000001d =&gt; [3.5, 5.0, 0.0]
+  0x0000000000000083 =&gt; [0.491192, 4.50977, 0.0]
+  0x00000000000000f9 =&gt; [4.58979, 2.13984, 0.3]
+  0x00000000000000cf =&gt; [4.13702, 4.13374, 0.3]
+  0x000000000000012c =&gt; [3.912, 1.72834, 0.3]
+  0x00000000000000ad =&gt; [3.09815, 1.27928, 0.0]
+  0x0000000000000121 =&gt; [3.09815, 1.27928, 0.3]
+  0x000000000000004a =&gt; [5.0, 1.5, 0.3]
+  0x00000000000000c9 =&gt; [1.2428, 1.83259, 0.3]
+  0x00000000000000b0 =&gt; [0.68916, 1.03144, 0.0]
+  0x0000000000000039 =&gt; [0.0, 3.5, 0.3]
+  0x000000000000001f =&gt; [2.5, 5.0, 0.0]
+  0x000000000000011d =&gt; [2.88243, 4.03622, 0.3]
+  0x000000000000013e =&gt; [0.0, 0.0, 0.3]
+  0x0000000000000046 =&gt; [4.0, 0.0, 0.3]
+  0x0000000000000021 =&gt; [1.5, 5.0, 0.0]
+  0x00000000000000fc =&gt; [1.9895, 3.70152, 0.3]
+  0x0000000000000072 =&gt; [1.43943, 0.480031, 0.0]
+  ⋮                  =&gt; ⋮</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next elements. For that, we extract physical groups and entities attached to them.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">physical_groups</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getPhysicalGroups</span><span class="p">()</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span> <span class="kp">in</span> <span class="n">physical_groups</span>
+    <span class="n">entities</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getEntitiesForPhysicalGroup</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+    <span class="n">physical_name</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">getPhysicalName</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+    <span class="n">println</span><span class="p">(</span><span class="s">&quot;(</span><span class="si">$dim</span><span class="s">, </span><span class="si">$tag</span><span class="s">) =&gt; </span><span class="si">$physical_name</span><span class="s">, entities: &quot;</span><span class="p">,</span> <span class="n">join</span><span class="p">(</span><span class="n">entities</span><span class="p">,</span> <span class="s">&quot;, &quot;</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>(2, 1) =&gt; LEFT, entities: 19
+(2, 2) =&gt; RIGHT, entities: 31
+(2, 3) =&gt; TOP, entities: 15
+(2, 4) =&gt; DOWN, entities: 27
+(2, 5) =&gt; FRONT, entities: 32
+(2, 6) =&gt; BACK, entities: 1
+(3, 1) =&gt; PLATE, entities: 1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>For example, elements in set LEFT can be accessed using <code>getElements</code>, where the first argument is dimension (2 = 2d), and the second argument is the tag of entity.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">element_types</span><span class="p">,</span> <span class="n">element_ids</span><span class="p">,</span> <span class="n">element_connectivity</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">getElements</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">19</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[10]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(Int32[2], Array{UInt64,1}[[0x0000000000000123, 0x0000000000000124, 0x0000000000000125, 0x0000000000000126, 0x0000000000000127, 0x0000000000000128, 0x0000000000000129, 0x000000000000012a, 0x000000000000012b, 0x000000000000012c, 0x000000000000012d, 0x000000000000012e, 0x000000000000012f, 0x0000000000000130, 0x0000000000000131, 0x0000000000000132]], Array{UInt64,1}[[0x0000000000000007, 0x0000000000000004, 0x0000000000000037, 0x0000000000000004, 0x0000000000000024, 0x0000000000000037, 0x000000000000002a, 0x0000000000000005, 0x0000000000000008, 0x000000000000002a  …  0x000000000000003b, 0x0000000000000028, 0x000000000000003c, 0x000000000000003b, 0x0000000000000029, 0x000000000000002a, 0x000000000000003c, 0x000000000000003c, 0x000000000000002a, 0x000000000000003d]])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">element_types</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[11]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>1-element Array{Int32,1}:
+ 2</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">for</span> <span class="n">i</span> <span class="kp">in</span> <span class="n">element_types</span>
+    <span class="n">println</span><span class="p">(</span><span class="s">&quot;</span><span class="si">$i</span><span class="s"> = &quot;</span><span class="p">,</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">getElementProperties</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>2 = (&#34;Triangle 3&#34;, 2, 1, 3, [0.0, 0.0, 1.0, 0.0, 0.0, 1.0])
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Like with nodes, let's create auxiliary dictionaries to make further processing of mesh easier.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">left_elements</span> <span class="o">=</span> <span class="kt">Dict</span><span class="p">(</span><span class="n">element_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="n">element_connectivity</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="mi">3</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">element_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[13]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Dict{UInt64,Array{UInt64,1}} with 16 entries:
+  0x0000000000000123 =&gt; UInt64[0x0000000000000007, 0x0000000000000004, 0x000000…
+  0x0000000000000129 =&gt; UInt64[0x0000000000000037, 0x0000000000000025, 0x000000…
+  0x0000000000000130 =&gt; UInt64[0x0000000000000028, 0x000000000000003c, 0x000000…
+  0x0000000000000132 =&gt; UInt64[0x000000000000003c, 0x000000000000002a, 0x000000…
+  0x000000000000012f =&gt; UInt64[0x000000000000003a, 0x0000000000000028, 0x000000…
+  0x0000000000000126 =&gt; UInt64[0x000000000000002a, 0x0000000000000008, 0x000000…
+  0x000000000000012a =&gt; UInt64[0x0000000000000025, 0x0000000000000039, 0x000000…
+  0x000000000000012b =&gt; UInt64[0x0000000000000026, 0x0000000000000027, 0x000000…
+  0x000000000000012c =&gt; UInt64[0x0000000000000026, 0x000000000000003a, 0x000000…
+  0x0000000000000128 =&gt; UInt64[0x0000000000000025, 0x0000000000000026, 0x000000…
+  0x0000000000000124 =&gt; UInt64[0x0000000000000004, 0x0000000000000024, 0x000000…
+  0x000000000000012e =&gt; UInt64[0x0000000000000028, 0x0000000000000029, 0x000000…
+  0x0000000000000131 =&gt; UInt64[0x0000000000000029, 0x000000000000002a, 0x000000…
+  0x0000000000000127 =&gt; UInt64[0x0000000000000024, 0x0000000000000025, 0x000000…
+  0x0000000000000125 =&gt; UInt64[0x000000000000002a, 0x0000000000000005, 0x000000…
+  0x000000000000012d =&gt; UInt64[0x000000000000003a, 0x0000000000000027, 0x000000…</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We do the same thing for all physical groups. A small function is written to make task easier.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">function</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+    <span class="n">element_types</span><span class="p">,</span> <span class="n">element_ids</span><span class="p">,</span> <span class="n">element_connectivity</span> <span class="o">=</span> <span class="n">gmsh</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mesh</span><span class="o">.</span><span class="n">getElements</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
+    <span class="n">length</span><span class="p">(</span><span class="n">element_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">||</span> <span class="n">error</span><span class="p">(</span><span class="s">&quot;Only one element type / entity supported.&quot;</span><span class="p">)</span>
+    <span class="n">nelements</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">element_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">nnodes</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">element_connectivity</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">÷</span> <span class="n">nelements</span>
+    <span class="n">elements</span> <span class="o">=</span> <span class="kt">Dict</span><span class="p">(</span><span class="n">element_ids</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="n">element_connectivity</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">nnodes</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">nnodes</span><span class="o">*</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span><span class="o">=</span><span class="mi">1</span><span class="o">:</span><span class="n">nelements</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">right_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+<span class="n">top_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">down_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">27</span><span class="p">)</span>
+<span class="n">front_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">back_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plate_elements</span> <span class="o">=</span> <span class="n">elements_to_dict</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of nodes in model (total) = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">nodes</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group LEFT  = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">left_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group RIGHT = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">right_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group TOP   = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">top_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group DOWN  = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">down_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group FRONT = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">front_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group BACK  = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">back_elements</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Number of elements in physical group PLATE = &quot;</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">plate_elements</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Number of nodes in model (total) = 318
+Number of elements in physical group LEFT  = 16
+Number of elements in physical group RIGHT = 20
+Number of elements in physical group TOP   = 20
+Number of elements in physical group DOWN  = 16
+Number of elements in physical group FRONT = 270
+Number of elements in physical group BACK  = 270
+Number of elements in physical group PLATE = 830
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now the mesh data is in dictionaries. What is left, is to create <code>Mesh</code> object and then build the model and run analysis.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">using</span> <span class="n">JuliaFEM</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">mesh</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[17]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Mesh(Dict{Int64,Array{Float64,1}}(), Dict{Symbol,Set{Int64}}(), Dict{Int64,Array{Int64,1}}(), Dict{Int64,Symbol}(), Dict{Int64,Symbol}(), Dict{Symbol,Set{Int64}}(), Dict{Symbol,Array{Tuple{Int64,Symbol},1}}(), Dict{Symbol,Symbol}(), nothing)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">nid</span><span class="p">,</span> <span class="n">ncoords</span><span class="p">)</span> <span class="kp">in</span> <span class="n">nodes</span>
+    <span class="n">add_node!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="kt">Int</span><span class="p">(</span><span class="n">nid</span><span class="p">),</span> <span class="n">ncoords</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">for</span> <span class="p">(</span><span class="n">elid</span><span class="p">,</span> <span class="n">elcon</span><span class="p">)</span> <span class="kp">in</span> <span class="n">left_elements</span>
+    <span class="n">add_element!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="kt">Int</span><span class="p">(</span><span class="n">elid</span><span class="p">),</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="n">elcon</span><span class="p">)</span>
+    <span class="n">add_element_to_element_set!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">LEFT</span><span class="p">,</span> <span class="kt">Int</span><span class="p">(</span><span class="n">elid</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="k">function</span> <span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">eltype</span><span class="p">,</span> <span class="n">set_name</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">elid</span><span class="p">,</span> <span class="n">elcon</span><span class="p">)</span> <span class="kp">in</span> <span class="n">elements</span>
+        <span class="n">add_element!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="kt">Int</span><span class="p">(</span><span class="n">elid</span><span class="p">),</span> <span class="n">eltype</span><span class="p">,</span> <span class="n">elcon</span><span class="p">)</span>
+        <span class="n">add_element_to_element_set!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="kt">Int</span><span class="p">(</span><span class="n">elid</span><span class="p">))</span>
+    <span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">right_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="o">:</span><span class="n">RIGHT</span><span class="p">)</span>
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">top_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="o">:</span><span class="n">TOP</span><span class="p">)</span>
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">down_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="o">:</span><span class="n">DOWN</span><span class="p">)</span>
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">front_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="o">:</span><span class="n">FRONT</span><span class="p">)</span>
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">back_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tri3</span><span class="p">,</span> <span class="o">:</span><span class="n">BACK</span><span class="p">)</span>
+<span class="n">elements_to_mesh!</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">plate_elements</span><span class="p">,</span> <span class="o">:</span><span class="n">Tet4</span><span class="p">,</span> <span class="o">:</span><span class="n">PLATE</span><span class="p">)</span>
+<span class="n">mesh</span><span class="o">.</span><span class="n">element_sets</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[20]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Dict{Symbol,Set{Int64}} with 7 entries:
+  :PLATE =&gt; Set([1316, 1090, 1333, 1131, 1265, 905, 892, 1124, 1337, 873  …  10…
+  :LEFT  =&gt; Set([291, 297, 304, 306, 303, 294, 298, 299, 300, 296, 292, 302, 30…
+  :RIGHT =&gt; Set([329, 326, 337, 332, 336, 334, 341, 328, 333, 324, 342, 327, 32…
+  :TOP   =&gt; Set([288, 287, 275, 282, 278, 279, 281, 280, 274, 273, 286, 277, 27…
+  :BACK  =&gt; Set([11, 158, 215, 160, 134, 29, 131, 249, 207, 173  …  24, 73, 119…
+  :DOWN  =&gt; Set([308, 310, 316, 311, 307, 319, 314, 321, 312, 317, 320, 313, 30…
+  :FRONT =&gt; Set([520, 491, 464, 582, 391, 478, 384, 542, 499, 477  …  389, 420,…</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">length</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[21]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>318</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Mesh is ready. Next create problems:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">plate</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">Elasticity</span><span class="p">,</span> <span class="s">&quot;plate&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">plate_elements</span> <span class="o">=</span> <span class="n">create_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">PLATE</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">plate_elements</span><span class="p">,</span> <span class="s">&quot;youngs modulus&quot;</span><span class="p">,</span> <span class="mf">210e9</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">plate_elements</span><span class="p">,</span> <span class="s">&quot;poissons ratio&quot;</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">)</span>
+<span class="n">add_elements!</span><span class="p">(</span><span class="n">plate</span><span class="p">,</span> <span class="n">plate_elements</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Creating a new problem of type Elasticity, having name `plate` and dimension 3 dofs/node.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:136
+┌ Info: Created 830 elements (830 x Tet4) from element set: PLATE.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/preprocess.jl:244
+┌ Info: Updating field `youngs modulus` =&gt; 2.1e11 for 830 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Updating field `poissons ratio` =&gt; 0.3 for 830 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Adding 830 elements to problem `plate`
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:382
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">left_elements</span> <span class="o">=</span> <span class="n">create_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">LEFT</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">left_elements</span><span class="p">,</span> <span class="s">&quot;displacement 1&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">left_bc</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">Dirichlet</span><span class="p">,</span> <span class="s">&quot;left bc&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&quot;displacement&quot;</span><span class="p">)</span>
+<span class="n">add_elements!</span><span class="p">(</span><span class="n">left_bc</span><span class="p">,</span> <span class="n">left_elements</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Created 16 elements (16 x Tri3) from element set: LEFT.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/preprocess.jl:244
+┌ Info: Updating field `displacement 1` =&gt; 0.0 for 16 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Creating a new boundary problem of type Dirichlet, having name `left bc` and dimension 3 dofs/node. This boundary problems fixes field `displacement`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:173
+┌ Info: Adding 16 elements to problem `left bc`
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:382
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">right_elements</span> <span class="o">=</span> <span class="n">create_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">RIGHT</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">right_elements</span><span class="p">,</span> <span class="s">&quot;displacement traction force 1&quot;</span><span class="p">,</span> <span class="mf">10e3</span><span class="p">)</span>
+<span class="n">right_bc</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">Elasticity</span><span class="p">,</span> <span class="s">&quot;right bc&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">add_elements!</span><span class="p">(</span><span class="n">right_bc</span><span class="p">,</span> <span class="n">right_elements</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Created 20 elements (20 x Tri3) from element set: RIGHT.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/preprocess.jl:244
+┌ Info: Updating field `displacement traction force 1` =&gt; 10000.0 for 20 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Creating a new problem of type Elasticity, having name `right bc` and dimension 3 dofs/node.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:136
+┌ Info: Adding 20 elements to problem `right bc`
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:382
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">down_elements</span> <span class="o">=</span> <span class="n">create_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">DOWN</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">down_elements</span><span class="p">,</span> <span class="s">&quot;displacement 2&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">down_bc</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">Dirichlet</span><span class="p">,</span> <span class="s">&quot;down bc&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&quot;displacement&quot;</span><span class="p">)</span>
+<span class="n">add_elements!</span><span class="p">(</span><span class="n">down_bc</span><span class="p">,</span> <span class="n">down_elements</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Created 16 elements (16 x Tri3) from element set: DOWN.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/preprocess.jl:244
+┌ Info: Updating field `displacement 2` =&gt; 0.0 for 16 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Creating a new boundary problem of type Dirichlet, having name `down bc` and dimension 3 dofs/node. This boundary problems fixes field `displacement`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:173
+┌ Info: Adding 16 elements to problem `down bc`
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:382
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">front_elements</span> <span class="o">=</span> <span class="n">create_elements</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="o">:</span><span class="n">FRONT</span><span class="p">)</span>
+<span class="n">update!</span><span class="p">(</span><span class="n">front_elements</span><span class="p">,</span> <span class="s">&quot;displacement 3&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="n">front_bc</span> <span class="o">=</span> <span class="n">Problem</span><span class="p">(</span><span class="n">Dirichlet</span><span class="p">,</span> <span class="s">&quot;front bc&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="s">&quot;displacement&quot;</span><span class="p">)</span>
+<span class="n">add_elements!</span><span class="p">(</span><span class="n">front_bc</span><span class="p">,</span> <span class="n">front_elements</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Created 270 elements (270 x Tri3) from element set: FRONT.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/preprocess.jl:244
+┌ Info: Updating field `displacement 3` =&gt; 0.0 for 270 elements.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/elements.jl:328
+┌ Info: Creating a new boundary problem of type Dirichlet, having name `front bc` and dimension 3 dofs/node. This boundary problems fixes field `displacement`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:173
+┌ Info: Adding 270 elements to problem `front bc`
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/problems.jl:382
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Analysis:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">analysis</span> <span class="o">=</span> <span class="n">Analysis</span><span class="p">(</span><span class="n">Linear</span><span class="p">)</span>
+<span class="n">add_problems!</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">plate</span><span class="p">,</span> <span class="n">left_bc</span><span class="p">,</span> <span class="n">right_bc</span><span class="p">,</span> <span class="n">down_bc</span><span class="p">,</span> <span class="n">front_bc</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Creating a new analysis of type Linear with name `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:30
+┌ Info: Adding problem `plate` to analysis `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:36
+┌ Info: Adding problem `left bc` to analysis `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:36
+┌ Info: Adding problem `right bc` to analysis `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:36
+┌ Info: Adding problem `down bc` to analysis `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:36
+┌ Info: Adding problem `front bc` to analysis `Linear Analysis`.
+└ @ FEMBase /home/jukka/repositories/FEMBase/src/analysis.jl:36
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Write results to Xdmf file during analysis</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-julia"><pre><span></span><span class="n">xdmf_output</span> <span class="o">=</span> <span class="n">Xdmf</span><span class="p">(</span><span class="s">&quot;plate_results&quot;</span><span class="p">;</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">true</span><span class="p">)</span>
+<span class="n">add_results_writer!</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="n">xdmf_output</span><span class="p">)</span>
+<span class="n">run!</span><span class="p">(</span><span class="n">analysis</span><span class="p">)</span>
+<span class="n">close</span><span class="p">(</span><span class="n">xdmf_output</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>┌ Info: Running linear quasistatic analysis `Linear Analysis` at time 0.0.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:637
+┌ Info: Assembling 5 problems.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:640
+┌ Info: Solving linear system.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:269
+┌ Info: Solved linear system in 1.15 seconds using solver 1. Solution norms (||u||, ||la||): (3.008804266899659e-6, 3917.0157991440396).
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:323
+┌ Info: 
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:335
+┌ Info: Postprocessing 5 problems.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:492
+┌ Info: Quasistatic linear analysis ready.
+└ @ JuliaFEM /home/jukka/repositories/JuliaFEM/src/solvers.jl:650
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Results</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><img src="{{site.baseurl}}/assets/images/parametric-fem-simulations-using-juliafem-and-gmsh/results.png"></p>
+
+</div>
+</div>
+</div>
+ 
+
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Ohjelmointikielien tehokkuudesta, Julia vs. C&#43;&#43;</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Ohjelmointikielien tehokkuudesta, Julia vs. C&#43;&#43;
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Ajattelin kirjoittaa lyhyen blogisarjan Julia-ohjelmointikielestä, lähinnä
+tehokkuusnäkökulmasta. Tarkoituksena on tuoda esille joitakin pointteja jotka
+vaikuttavat ohjelmien suoritusnopeuteen.</p>
+<p>Ohjelmointikieli on JIT-kääntyvä, ja sillä pitäisi vähintäänkin teoriassa
+saavuttaa sama suorituskyky kuin C-kielellä. Riippuu kuitenkin ohjelmoijan
+taidoista suunnitella algoritmeja, kuinka nopea lopullinen koodi on.</p>
+<p>Omien havaintojeni perusteella Julialla ohjelmoitaessa on vähän liiankin helppoa
+hukata koodin tehokkuus olemalla huolehtimatta kuinka muistia varataan ohjelman
+suorituksen aikana. Mikäli muistia varataan nopeissa loopeissa, lopputuloksena
+on koodia jonka nopeus on suurinpiirtein Pythonin luokkaa.</p>
+<p>Otan tähän yhden asiaa havainnollistavan esimerkin. Törmäsin hiljattain erääseen
+ohjelmakoodiin, jonka tarkoituksena on laskea graafin (<a href="https://en.wikipedia.org/wiki/Band_matrix#Bandwidth">bandwidth</a>).
+Ohjelmakoodi kokonaisuudessaan on:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> calculate_bandwidth(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>maximum([maximum(j<span style="color:#f92672">-</span>g) <span style="color:#66d9ef">for</span> (j,g) <span style="color:#66d9ef">in</span> G]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Graafi annetaan hajautustauluna, joka sisältää solmun id-numeron sekä listan
+naapurisolmujen id-numeroista. Funktion käyttö menee seuraavalla tavalla:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">const</span> G <span style="color:#f92672">=</span> <span style="color:#66d9ef">Dict</span>(
+    <span style="color:#ae81ff">1</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>],
+    <span style="color:#ae81ff">2</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">7</span>],
+    <span style="color:#ae81ff">3</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>],
+    <span style="color:#ae81ff">4</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>],
+    <span style="color:#ae81ff">5</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">7</span>, <span style="color:#ae81ff">8</span>],
+    <span style="color:#ae81ff">6</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">7</span>],
+    <span style="color:#ae81ff">7</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">6</span>],
+    <span style="color:#ae81ff">8</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">5</span>],
+    <span style="color:#ae81ff">9</span> <span style="color:#f92672">=&gt;</span> [<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">4</span>])
+
+bw <span style="color:#f92672">=</span> calculate_bandwidth(G)
+<span style="color:#a6e22e">@show</span> bw
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">bw = 17
+</code></pre></div><p>Yhden rivin koodissa ei luulisi voivan mennä paljoa pieleen? Äkkiä katsottuna
+koodi näyttääkin varsin viattomalta, joskin se sisältää jonkinasteista
+&ldquo;<a href="https://en.wikipedia.org/wiki/Code_golf">golffausta</a>&quot;, kun kaikki toiminnallisuus on haluttu saada yhdelle
+riville. Tämä ei välttämättä ole parasta ohjelmointikäytäntöä ainakaan
+tuotantokoodissa.</p>
+<p>Golffaaminen jakaa varmasti mielipiteitä sekä puolesta että vastaan. Itse olen
+päätynyt kannalle että tätä ohjelmointikäytäntöä ei tulisi harjoittaa, sillä
+mikäli koodin toiminnallisuutta joutuu joskus analysoimaan, se pitää joka
+tapauksessa purkaa pienempiin osiin, ja koodin palauttaminen takaisin
+kompaktiksi on-lineriksi on ensinnäkin ylimääräistä vaivaa, ja toisekseen koodi
+ei lähtökohtaisesti ole sen tehokkaampaa yhdellä rivillä kuin monella rivillä
+kirjoitettuna.</p>
+<p>Funktion suorittaminen onnistuu ainakin Julian versiolla 0.5. Uusimmalla
+versiolla koodi ei toimi, vaan tulee virheilmoitus</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ERROR: LoadError: MethodError: no method matching -(::Int64, ::Array{Int64,1})
+</code></pre></div><p>Uudemmissa Julian versioissa ei vektorin ja skalaarin välistä vähennyslaskua ole
+määritelty, vaan se pitää erikseen tehdä broadcastingilla, ts.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>] <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e"># ei toimi</span>
+[<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>] <span style="color:#f92672">.+</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e"># toimii</span>
+</code></pre></div><p>Julian versiolla 1.4 toimiva, päivitetty ohjelmakoodi olisi siis seuraavanlainen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> calculate_bandwidth(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>maximum([maximum(j<span style="color:#f92672">.-</span>g) <span style="color:#66d9ef">for</span> (j,g) <span style="color:#66d9ef">in</span> G]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Julialla kun ohjelmoi, niin olisi hyvä, jos olisi hieman ohjelmointitaustaa
+c-kielestä tai muusta vastaavasta, jossa muistinhallinta ei ole automatisoitua
+samalla tavalla kuin Pythonissa, vaan dynaamista muistia pitää erikseen varata
+luomalla objektit <code>new</code>-komennolla tai muulla ohjelmointikielelle tyypillisellä
+tavalla.</p>
+<p>Tässä tapauksessa meillä on funktio, joka palauttaa skalaarin. Sen sisältämät
+operaatiot ovat vieläpä niin yksinkertaisia, että voidaan varmuudella sanoa että
+yhtään muistivarausta ei tällaisen funktion pitäisi tehdä. Muuten on jotakin
+pielessä. Asia voidaan selvittää esimerkiksi <code>@time</code>-makrolla.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">julia<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">@time</span> calculate_bandwidth(G)
+  <span style="color:#ae81ff">0.000006</span> seconds (<span style="color:#ae81ff">20</span> allocations<span style="color:#f92672">:</span> <span style="color:#ae81ff">1.359</span> KiB)
+<span style="color:#ae81ff">17</span>
+</code></pre></div><p>Tämä yhden rivin funktio tekee kuitenkin hämmästyttävät 20 muistivarausta,
+yhdeksällä solmupisteellä. Jotakin siis on pielessä. Siitä selvin merkki on se,
+että muistinvarausten määrä kasvaa suhteessa graafin kokoon.</p>
+<p>Puretaan koodia hieman useammalle riville. Otetaan ensinnäkin ulomman
+<code>maximum</code>-funktion sisältö erilliseen muuttujaan <code>A</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> calculate_bandwidth(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    A <span style="color:#f92672">=</span> [maximum(j<span style="color:#f92672">.-</span>g) <span style="color:#66d9ef">for</span> (j,g) <span style="color:#66d9ef">in</span> G]
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>maximum(A) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Tästä jo näkeekin, että yksi muistinvaraus tapahtuu siinä, että luodaan vektori <code>A</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">A <span style="color:#f92672">=</span> [maximum(j<span style="color:#f92672">.-</span>g) <span style="color:#66d9ef">for</span> (j, g) <span style="color:#66d9ef">in</span> G]
+<span style="color:#a6e22e">@show</span> A
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">A = [5, -4, 8, -1, 2, -2, 7, 4, -2]
+</code></pre></div><p>Vektori muodostetaan generattorilla. Yleisesti generaattori muodostetaan Juliassa käyttämällä normaaleja sulkuja <code>()</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">T <span style="color:#f92672">=</span> (i <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>)
+<span style="color:#a6e22e">@show</span> T
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">T = Base.Generator{UnitRange{Int64},typeof(identity)}(identity, 1:3)
+</code></pre></div><p>Generaattorin voi sitten purkaa for-lauseessa:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> T
+    println(i)
+<span style="color:#66d9ef">end</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#ae81ff">1</span>
+<span style="color:#ae81ff">2</span>
+<span style="color:#ae81ff">3</span>
+</code></pre></div><p>Generaattorin saa listaksi <code>collect</code>-komennolla, esimerkiksi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">T <span style="color:#f92672">=</span> (i<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span> <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span><span style="color:#ae81ff">3</span>)
+<span style="color:#a6e22e">@show</span> collect(T)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">collect(T) = [1, 4, 9]
+</code></pre></div><p>Ilman generaattorin käyttöä vektori <code>A</code> voitaisiin muodostaa esimerkiksi näin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">A <span style="color:#f92672">=</span> <span style="color:#66d9ef">Int</span>[]
+<span style="color:#66d9ef">for</span> (j, g) <span style="color:#66d9ef">in</span> G
+    b <span style="color:#f92672">=</span> j <span style="color:#f92672">.-</span> g
+    push!(A, maximum(b))
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Varsinainen ongelma muodostuu rivillä <code>b = j .- g</code>. Siinä muodostetaan jokaisessa iteraatiossa yksi täysin tarpeeton vektori, josta haetaan suurin arvo.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">j <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
+g <span style="color:#f92672">=</span> [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">9</span>]
+<span style="color:#a6e22e">@show</span> j <span style="color:#f92672">.-</span> g
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">j .- g = [-2, -7, -8]
+</code></pre></div><p>Tämä yhden rivin funktio siis, auki kirjoitettuna, on suurinpiirtein tällainen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#e6db74">&#34;&#34;&#34; Alkuperäinen koodi. &#34;&#34;&#34;</span>
+<span style="color:#66d9ef">function</span> calculate_bandwidth_1(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>maximum([maximum(j<span style="color:#f92672">.-</span>g) <span style="color:#66d9ef">for</span> (j,g) <span style="color:#66d9ef">in</span> G]) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#e6db74">&#34;&#34;&#34; Koodi ilman generaattoria ja broadcastingia. &#34;&#34;&#34;</span>
+<span style="color:#66d9ef">function</span> calculate_bandwidth_2(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    A <span style="color:#f92672">=</span> <span style="color:#66d9ef">Int</span>[]  <span style="color:#75715e"># &lt;-- ensimmäinen muistiallokaatio</span>
+    <span style="color:#66d9ef">for</span> (j, g) <span style="color:#66d9ef">in</span> G
+        b <span style="color:#f92672">=</span> <span style="color:#66d9ef">Int</span>[]  <span style="color:#75715e"># &lt;-- toinen muistiallokaatio</span>
+        <span style="color:#66d9ef">for</span> k <span style="color:#66d9ef">in</span> g
+            push!(b, j <span style="color:#f92672">-</span> k)  <span style="color:#75715e"># pitäisikö olla abs(j - k) ?</span>
+        <span style="color:#66d9ef">end</span>
+        push!(A, maximum(b))
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> maximum(A) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Entäpä performance? Kokeillaan hieman isommilla graafeilla, tehdään funktio joka
+generoi satunnaisia graafeja jollakin tietyllä määrällä naapureita.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> generate_random_graph(n, nadj)
+    G <span style="color:#f92672">=</span> <span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}}()
+    <span style="color:#66d9ef">for</span> u <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>n
+        G[u] <span style="color:#f92672">=</span> <span style="color:#66d9ef">Int</span>[]
+        <span style="color:#66d9ef">while</span> length(G[u]) <span style="color:#f92672">&lt;</span> nadj
+            v <span style="color:#f92672">=</span> rand(<span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>n)
+            <span style="color:#66d9ef">if</span> (u <span style="color:#f92672">==</span> v <span style="color:#f92672">||</span> v <span style="color:#66d9ef">in</span> G[u])
+                <span style="color:#66d9ef">continue</span>
+            <span style="color:#66d9ef">end</span>
+            push!(G[u], v)
+        <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> G
+<span style="color:#66d9ef">end</span>
+</code></pre></div><p>Käytetään myös pakettia BenchmarkTools, joka tekee funktion testaamisen
+jokseenkin luotettavammin kuin <code>@time</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">using</span> Test, BenchmarkTools
+<span style="color:#66d9ef">const</span> G <span style="color:#f92672">=</span> generate_random_graph(<span style="color:#ae81ff">2</span><span style="color:#f92672">^</span><span style="color:#ae81ff">20</span>, <span style="color:#ae81ff">4</span>)
+<span style="color:#a6e22e">@test</span> calculate_bandwidth_1(G) <span style="color:#f92672">==</span> calculate_bandwidth_2(G)
+<span style="color:#a6e22e">@btime</span> calculate_bandwidth_1(<span style="color:#f92672">$</span>G)
+<span style="color:#a6e22e">@btime</span> calculate_bandwidth_2(<span style="color:#f92672">$</span>G)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Test Passed
+  248.120 ms (2097155 allocations: 152.00 MiB)
+  408.055 ms (2097172 allocations: 137.00 MiB)
+</code></pre></div><p>Tässä nyt nähtiin, että sinänsä näppärä koodi on oikeastaan melko monimutkainen
+sisäiseltä rakenteeltaan. Sitä on myös aika hankala debugata, jos siinä ilmenee
+ongelmia kuiten tässä tapauksessa.</p>
+<p>Perusongelma on, että tyhjiä vektoreita alustetaan sekä algoritmin alussa että
+myöskin loopissa, joka varmasti on pullonkaulana kun haetaan algoritmille
+tehokkuutta. Nämä ongelmat on onnistuttu piilottamaan generaattoriin sekä
+broadcastingiin, mutta kun koodin purki auki, niin ongelmat ovat siinä melko
+selvästi nähtävissä.</p>
+<p>Keskeiset tehokkuuteen liittyvät ongelmat liittyvät nimenomaan turhiin
+muistinvarauksiin. Tässä algoritmissa niitä ei tarvita lainkaan. Ne ovat täysin
+tarpeettomia. Korjattu versio voisi olla esimerkiksi seuraava:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> calculate_bandwidth_3(G<span style="color:#f92672">::</span><span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Vector</span>{<span style="color:#66d9ef">Int</span>}})
+    <span style="color:#75715e"># A = Int[]  # &lt;-- ensimmäinen muistiallokaatio</span>
+    Amax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+    <span style="color:#66d9ef">for</span> (j, g) <span style="color:#66d9ef">in</span> G
+        <span style="color:#75715e"># b = Int[]  # &lt;-- toinen muistiallokaatio</span>
+        bmax <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+        <span style="color:#75715e"># for k in g</span>
+        <span style="color:#75715e">#     push!(b, j - k)  # pitäisikö olla abs(j - k) ?</span>
+        <span style="color:#75715e"># end</span>
+        <span style="color:#75715e"># push!(A, maximum(b))</span>
+        <span style="color:#66d9ef">for</span> k <span style="color:#66d9ef">in</span> g
+            bmax <span style="color:#f92672">=</span> max(bmax, j <span style="color:#f92672">-</span> k)
+        <span style="color:#66d9ef">end</span>
+        Amax <span style="color:#f92672">=</span> max(Amax, bmax)
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> Amax <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#a6e22e">@test</span> calculate_bandwidth_1(G) <span style="color:#f92672">==</span> calculate_bandwidth_3(G)
+<span style="color:#a6e22e">@btime</span> calculate_bandwidth_3(<span style="color:#f92672">$</span>G)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Test Passed
+  111.818 ms (0 allocations: 0 bytes)
+</code></pre></div><p>Siivottu, lopullinen versio voisi olla vaikkapa tällainen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> calculate_bandwidth_4(G)
+    bw <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">for</span> (u, adj) <span style="color:#66d9ef">in</span> G
+        <span style="color:#66d9ef">for</span> v <span style="color:#66d9ef">in</span> adj
+            bw <span style="color:#f92672">=</span> max(bw, abs(u <span style="color:#f92672">-</span> v))
+        <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#a6e22e">@assert</span> bw <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> bw <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#a6e22e">@test</span> calculate_bandwidth_1(G) <span style="color:#f92672">==</span> calculate_bandwidth_4(G)
+<span style="color:#a6e22e">@btime</span> calculate_bandwidth_4(<span style="color:#f92672">$</span>G)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Test Passed
+  108.099 ms (0 allocations: 0 bytes)
+</code></pre></div><p>Jäljelle jää kysymys. onko tämä nyt sitten nopeaa?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">const</span> G2 <span style="color:#f92672">=</span> generate_random_graph(<span style="color:#ae81ff">2</span><span style="color:#f92672">^</span><span style="color:#ae81ff">21</span>, <span style="color:#ae81ff">4</span>)
+<span style="color:#a6e22e">@btime</span> calculate_bandwidth_4(<span style="color:#f92672">$</span>G2)
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">  193.271 ms (0 allocations: 0 bytes)
+</code></pre></div><p>Karkeasti ottaen suoritusaika tuplaantui kun solmupisteiden määrä tuplaantui,
+joten algoritmin kompleksisuus on kunnossa.</p>
+<p>Vastaava algoritmi esimerkiksi C++:lla olisi, ensin kirjastot:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;iostream&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;math.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;unordered_map&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;vector&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;algorithm&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;chrono&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">typedef</span> std<span style="color:#f92672">::</span>unordered_map<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> Graph;
+</code></pre></div><p>Funktio satunnaisgraafin generointiin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">Graph <span style="color:#a6e22e">generate_random_graph</span>(<span style="color:#66d9ef">int</span> n, <span style="color:#66d9ef">int</span> nadj) {
+    Graph G;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> u <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; u <span style="color:#f92672">&lt;</span> n; u<span style="color:#f92672">++</span>) {
+        G[u] <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span>();
+        <span style="color:#66d9ef">while</span> (G[u].size() <span style="color:#f92672">&lt;</span> nadj) {
+            <span style="color:#66d9ef">int</span> v <span style="color:#f92672">=</span> rand() <span style="color:#f92672">%</span> n;
+            <span style="color:#66d9ef">bool</span> can_add <span style="color:#f92672">=</span> u <span style="color:#f92672">!=</span> v;
+            <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> p: G[u]) {
+                <span style="color:#66d9ef">if</span> (p <span style="color:#f92672">==</span> v) {
+                    can_add <span style="color:#f92672">=</span> false;
+                }
+            }
+            <span style="color:#66d9ef">if</span> (can_add) {
+                G[u].push_back(v);
+            }
+        }
+    }
+    <span style="color:#66d9ef">return</span> G;
+}
+</code></pre></div><p>Bandwidth laskenta:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">calculate_bandwidth</span>(Graph G) {
+    <span style="color:#66d9ef">int</span> bw <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>;
+    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">auto</span> p : G) {
+        <span style="color:#66d9ef">int</span> u <span style="color:#f92672">=</span> p.first;
+        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> v : p.second) {
+            bw <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>max(bw, std<span style="color:#f92672">::</span>abs(u <span style="color:#f92672">-</span> v));
+        }
+    }
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> bw <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+}
+</code></pre></div><p>Ajurikoodi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>(<span style="color:#66d9ef">int</span> argv, <span style="color:#66d9ef">char</span> <span style="color:#f92672">*</span>argc[]) {
+    <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>pow(<span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">20</span>);
+    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;number of nodes: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> n <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+    Graph G <span style="color:#f92672">=</span> generate_random_graph(n, <span style="color:#ae81ff">4</span>);
+    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;graph ready&#34;</span> <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+    <span style="color:#66d9ef">auto</span> start <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>chrono<span style="color:#f92672">::</span>high_resolution_clock<span style="color:#f92672">::</span>now();
+    <span style="color:#66d9ef">int</span> bw <span style="color:#f92672">=</span> calculate_bandwidth(G);
+    <span style="color:#66d9ef">auto</span> finish <span style="color:#f92672">=</span> std<span style="color:#f92672">::</span>chrono<span style="color:#f92672">::</span>high_resolution_clock<span style="color:#f92672">::</span>now();
+    std<span style="color:#f92672">::</span>chrono<span style="color:#f92672">::</span>duration<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">double</span><span style="color:#f92672">&gt;</span> elapsed <span style="color:#f92672">=</span> finish <span style="color:#f92672">-</span> start;
+    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Elapsed time: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> elapsed.count() <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span> <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34; ms</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>;
+    std<span style="color:#f92672">::</span>cout <span style="color:#f92672">&lt;&lt;</span> <span style="color:#e6db74">&#34;Bandwidth: &#34;</span> <span style="color:#f92672">&lt;&lt;</span> bw <span style="color:#f92672">&lt;&lt;</span> std<span style="color:#f92672">::</span>endl;
+}
+</code></pre></div><p>Käännetään -O3 lipulla ja katsotaan tulos:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">g++ -O3 calc_bw.cpp <span style="color:#f92672">&amp;&amp;</span> ./a.out
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">number of nodes: 1048576
+Elapsed time: 106.901 ms
+Bandwidth: 2096393
+</code></pre></div><p>Yhteenvetona: tietokone jolla lasketaan on Dell XPS 9380, ja Julialla laskettuna
+ajoaika oli 108 ms ja C++:lla laskettuna 107 ms. Kunhan muistinhallinnasta
+pidetään huolta, tulee Julialla kirjoitettu koodi olemaan samassa nopeusluokassa
+kuin C ja C++.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Makefile ja ympäristömuuttujat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Makefile ja ympäristömuuttujat
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Makefilet ovat varsin kätevä tapa automatisoida erilaisia prosesseja. Monesti
+myös tulee tarvetta käyttää erilaisia ympäristömuuttujia Makefileissä. Niiden
+käytössä kuitenkin piilee iso riski, joka voi pahimmillaan maksaa kaikki datasi.
+Esittelen tässä joitakin keinoja, joilla voit varmistaa, että ympäristömuuttujat
+todella ovat määriteltyjä.</p>
+<p>Otetaan ensi yksi motivoiva ja havainnollistava esimerkki, millä tavalla asiat
+voivat mennä ikävällä tavalla pieleen vääränlaisten oletusten vuoksi.</p>
+<p><strong>Esimerkki</strong>. Skripti generoi automaattisesti asioita <code>build</code>-hakemistoon, joka
+on jonkinlaisen juurihakemiston alihakemisto. Esimerkiksi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app
+APP_BUILD_DIR<span style="color:#f92672">=</span>build
+</code></pre></div><p>Makefilessä voi sitten olla <code>make clean</code>, joka huolehtii build-hakemiston
+poistamisesta.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#960050;background-color:#1e0010">(...</span> <span style="color:#960050;background-color:#1e0010">muuta</span> <span style="color:#960050;background-color:#1e0010">koodia</span> <span style="color:#960050;background-color:#1e0010">...)</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+    rm -rf <span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span>/<span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span>
+
+<span style="color:#960050;background-color:#1e0010">(...</span> <span style="color:#960050;background-color:#1e0010">muuta</span> <span style="color:#960050;background-color:#1e0010">koodia</span> <span style="color:#960050;background-color:#1e0010">...)</span>
+</code></pre></div><p>Skripti näyttää sopivan viattomalta. Tästähän näkee heti että <code>clean</code>-target
+poistaa tiedostot hakemistosta <code>/opt/app/build</code>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rm -rf /opt/app/build
+</code></pre></div><p>Mutta mitä tapahtuu, jos ympäristömuuttujia <code>APP_ROOT</code> ja <code>APP_BUILD_DIR</code> <strong>ei
+ole määritelty</strong>? Harmittoman näköinen komento saakin aivan uusia piirteitä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">rm -rf /
+</code></pre></div><p>Yllätys oli suuri, kun pääkäyttäjän oikeuksilla skripti ajettiin ilman että
+ympäristömuuttujia oli määritelty. Teknisesti, <code>clean</code>-target tuhosi kyllä
+<code>build</code> hakemiston mutta siinä vaiheessa kun joku huomasi, että komento ottaa
+liian kauan, oli skripti kerennyt jo tuhota puolet kiintolevyn sisällöstä.</p>
+<p>Esimerkki mukaili erästä lukemaani artikkelia, missä suurinpiirtien näin oli
+päässyt käymään. Tätä voi itsekin kokeilla, hieman vaarattomalla komennolla
+tosin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+    @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /
+</code></pre></div><p>Ei mennyt ihan nappiin! Tästä ei sysadminilel kiitosta tulisi. Jos
+ympäristömuuttujat asettaa, komento toimii sillä tavalla kuin pitääkin.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /opt/app/build
+</code></pre></div><p>Tarinan opetus on, että <strong>automatisoiduissa prosesseissa ei kannata luottaa
+siihen, että skriptissä käytettävät ympäristömuuttujat ovat asetettuja</strong>.
+Riippuu siitä, mitä on tekemässä, minkäasteista tuhoa vääränlaiset oletukset
+aiheuttavat. Voidaanko tehdä paremmin? Kyllä voidaan. Ympäristömuuttujat
+nimittäin voidaan tarkastaa, ja mikäli niitä ei ole asetettu, poistutaan
+skriptistä turvallisesti.</p>
+<p>Yksi tapa on määritellä if-ehto <code>Makefile</code>-tiedoston alkuun. Ehdolla
+tarkastetaan, onko ympäristömuuttuja asetettu, ja heitetään virhe, mikäli näin
+ei ole. Modifikaatio olisi siis seuraava:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#960050;background-color:#1e0010">ifeq</span> <span style="color:#960050;background-color:#1e0010">(</span><span style="color:#66d9ef">$(</span>APP_ROOT<span style="color:#66d9ef">)</span><span style="color:#960050;background-color:#1e0010">,)</span>
+  <span style="color:#66d9ef">$(</span>error APP_ROOT is not set<span style="color:#66d9ef">)</span>
+<span style="color:#960050;background-color:#1e0010">endif</span>
+
+<span style="color:#960050;background-color:#1e0010">ifeq</span> <span style="color:#960050;background-color:#1e0010">(</span><span style="color:#66d9ef">$(</span>APP_BUILD_DIR<span style="color:#66d9ef">)</span><span style="color:#960050;background-color:#1e0010">,)</span>
+  <span style="color:#66d9ef">$(</span>error APP_BUILD_DIR is not set<span style="color:#66d9ef">)</span>
+<span style="color:#960050;background-color:#1e0010">endif</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+    @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><p>Nyt tämä toimii kuten pitääkin. Kutsutaan ensin ympäristömuuttujia:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Makefile:2: *** APP_ROOT is not set.  Stop.
+</code></pre></div><p>Asetetaan vain toinen ympäristömuuttuja:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Makefile:6: *** APP_BUILD_DIR is not set.  Stop.
+</code></pre></div><p>Kun asetetaan molemmat ympäristömuuttujat, komento ajetaan:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /opt/app/build
+</code></pre></div><p>Aina ei ole mahdollista tai järkevää vaatia, että kaikki ympäristömuuttujat ovat
+määriteltyjä, mikäli niitä käytetään vain jossakin tietyssä targetissa.
+Ympäristömuuttujat voidaan tarkastaa <code>test</code>-komennolla, joka palauttaa vivulla
+<code>-n &quot;&lt;tekstiä&gt;</code> arvon 0, mikäli tekstiä löytyy, ja arvon 1, mikäli tekstiä ei
+lyödy.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">test -n <span style="color:#e6db74">&#34;tekstiä&#34;</span>
+echo <span style="color:#e6db74">&#34;Paluukoodi: </span>$?<span style="color:#e6db74">&#34;</span>
+test -n <span style="color:#e6db74">&#34;&#34;</span>
+echo <span style="color:#e6db74">&#34;Paluukoodi: </span>$?<span style="color:#e6db74">&#34;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Paluukoodi: 0
+Paluukoodi: 1
+</code></pre></div><p>Tällä tavalla toteutettuna Makefilen clean-target on:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span>
+    test -n <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e"># APP_ROOT</span>
+    test -n <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> <span style="color:#75715e"># APP_BUILD_DIR</span>
+    @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">test -n &#34;&#34; # APP_ROOT
+make: *** [Makefile:10: clean] Error 1
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">test -n &#34;/opt/app&#34; # APP_ROOT
+test -n &#34;&#34; # APP_BUILD_DIR
+make: *** [Makefile:11: clean] Error 1
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">test -n &#34;/opt/app&#34; # APP_ROOT
+test -n &#34;build&#34; # APP_BUILD_DIR
+Poistetaan hakemisto /opt/app/build
+</code></pre></div><p>Tässä vielä etuna on se, että ympäristömuuttujat tulostuvat prosessin aikana.
+Mikäli se ei ole tarpeellista, ne voi prefiksata <code>@</code>-merkillä.</p>
+<p>Tätä lähestymistapaa voi parantaa muutamilla eri tavoilla. Ensinnäkin,
+ympäristömuuttujien vaatimuksista voi tehdä omat reseptit, jolloin niitä voi
+lisätä useampaan kohteeseen riippuvuutena:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#a6e22e">require-APP_ROOT</span><span style="color:#f92672">:</span>
+    @ <span style="color:#66d9ef">if</span> test <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>APP_ROOT<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#66d9ef">then</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        echo <span style="color:#e6db74">&#34;Ympäristömuuttuja APP_ROOT ei määritelty!&#34;</span>; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        exit 1; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">fi</span>
+
+<span style="color:#a6e22e">require-APP_BUILD_DIR</span><span style="color:#f92672">:</span>
+    @ <span style="color:#66d9ef">if</span> test <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>APP_BUILD_DIR<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#66d9ef">then</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        echo <span style="color:#e6db74">&#34;Ympäristömuuttuja APP_BUILD_DIR ei määritelty!&#34;</span>; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        exit 1; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">fi</span>
+
+<span style="color:#a6e22e">build</span><span style="color:#f92672">:</span> require-APP_ROOT require-APP_BUILD_DIR
+    @echo <span style="color:#e6db74">&#34;Buildataan projekti hakemistoon </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span> require-APP_ROOT require-APP_BUILD_DIR
+    @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Ympäristömuuttuja APP_ROOT ei määritelty!
+make: *** [Makefile:10: require-APP_ROOT] Error 1
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Ympäristömuuttuja APP_BUILD_DIR ei määritelty!
+make: *** [Makefile:8: require-APP_BUILD_DIR] Error 1
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /opt/app/build
+</code></pre></div><p><code>Makefile</code> toimii, mutta siinä on toistoa. Käyttämällä Makefilen syntaksiin
+kuuluvia [automaattisia muuttujia][automatic-variable] voidaan tarpeeton toisto
+poistaa.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#a6e22e">require-%</span><span style="color:#f92672">:</span>
+    @ <span style="color:#66d9ef">if</span> test <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span><span style="color:#e6db74">${</span>*<span style="color:#e6db74">}</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#66d9ef">then</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        echo <span style="color:#e6db74">&#34;Ympäristömuuttuja </span>$*<span style="color:#e6db74"> ei määritelty!&#34;</span>; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>        exit 1; <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>    <span style="color:#66d9ef">fi</span>
+
+<span style="color:#a6e22e">build</span><span style="color:#f92672">:</span> require-APP_ROOT require-APP_BUILD_DIR
+    @echo <span style="color:#e6db74">&#34;Buildataan projekti hakemistoon </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+
+<span style="color:#a6e22e">clean</span><span style="color:#f92672">:</span> require-APP_ROOT require-APP_BUILD_DIR
+    @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+</code></pre></div><h2 id="yhteenveto">Yhteenveto</h2>
+<p>Prosesseja automatisoivissa skripteissä ympäristömuuttujan puuttuminen voi
+johtaa ennalta-arvaamattomiin ja katastrofaalisiin virheisiin. Mikäli
+ympäristömuuttujaa ei ole määritelty skriptin sisällä, pitäisi sen olemassaolo
+aina erikseen tarkastaa. Ympäristömuuttujien tarkastuksen voi tehdä monella eri
+tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

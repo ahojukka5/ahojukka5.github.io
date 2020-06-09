@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Born to be coder.  | Varmuuskopioiden varmentaminen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Varmuuskopioiden varmentaminen
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Kun varmuuskopiointi on kerran saatu toimimaan, on vähän liiankin helppoa
+unohtaa koko asia. Kuten kaikilla asioilla, myös varmuuskopiolla on taipumusta
+mennä aikanaan rikki, esimerkiksi kun ohjelmistoja päivitetään, voikin käydä
+niin että varmuuskopiointia ei enää ajeta. Salasanat tuppaavat unohtumaan kun
+niitä ei tarvita eikä käytetä. Tai sitten vaan unohtuu tai ei ole tiedossa
+kuinka koko varmuuskopio tarvittaessa palautetaan. Tätä asiaa on syytä
+harjoitella mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
+oikeasti tarvitsisi.</p>
+<p>Ensinnäkin voidaan tarkastaa varmuuskopioiden tila. Tällä saadaan selville
+vähintäänkin se, onko varmuuskopioita otettu viime aikoina, eli ajetaanko koko
+skriptiä. Oletan tässä, että ympäristömuuttuja <code>TARGET</code> on asetettu. Se voi olla
+esimerkiksi jokin shell-tunnus rsyncillä yhteistettynä,
+<code>rsync://tunnus@domain/backup</code>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">duplicity collection-status $TARGET
+</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Last full backup date: Sat Jan  4 21:11:39 2020
+Collection Status
+-----------------
+Connecting with backend: BackendWrapper
+Archive dir: /home/jukka/.cache/duplicity/dcfc04065d9a363af6686a4bc156631e
+
+Found 0 secondary backup chains.
+
+Found primary backup chain with matching signature chain:
+-------------------------
+Chain start time: Sat Jan  4 21:11:39 2020
+Chain end time: Thu Jun  4 00:00:40 2020
+Number of contained backup sets: 147
+Total number of contained volumes: 354
+ Type of backup set:                            Time:      Num volumes:
+                Full         Sat Jan  4 21:11:39 2020               110
+         Incremental         Sun Jan  5 13:00:10 2020                77
+         Incremental         Mon Jan  6 15:00:09 2020                 1
+         Incremental         Tue Jan  7 11:33:35 2020                14
+         Incremental         Wed Jan  8 07:30:08 2020                 1
+         &lt;... rivejä poistettu... &gt;
+         Incremental         Mon Jun  1 00:01:26 2020                 5
+         Incremental         Tue Jun  2 00:00:31 2020                 1
+         Incremental         Wed Jun  3 00:03:53 2020                 1
+         Incremental         Thu Jun  4 00:00:40 2020                 1
+-------------------------
+No orphaned or incomplete backup sets found.
+</code></pre></div><p>Vähintäänkin tiedetään, että varmuuskopioskripti ajetaan edelleen päivittäin.
+Varmuuskopion sisältöä voidaan tutkia listaamalla sen tiedostot:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">duplicity list-current-files $TARGET &gt; backup_files.lst
+</code></pre></div><p>Voimme verrata varmuuskopion sisältöä tietokoneen tiedostojen nykyiseen
+sisältöön. Saamme tulosteen, paljonko viimeisin varmuuskopio eroaa nykyisestä
+tietokoneen sisällöstä. Ei pitäisi erota paljoa.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">duplicity verify -v8 --exclude-filelist<span style="color:#f92672">=</span>excludes.lst $TARGET $SOURCE
+</code></pre></div><p>Lopulta, voimme yrittää palauttaa varmuuskopiosta jonkin tietyn osan.
+Esimerkinomaisesti, minulta löytyi listasta <code>backup_files.lst</code> seuraava rivi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Thu May 28 12:11:12 2020 dev/latex/minted/minted-pandoc/minted.lua
+</code></pre></div><p>Tämän palauttaminen onnistuu komennolla:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">duplicity --file-to-restore dev/latex/minted/minted-pandoc/minted.lua $TARGET /tmp/minted.lue
+</code></pre></div><p>Tämän jumpan jälkeen pitäisi olla tiedossa että varmuuskopiointi toimii kuten pitääkin!</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
+            <time class="has-text-grey-light is-size-7">3 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
+            <time class="has-text-grey-light is-size-7">31 May 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Born to be coder. 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

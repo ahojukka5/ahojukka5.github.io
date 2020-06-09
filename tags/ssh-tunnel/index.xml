@@ -1,0 +1,27 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ssh tunnel on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/ssh-tunnel/</link>
+    <description>Recent content in ssh tunnel on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Thu, 04 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/ssh-tunnel/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>SSH-tunnelin pitäminen ylhäällä autossh:lla</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/</guid>
+      <description>&lt;p&gt;Pätkivissä internet-yhteyksissä ssh-tunnelien pitäminen ylhäällä voi osoittautua
+melko työlääksi touhuksi. Tämän ongelman voi kuitenkin ratkaista käynnistämällä
+autossh-ohjelman systemd:llä. Tällä tavalla tunneli luodaan automaattisesti kun
+tietokone käynnistetään sekä pidetään ylhäällä aina kun intenert-yhteys löytyy.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

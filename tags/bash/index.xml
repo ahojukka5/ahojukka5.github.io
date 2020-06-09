@@ -1,0 +1,29 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>bash on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/bash/</link>
+    <description>Recent content in bash on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/bash/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Uusimman tiedoston löytäminen</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</link>
+      <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</guid>
+      <description>&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
+lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
+esimerkiksi &lt;code&gt;ls -lasrt&lt;/code&gt;, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
+Tämä voidaan kuitenkin automatisoida aika näppärästi. Esittelen tässä aika
+näppärin aliaksen mitä itse käytän.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

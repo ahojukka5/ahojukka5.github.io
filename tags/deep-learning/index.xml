@@ -1,0 +1,29 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>deep learning on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/deep-learning/</link>
+    <description>Recent content in deep learning on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Sun, 17 Feb 2019 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/deep-learning/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Use of vibration data to predict machine failure using deep learning</title>
+      <link>https://ahojukka5.github.io/2019/lstm-autoencoders/</link>
+      <pubDate>Sun, 17 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/lstm-autoencoders/</guid>
+      <description>
+This blog post demonstrates how to use LSTM Autoencoder to detect anomalies
+from the time series data. Data set is FEMTO Bearing Data Set, which contains
+acceleration measurements for bearings.
+
+</description>
+    </item>
+    
+  </channel>
+</rss>

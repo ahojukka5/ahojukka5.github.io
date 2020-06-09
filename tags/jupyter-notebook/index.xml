@@ -1,0 +1,25 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jupyter notebook on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/jupyter-notebook/</link>
+    <description>Recent content in jupyter notebook on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Sun, 20 Jan 2019 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/jupyter-notebook/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Blogging using Jupyter notebooks</title>
+      <link>https://ahojukka5.github.io/2019/blogging-using-jupyter-notebooks/</link>
+      <pubDate>Sun, 20 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2019/blogging-using-jupyter-notebooks/</guid>
+      <description>Hello world!
+   In&amp;nbsp;[4]: 1+1     Out[4]: 2      \begin{equation} F\left(t\right)=\int_{0}^{t}\frac{1}{2}x^{2}\,\mathrm{d}x \end{equation}    In&amp;nbsp;[5]: using Plots      In&amp;nbsp;[9]: x = range(0, stop=2*pi, length=50) y = sin.(x) plot(x, y)     Out[9]:             0  1  2  3  4  5  6  -1.</description>
+    </item>
+    
+  </channel>
+</rss>

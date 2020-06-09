@@ -1,0 +1,56 @@
+---
+date: 2020-06-04
+author: Jukka Aho
+title: Hello world, Tensorflow!
+lang: fi
+katex: true
+tags:
+  - tensorflow
+  - keras
+  - linear neural network
+categories:
+  - neural networks
+  - introduction
+versions:
+  - numpy: 1.18.1
+  - keras: 2.3.1
+  - tensorflow: 2.2.0
+abstract: |
+  Tensorflow on alan johtavia syväoppimiseen tehtyjä open-source ohjelmistoja.
+  Tarkastelen tässä kirjoituksessa yksinkertaista neuroverkkomallia
+  $y = 2x - 1$, keskittyen neuroverkkojen teoriaan sekä Tensorflowin käyttöön
+  Keras-kirjaston avulla.
+---
+
+<p>
+    Tarkastellaan funktiota <span class="math display">\[ y = 2x - 1 \]</span>
+    välillä <span class="math inline">\(-1 \leq x \leq 4\)</span>.
+    Diskretoidaan väli <span class="math inline">\(I = [-1, 4]\)</span> siten,
+    että <span class="math inline">\(\Delta x = 1\)</span>, siis on
+    <span class="math display">\[ x_i \in \left\{-1, 0, 1, 2, 3, 4\right\},\]
+    </span> ja sovitetaan dataan lineaarinen malli.
+</p>
+
+<div class="sourceCode" id="cb1">
+<pre class="sourceCode python">
+<code class="sourceCode python"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="im">import</span> numpy <span class="im">as</span> np</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="im">import</span> keras</a></code></pre>
+</div>
+
+<p>Data siis on:</p>
+
+<div class="sourceCode" id="cb2">
+    <pre class="sourceCode python">
+<code class="sourceCode python"><a class="sourceLine" id="cb2-1" data-line-number="1">xs <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">2.0</span>, <span class="fl">3.0</span>, <span class="fl">4.0</span>])</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">ys <span class="op">=</span> np.array([<span class="op">-</span><span class="fl">3.0</span>, <span class="fl">-1.0</span>, <span class="fl">1.0</span>, <span class="fl">3.0</span>, <span class="fl">5.0</span>, <span class="fl">7.0</span>])</a></code></pre></div>
+<figure>
+<img src="data.svg" alt="Testidata diskretoidusta funktiosta y = 2x - 1" /><figcaption>Testidata diskretoidusta funktiosta <span class="math inline">\(y = 2x - 1\)</span></figcaption>
+</figure>
+<p>Suoran sovitus dataan ei sinänsä ihmeellinen temppu ole, mutta voimme tarkastella tätä ongelmaa koneoppimisen näkökulmasta, jolloin saamme ongelmaan uusia vivahteita. Voimme nimittäin rakentaa yksinkertaisen neuroverkkomallin kuvaamaan funktiota. Malli on <span class="math display">\[
+    y = wx + b,
+\]</span> missä, alan termistöä käyttäen, <span class="math inline">\(w\)</span> on painokerroin ja <span class="math inline">\(b\)</span> on bias-termi.</p>
+<p>Nyt pitäisi löytää parametreille <span class="math inline">\((w, b)\)</span> sellaiset luvut, että mallin ja datan välinen etäisyys tai virhe minimoituu. Tyypillisesti tämä tapahtuu vaatimalla, että datan <span class="math inline">\(y_i\)</span> ja mallin antaman ennusteen <span class="math inline">\(\hat{y}_i = wx_{i}+b\)</span> välinen virhe kaikille <span class="math inline">\(i\)</span> minimoituu jonkin normin suhteen. Varsin yleinen valinta on <span class="math inline">\(L_2\)</span> normi, ja määritellään “loss-funktio” <span class="math display">\[
+\mathcal{L}\left(w,b\right)
+= \frac{1}{2} \sum_{i=1}^{n} \left(y_{i}-\hat{y}_{i}\right)^{2}.
+\]</span></p>
+<p>Tehtävänä nyt on löytää mallin parametrien <span class="math inline">\(w\)</span> ja <span class="math inline">\(b\)</span> arvot siten, että <span class="math inline">\(\mathcal{L}\left(w,b\right)\)</span> minimoituu.</p>

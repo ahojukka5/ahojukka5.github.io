@@ -1,0 +1,31 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>duplicity on Born to be coder.</title>
+    <link>https://ahojukka5.github.io/tags/duplicity/</link>
+    <description>Recent content in duplicity on Born to be coder.</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Thu, 04 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/duplicity/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Varmuuskopioiden varmentaminen</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-04-backup-verification/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-04-backup-verification/</guid>
+      <description>&lt;p&gt;Kun varmuuskopiointi on kerran saatu toimimaan, on vähän liiankin helppoa
+unohtaa koko asia. Kuten kaikilla asioilla, myös varmuuskopiolla on taipumusta
+mennä aikanaan rikki, esimerkiksi kun ohjelmistoja päivitetään, voikin käydä
+niin että varmuuskopiointia ei enää ajeta. Salasanat tuppaavat unohtumaan kun
+niitä ei tarvita eikä käytetä. Tai sitten vaan unohtuu tai ei ole tiedossa
+kuinka koko varmuuskopio tarvittaessa palautetaan. Tätä asiaa on syytä
+harjoitella mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
+oikeasti tarvitsisi.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
