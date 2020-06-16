@@ -55,7 +55,7 @@ miettiä ratkaisua.</p>
 Käydään listan alkiot läpi kahdella sisäkkäisellä loopilla, ja mikäli niiden
 summa on <code>target</code>, tehtävä on ratkaisu.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> find_indices_1(arr, target)
-    <span style="color:#a6e22e">@inbounds</span> <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(arr)
+    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(arr)
         <span style="color:#66d9ef">for</span> j<span style="color:#f92672">=</span>i<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(arr)
             <span style="color:#66d9ef">if</span> arr[i] <span style="color:#f92672">+</span> arr[j] <span style="color:#f92672">==</span> target
                 <span style="color:#66d9ef">return</span> (i, j)
