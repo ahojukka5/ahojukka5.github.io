@@ -54,12 +54,31 @@
                     <article class="media">
                         <div class="media-content">
                             <div class="content">
+                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></p>
+                                <p class="subtitle is-size-6 has-text-grey-light">
+                                    Published at June 16, 2020 &middot;
+                                    <i class="far fa-clock"></i>&nbsp;5 min read
+                                </p>
+                                <p><p>Funktioiden benchmarkkaaminen Juliassa on tehty helpoksi erikseen asennttavalla
+BenchmarkTools-paketilla. Tarkastellaan seuraavanlaista ongelmaa: käyttäjälle
+annetaan kokonaislukulista <code>arr</code>, ja yksittäinen luku <code>target</code>. Implementoi
+funktio, joka palauttaa indeksiparin <code>(i, j)</code> siten, että listan alkioiden summa
+on <code>target</code>, siis <code>arr[i] + arr[j] = target</code>. Kannattaa käyttää hetki aikaa ja
+miettiä ratkaisua.</p>...</p>
+                            </div>
+                        </div>
+                    </article>
+                
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
                                 <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></p>
                                 <p class="subtitle is-size-6 has-text-grey-light">
                                     Published at June 5, 2020 &middot;
                                     <i class="far fa-clock"></i>&nbsp;2 min read
                                 </p>
-                                <p><p>Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+                                <p><p><img src="index.png" alt="bash logo"></p>
+<p>Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
 uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
 lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
 esimerkiksi <code>ls -lasrt</code>, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
@@ -206,24 +225,6 @@ CxxWrap.jl.
                         </div>
                     </article>
                 
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="content">
-                                <p class="title is-4"><a href="https://ahojukka5.github.io/2019/lstm-autoencoders/">Use of vibration data to predict machine failure using deep learning</a></p>
-                                <p class="subtitle is-size-6 has-text-grey-light">
-                                    Published at February 17, 2019 &middot;
-                                    <i class="far fa-clock"></i>&nbsp;17 min read
-                                </p>
-                                <p>
-This blog post demonstrates how to use LSTM Autoencoder to detect anomalies
-from the time series data. Data set is FEMTO Bearing Data Set, which contains
-acceleration measurements for bearings.
-
-...</p>
-                            </div>
-                        </div>
-                    </article>
-                
             </div>
         </div>
     </div>
@@ -232,6 +233,8 @@ acceleration measurements for bearings.
     <div class="card-content">
         <h1 class="title is-5">Tags</h1>
         <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
         
@@ -247,6 +250,8 @@ acceleration measurements for bearings.
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
         
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
             <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
@@ -260,6 +265,8 @@ acceleration measurements for bearings.
             <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
         
@@ -278,6 +285,9 @@ acceleration measurements for bearings.
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></h1>
+            <time class="has-text-grey-light is-size-7">16 June 2020</time>
+        
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
             <time class="has-text-grey-light is-size-7">5 June 2020</time>
         
@@ -290,9 +300,6 @@ acceleration measurements for bearings.
             <h1><a href="https://ahojukka5.github.io/2020/makefile-ja-ymparistomuuttujat/">Makefile ja ympäristömuuttujat</a></h1>
             <time class="has-text-grey-light is-size-7">3 June 2020</time>
         
-            <h1><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></h1>
-            <time class="has-text-grey-light is-size-7">31 May 2020</time>
-        
     </div>
 </div>
     
@@ -301,7 +308,7 @@ acceleration measurements for bearings.
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (7)<br>
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (8)<br>
         
             <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
         

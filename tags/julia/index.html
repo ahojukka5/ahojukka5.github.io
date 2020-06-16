@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Jukka Aho (@ahojukka5)  | SSH-tunnelin pitäminen ylhäällä autossh:lla</title>
+    <title>Jukka Aho (@ahojukka5)  | julia</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
     <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    <link rel="alternate" type="application/rss+xml" href="https://ahojukka5.github.io/tags/julia/index.xml" title="Jukka Aho (@ahojukka5)" />
     </head>
 <body>
 
@@ -28,7 +29,7 @@
                 <br>
                 <h1 class="title is-size-1">
                     
-                        SSH-tunnelin pitäminen ylhäällä autossh:lla
+                        #julia
                     
                 </h1>
                 
@@ -41,69 +42,32 @@
     <div class="section">
     
 
+
+
 <div class="columns">
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
-                <p>Pätkivissä internet-yhteyksissä ssh-tunnelien pitäminen ylhäällä voi osoittautua
-melko työlääksi touhuksi. Tämän ongelman voi kuitenkin ratkaista käynnistämällä
-autossh-ohjelman systemd:llä. Tällä tavalla tunneli luodaan automaattisesti kun
-tietokone käynnistetään sekä pidetään ylhäällä aina kun intenert-yhteys löytyy.</p>
-<p>Tiedostoon <code>/etc/systemd/system/autossh@.service</code>:</p>
-<pre><code class="language-conf" data-lang="conf">[Unit]
-Description=Keeps an ssh tunnel to %I open
-After=network-online.target ssh.service
 
-[Service]
-User=tunnel
-# no monitoring
-Environment=&quot;AUTOSSH_PORT=0&quot;
-# Disable gatetime behaviour
-Environment=&quot;AUTOSSH_GATETIME=0&quot;
-EnvironmentFile=/etc/default/autossh@%i
-RestartSec=3
-Restart=always
+                <article class="media">
+                    <div class="media-content">
+                        <div class="content">
+                            <p class="title is-4"><a href="/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></p>
+                            <p class="subtitle is-size-6 has-text-grey-light">
+                                Published at June 16, 2020 &middot;
+                                <i class="far fa-clock"></i>&nbsp;5 min read
+                            </p>
+                            <p><p>Funktioiden benchmarkkaaminen Juliassa on tehty helpoksi erikseen asennttavalla
+BenchmarkTools-paketilla. Tarkastellaan seuraavanlaista ongelmaa: käyttäjälle
+annetaan kokonaislukulista <code>arr</code>, ja yksittäinen luku <code>target</code>. Implementoi
+funktio, joka palauttaa indeksiparin <code>(i, j)</code> siten, että listan alkioiden summa
+on <code>target</code>, siis <code>arr[i] + arr[j] = target</code>. Kannattaa käyttää hetki aikaa ja
+miettiä ratkaisua.</p>...</p>
+                        </div>
+                    </div>
+                </article>
+                <br>
 
-# -NT Just open the connection and do nothing (not interactive, no tty alloc)
-# use /usr/bin/ssh instead of autossh is good as well
-ExecStart=/usr/bin/autossh -NT -o &quot;ExitOnForwardFailure=yes&quot; $SSH_OPTIONS ${TARGET_HOST} $FORWARDS
-TimeoutStopSec=10
-
-[Install]
-WantedBy=multi-user.target
-</code></pre><p>Tässä siis luetaan ympäristön konfiguraatio tiedostosta
-<code>/etc/default/autossh@%i</code>, missä <code>i</code> on jokin merkkijono, esimerkiksi
-ssh-palvelun nimi. Ympäristön konfiguraatio taas on seuraava:</p>
-<pre><code class="language-conf" data-lang="conf"># Options for autossh@host1.service
-# Place it at /etc/default
-
-# Save all your credential/user/port related config in ~/.ssh/config is strongly recommanded
-# Leave hostname here only
-TARGET_HOST=kayttajatunnus@domain.com
-
-# -L LOCALPORT:IP_ON_EXAMPLE_COM:PORT_ON_EXAMPLE_COM
-# can set multiple forwardings here
-FORWARDS=-D8080
-
-# === Settings below for ADVANCED users only ===
-
-SSH_OPTIONS=-o &quot;ServerAliveInterval=180&quot; -o &quot;ServerAliveCountMax=60&quot;
-AUTOSSH_PORT=0
-AUTOSSH_GATETIME=0
-</code></pre><p>Tässä tapauksessa tehdään dynaaminen tunneli porttiin 8080 (SOCKS). Eli komento
-joka lopulta suoritetaan on:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">/usr/bin/autossh -NT -o <span style="color:#e6db74">&#34;ExitOnForwardFailure=yes&#34;</span> -o <span style="color:#e6db74">&#34;ServerAliveInterval=180&#34;</span> -o <span style="color:#e6db74">&#34;ServerAliveCountMax=60&#34;</span> kayttajatunnus@domain.com -D8080
-</code></pre></div><p>Vastaavalla tavalla voidaan rakentaa SSH-tunneli esimerkiksi serverin
-MySQL-tietokantaan, mikäli vain lokaalit yhteydet on sallittu, mikä
-tyypillisesti on tilanne.</p>
-<p>Tunnelin tilaa voidaan tarkastaa ja säätää <code>systemctl</code>-komennolla. Tunnelin
-automaattinen käynnistys kun tietokone käynnistetään:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">systemctl enable autossh@palvelun_nimi
-</code></pre></div><p>Tunnelin käynnistys välittömästi:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">systemctl start autossh@palvelun_nimi
-</code></pre></div><p>Tunnelin tilan tarkastus:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">systemctl status autossh@palvelun_nimi
-</code></pre></div>
             </div>
         </div>
     </div>
@@ -181,11 +145,6 @@ automaattinen käynnistys kun tietokone käynnistetään:</p>
         
     </div>
 </div>
-    
-<br>
-                
-
-
     
 <br>
         <div class="card">

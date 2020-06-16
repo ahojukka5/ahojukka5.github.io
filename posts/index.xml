@@ -6,10 +6,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Fri, 05 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 16 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Algoritmien benchmarkkaaminen Julialla</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/</link>
+      <pubDate>Tue, 16 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/</guid>
+      <description>&lt;p&gt;Funktioiden benchmarkkaaminen Juliassa on tehty helpoksi erikseen asennttavalla
+BenchmarkTools-paketilla. Tarkastellaan seuraavanlaista ongelmaa: käyttäjälle
+annetaan kokonaislukulista &lt;code&gt;arr&lt;/code&gt;, ja yksittäinen luku &lt;code&gt;target&lt;/code&gt;. Implementoi
+funktio, joka palauttaa indeksiparin &lt;code&gt;(i, j)&lt;/code&gt; siten, että listan alkioiden summa
+on &lt;code&gt;target&lt;/code&gt;, siis &lt;code&gt;arr[i] + arr[j] = target&lt;/code&gt;. Kannattaa käyttää hetki aikaa ja
+miettiä ratkaisua.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Uusimman tiedoston löytäminen</title>
@@ -17,7 +31,8 @@
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</guid>
-      <description>&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+      <description>&lt;p&gt;&lt;img src=&#34;index.png&#34; alt=&#34;bash logo&#34;&gt;&lt;/p&gt;
+&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
 uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
 lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
 esimerkiksi &lt;code&gt;ls -lasrt&lt;/code&gt;, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
