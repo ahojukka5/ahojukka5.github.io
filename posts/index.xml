@@ -6,10 +6,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Thu, 18 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Metaohjelmointia Julialla: symbolinen derivointi</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/</guid>
+      <description>&lt;p&gt;Esittelen seuraavaksi erään ihan todellisen käyttötapauksen, missä makrojen
+käytöstä voi olla todellista hyötyä. Kuvitellaan tilannetta, missä meillä on
+olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
+laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
+yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
+John Myles Whiten &lt;a href=&#34;http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/&#34;&gt;blogikirjoitusta&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Julian makrot</title>
@@ -43,8 +57,7 @@ miettiä ratkaisua.&lt;/p&gt;</description>
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;index.png&#34; alt=&#34;bash logo&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+      <description>&lt;p&gt;Toisinaan tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
 uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
 lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
 esimerkiksi &lt;code&gt;ls -lasrt&lt;/code&gt;, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
@@ -65,7 +78,7 @@ tietokone käynnistetään sekä pidetään ylhäällä aina kun intenert-yhteys
     </item>
     
     <item>
-      <title>Varmuuskopioiden varmentaminen</title>
+      <title>Varmuuskopioiden verifioiminen</title>
       <link>https://ahojukka5.github.io/2020/2020-06-04-backup-verification/</link>
       <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
       
@@ -76,7 +89,7 @@ mennä aikanaan rikki, esimerkiksi kun ohjelmistoja päivitetään, voikin käyd
 niin että varmuuskopiointia ei enää ajeta. Salasanat tuppaavat unohtumaan kun
 niitä ei tarvita eikä käytetä. Tai sitten vaan unohtuu tai ei ole tiedossa
 kuinka koko varmuuskopio tarvittaessa palautetaan. Tätä asiaa on syytä
-harjoitella mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
+harjoitella, ja mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
 oikeasti tarvitsisi.&lt;/p&gt;</description>
     </item>
     

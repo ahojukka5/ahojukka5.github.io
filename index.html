@@ -6,6 +6,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Jukka Aho (@ahojukka5)  | Jukka Aho (@ahojukka5)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -54,10 +58,28 @@
                     <article class="media">
                         <div class="media-content">
                             <div class="content">
+                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></p>
+                                <p class="subtitle is-size-6 has-text-grey-light">
+                                    Published at June 19, 2020 &middot;
+                                    <i class="far fa-clock"></i>&nbsp;8 min read
+                                </p>
+                                <p><p>Esittelen seuraavaksi erään ihan todellisen käyttötapauksen, missä makrojen
+käytöstä voi olla todellista hyötyä. Kuvitellaan tilannetta, missä meillä on
+olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
+laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
+yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
+John Myles Whiten <a href="http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/">blogikirjoitusta</a>.</p>...</p>
+                            </div>
+                        </div>
+                    </article>
+                
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
                                 <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></p>
                                 <p class="subtitle is-size-6 has-text-grey-light">
                                     Published at June 18, 2020 &middot;
-                                    <i class="far fa-clock"></i>&nbsp;3 min read
+                                    <i class="far fa-clock"></i>&nbsp;4 min read
                                 </p>
                                 <p><p>Eräs hieno ominaisuus Juliassa on sen makrot. Juliassa makro on hieman funktion
 kaltainen rakenne, joka palauttaa Expr-tyypin joka suoritetaan makron päätyttyä.
@@ -93,8 +115,7 @@ miettiä ratkaisua.</p>...</p>
                                     Published at June 5, 2020 &middot;
                                     <i class="far fa-clock"></i>&nbsp;2 min read
                                 </p>
-                                <p><p><img src="index.png" alt="bash logo"></p>
-<p>Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+                                <p><p>Toisinaan tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
 uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
 lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
 esimerkiksi <code>ls -lasrt</code>, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.
@@ -107,7 +128,7 @@ näppärin aliaksen mitä itse käytän.</p>...</p>
                     <article class="media">
                         <div class="media-content">
                             <div class="content">
-                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></p>
+                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden verifioiminen</a></p>
                                 <p class="subtitle is-size-6 has-text-grey-light">
                                     Published at June 4, 2020 &middot;
                                     <i class="far fa-clock"></i>&nbsp;2 min read
@@ -118,7 +139,7 @@ mennä aikanaan rikki, esimerkiksi kun ohjelmistoja päivitetään, voikin käyd
 niin että varmuuskopiointia ei enää ajeta. Salasanat tuppaavat unohtumaan kun
 niitä ei tarvita eikä käytetä. Tai sitten vaan unohtuu tai ei ole tiedossa
 kuinka koko varmuuskopio tarvittaessa palautetaan. Tätä asiaa on syytä
-harjoitella mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
+harjoitella, ja mielellään etukäteen eikä siinä vaiheessa, kun varmuuskopioita
 oikeasti tarvitsisi.</p>...</p>
                             </div>
                         </div>
@@ -209,25 +230,6 @@ vaikuttavat ohjelmien suoritusnopeuteen.</p>...</p>
                         </div>
                     </article>
                 
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="content">
-                                <p class="title is-4"><a href="https://ahojukka5.github.io/2019/wrapping-cpp-libraries-to-julia-part-1/">Wrapping C&#43;&#43; libraries to Julia: part 1</a></p>
-                                <p class="subtitle is-size-6 has-text-grey-light">
-                                    Published at September 24, 2019 &middot;
-                                    <i class="far fa-clock"></i>&nbsp;2 min read
-                                </p>
-                                <p>
-Ability to wrap old program codes to use them in new programming environments is
-an essential task for efficient code reuse. In this blog post, I will present a
-minimum working example on how to compile and wrap a shared C ++ library with
-CxxWrap.jl.
-
-...</p>
-                            </div>
-                        </div>
-                    </article>
-                
             </div>
         </div>
     </div>
@@ -240,6 +242,8 @@ CxxWrap.jl.
             <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
         
@@ -275,9 +279,9 @@ CxxWrap.jl.
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
         
@@ -290,6 +294,9 @@ CxxWrap.jl.
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
             <time class="has-text-grey-light is-size-7">18 June 2020</time>
         
@@ -299,10 +306,7 @@ CxxWrap.jl.
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
             <time class="has-text-grey-light is-size-7">5 June 2020</time>
         
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
-            <time class="has-text-grey-light is-size-7">4 June 2020</time>
-        
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden verifioiminen</a></h1>
             <time class="has-text-grey-light is-size-7">4 June 2020</time>
         
     </div>
@@ -313,7 +317,7 @@ CxxWrap.jl.
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (9)<br>
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (10)<br>
         
             <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
         

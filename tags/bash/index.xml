@@ -17,8 +17,7 @@
       <pubDate>Fri, 05 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/</guid>
-      <description>&lt;p&gt;&lt;img src=&#34;index.png&#34; alt=&#34;bash logo&#34;&gt;&lt;/p&gt;
-&lt;p&gt;Aika usein tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
+      <description>&lt;p&gt;Toisinaan tulee vastaan tilanne, että haluaa nopeasti tehdä jotakin hakemiston
 uusimmalle tiedostolle. On esimerkiksi prosessi, joka tekee aina uuden
 lokitiedoston kun se käynnistetään. Tiedostothan voi laittaa aikajärjestykseen
 esimerkiksi &lt;code&gt;ls -lasrt&lt;/code&gt;, ja sitten manuaalisesti kaivaa siitä se uusin tulokas.

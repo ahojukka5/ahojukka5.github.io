@@ -6,10 +6,24 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Thu, 18 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/tags/julia/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Metaohjelmointia Julialla: symbolinen derivointi</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/</guid>
+      <description>&lt;p&gt;Esittelen seuraavaksi erään ihan todellisen käyttötapauksen, missä makrojen
+käytöstä voi olla todellista hyötyä. Kuvitellaan tilannetta, missä meillä on
+olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
+laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
+yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
+John Myles Whiten &lt;a href=&#34;http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/&#34;&gt;blogikirjoitusta&lt;/a&gt;.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Julian makrot</title>

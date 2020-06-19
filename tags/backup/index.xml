@@ -1,14 +1,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>duplicity on Jukka Aho (@ahojukka5)</title>
-    <link>https://ahojukka5.github.io/tags/duplicity/</link>
-    <description>Recent content in duplicity on Jukka Aho (@ahojukka5)</description>
+    <title>backup on Jukka Aho (@ahojukka5)</title>
+    <link>https://ahojukka5.github.io/tags/backup/</link>
+    <description>Recent content in backup on Jukka Aho (@ahojukka5)</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
     <lastBuildDate>Thu, 04 Jun 2020 00:00:00 +0000</lastBuildDate>
     
-        <atom:link href="https://ahojukka5.github.io/tags/duplicity/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://ahojukka5.github.io/tags/backup/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>

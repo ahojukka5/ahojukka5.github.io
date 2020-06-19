@@ -1,14 +1,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>macro on Jukka Aho (@ahojukka5)</title>
-    <link>https://ahojukka5.github.io/tags/macro/</link>
-    <description>Recent content in macro on Jukka Aho (@ahojukka5)</description>
+    <title>symbolic differentiation on Jukka Aho (@ahojukka5)</title>
+    <link>https://ahojukka5.github.io/tags/symbolic-differentiation/</link>
+    <description>Recent content in symbolic differentiation on Jukka Aho (@ahojukka5)</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
     <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
-        <atom:link href="https://ahojukka5.github.io/tags/macro/index.xml" rel="self" type="application/rss+xml" />
+        <atom:link href="https://ahojukka5.github.io/tags/symbolic-differentiation/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -23,18 +23,6 @@ olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
 laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
 yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
 John Myles Whiten &lt;a href=&#34;http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/&#34;&gt;blogikirjoitusta&lt;/a&gt;.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Julian makrot</title>
-      <link>https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/</link>
-      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/</guid>
-      <description>&lt;p&gt;Eräs hieno ominaisuus Juliassa on sen makrot. Juliassa makro on hieman funktion
-kaltainen rakenne, joka palauttaa Expr-tyypin joka suoritetaan makron päätyttyä.
-Makroa voi ajatella ikääneräänlaisena esikäsittelijänä, jolla voi muokata koodin
-rakennetta ennenkuin se itse asiassa suoritetaan.&lt;/p&gt;</description>
     </item>
     
   </channel>

@@ -5,6 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Jukka Aho (@ahojukka5)  | Makefile ja ympäristömuuttujat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -81,7 +85,7 @@ tosin:</p>
     @echo <span style="color:#e6db74">&#34;Poistetaan hakemisto </span><span style="color:#e6db74">${</span>APP_ROOT<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">${</span>APP_BUILD_DIR<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">make clean
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /
-</code></pre></div><p>Ei mennyt ihan nappiin! Tästä ei sysadminilel kiitosta tulisi. Jos
+</code></pre></div><p>Ei mennyt ihan nappiin! Tästä ei sysadminille kiitosta tulisi. Jos
 ympäristömuuttujat asettaa, komento toimii sillä tavalla kuin pitääkin.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /opt/app/build
@@ -171,7 +175,7 @@ make: *** [Makefile:8: require-APP_BUILD_DIR] Error 1
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">APP_ROOT<span style="color:#f92672">=</span>/opt/app APP_BUILD_DIR<span style="color:#f92672">=</span>build make clean
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Poistetaan hakemisto /opt/app/build
 </code></pre></div><p><code>Makefile</code> toimii, mutta siinä on toistoa. Käyttämällä Makefilen syntaksiin
-kuuluvia [automaattisia muuttujia][automatic-variable] voidaan tarpeeton toisto
+kuuluvia <a href="https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html">automaattisia muuttujia</a> voidaan tarpeeton toisto
 poistaa.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-makefile" data-lang="makefile"><span style="color:#a6e22e">require-%</span><span style="color:#f92672">:</span>
     @ <span style="color:#66d9ef">if</span> test <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span><span style="color:#e6db74">${</span>*<span style="color:#e6db74">}</span><span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;&#34;</span>; <span style="color:#66d9ef">then</span> <span style="color:#ae81ff">\
@@ -202,6 +206,8 @@ tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
             <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
         
@@ -237,9 +243,9 @@ tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
         
@@ -252,6 +258,9 @@ tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
             <time class="has-text-grey-light is-size-7">18 June 2020</time>
         
@@ -261,10 +270,7 @@ tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
             <time class="has-text-grey-light is-size-7">5 June 2020</time>
         
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
-            <time class="has-text-grey-light is-size-7">4 June 2020</time>
-        
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden verifioiminen</a></h1>
             <time class="has-text-grey-light is-size-7">4 June 2020</time>
         
     </div>
@@ -280,7 +286,7 @@ tavalla. Tärkeintä on, että sen tekee jollakin tavalla.</p>
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (9)<br>
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (10)<br>
         
             <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
         

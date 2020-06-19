@@ -6,7 +6,7 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Thu, 18 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 19 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>julia</title>
       <link>https://ahojukka5.github.io/tags/julia/</link>
-      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/tags/julia/</guid>
       <description></description>
@@ -23,9 +23,18 @@
     <item>
       <title>macro</title>
       <link>https://ahojukka5.github.io/tags/macro/</link>
-      <pubDate>Thu, 18 Jun 2020 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/tags/macro/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>symbolic differentiation</title>
+      <link>https://ahojukka5.github.io/tags/symbolic-differentiation/</link>
+      <pubDate>Fri, 19 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/symbolic-differentiation/</guid>
       <description></description>
     </item>
     
@@ -75,6 +84,15 @@
     </item>
     
     <item>
+      <title>backup</title>
+      <link>https://ahojukka5.github.io/tags/backup/</link>
+      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/tags/backup/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>duplicity</title>
       <link>https://ahojukka5.github.io/tags/duplicity/</link>
       <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
@@ -98,15 +116,6 @@
       <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/tags/systemd/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>verify</title>
-      <link>https://ahojukka5.github.io/tags/verify/</link>
-      <pubDate>Thu, 04 Jun 2020 00:00:00 +0000</pubDate>
-      
-      <guid>https://ahojukka5.github.io/tags/verify/</guid>
       <description></description>
     </item>
     

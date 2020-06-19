@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Jukka Aho (@ahojukka5)  | Metaohjelmointia Julialla: symbolinen derivointi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Metaohjelmointia Julialla: symbolinen derivointi
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Esittelen seuraavaksi erään ihan todellisen käyttötapauksen, missä makrojen
+käytöstä voi olla todellista hyötyä. Kuvitellaan tilannetta, missä meillä on
+olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
+laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
+yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
+John Myles Whiten <a href="http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/">blogikirjoitusta</a>.</p>
+
+<p>Juliassa Expr-tyyppi on ohjelmakoodin esitys, &quot;ajamatonta koodia&quot;. Esimerkiksi,</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, <span style="color:#f92672">:+</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">:(1 + 1)</code></pre></div>
+<p>Expr-tyypin suoritus tapahtuu <code>eval</code>-funktiolla:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">eval(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">2</code></pre></div>
+<p>Myös <code>dump</code>-komento on hyödyllinen:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">dump(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Expr
+  head: Symbol call
+  args: Array{Any}((3,))
+    1: Symbol +
+    2: Int64 1
+    3: Int64 1</code></pre></div>
+<p>Voimme rakentaa Julia-ohjelmakoodia ohjelmallisesti:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">e <span style="color:#f92672">=</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call)
+e<span style="color:#f92672">.</span>args <span style="color:#f92672">=</span> [<span style="color:#f92672">:+</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>]
+eval(e)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">2</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">myfunc <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#66d9ef">function</span> hello() println(<span style="color:#e6db74">&#34;Hello, world!&#34;</span>) <span style="color:#66d9ef">end</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">:(function hello()
+      println(&#34;Hello, world&#34;)
+  end)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">eval(myfunc)
+hello()</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Hello, world!</code></pre></div>
+<p>FEMBasis-projektissa pitää laskea polynomeja ja niiden derivaattoja. Tehtävä ei
+ole kovin monimutkainen. Esimerkiksi, pitäisi voida laskea vaikkapa funktion</p>
+
+<p><span  class="math">\[\frac{\partial\left(2w^{2}uv^{2}\right)}{\partial u}\]</span></p>
+
+<p>arvo joillakin parametreilla $(u, v, w)$. Perinteinen tapa ratkaista asia on
+ottaa esille kynä ja paperia sekä ratkaista osittaisderivaatat käsin. Toinen
+tapa on laskea osittaisderivaatat jollakin symbolisella laskimella sekä
+copypastettaa vastaus koodiin. Kokeillaan nyt näistä vielä parannettua versiota,
+jossa itse asiassa laskemme osittaisderivaatan analyyttisesti ohjelman
+käännösvaiheessa, jotta se olisi nopeaa varsinaisessa ajovaiheessa.</p>
+
+<p>Esimerkiksi mainittu funktio olisi Julian AST:ssä:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">dump(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Expr
+  head: Symbol call
+  args: Array{Any}((5,))
+    1: Symbol *
+    2: Int64 2
+    3: Expr
+      head: Symbol call
+      args: Array{Any}((3,))
+        1: Symbol ^
+        2: Symbol w
+        3: Int64 2
+    4: Symbol u
+    5: Expr
+      head: Symbol call
+      args: Array{Any}((3,))
+        1: Symbol ^
+        2: Symbol v
+        3: Int64 2</code></pre></div>
+<p>Derivoituna vaikkapa $u$:n suhteen haluaisimme</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">dump(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">Expr
+  head: Symbol call
+  args: Array{Any}((4,))
+    1: Symbol *
+    2: Int64 2
+    3: Expr
+      head: Symbol call
+      args: Array{Any}((3,))
+        1: Symbol ^
+        2: Symbol w
+        3: Int64 2
+    4: Expr
+      head: Symbol call
+      args: Array{Any}((3,))
+        1: Symbol ^
+        2: Symbol v
+        3: Int64 2</code></pre></div>
+<p>Rakennellaan derivointia pala kerrallaan. Hyödynnetään Julian ns. multiple
+dispatchia, joka tunnetaan esimerkiksi Javassa tai C++:ssa method
+overloadingina. Eli voi olla samannimisiä funktioita, ja kutsuttavan funktio
+riippuu sen argumenteista. Valitaan funktion nimeksi <code>differentiate</code>, ja käyttö
+sillä tavalla, että <code>differentiate(f, :x)</code>, missä <code>f</code> on jokin lauseke,
+palauttaa lausekkeen derivoituna x:n suhteen.</p>
+
+<p>Ensimmäisenä vakion derivointi,</p>
+
+<p><span  class="math">\[\frac{\mathrm{d}a}{\mathrm{d}x} = 0.\]</span></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> differentiate(<span style="color:#f92672">::</span><span style="color:#66d9ef">Number</span>, <span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+<span style="color:#66d9ef">end</span>
+
+
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#ae81ff">5</span>, <span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">differentiate(5, :x) = 0</code></pre></div>
+<p>Seuraavaksi muuttujan derivointi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> differentiate(s<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>, t<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    <span style="color:#66d9ef">return</span> s <span style="color:#f92672">==</span> t <span style="color:#f92672">?</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">0</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#f92672">:</span>x, <span style="color:#f92672">:</span>x)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#f92672">:</span>y, <span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">differentiate(:x, :x) = 1
+differentiate(:y, :x) = 0</code></pre></div>
+<p>Seuraavaksi ketjusääntö. Toteutetaan yleisessä muodossa, missä muuttujia voi
+olla enemmänkin kuin kaksi. Esimerkiksi kolmelle x:stä riippuvalle muuttujalle</p>
+
+<p><span  class="math">\[
+\frac{\mathrm{d}}{\mathrm{d}x}\left(fgh\right)=\frac{\mathrm{d}f}{\mathrm{d}x}gh+f\frac{\mathrm{d}g}{\mathrm{d}x}h+fg\frac{\mathrm{d}h}{\mathrm{d}x},
+\]</span></p>
+
+<p>joka ohjelmointikielisenä syntaksina olisi ehkäpäkin</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">diff(<span style="color:#f92672">*</span>(f, g, h), x) <span style="color:#f92672">=</span> <span style="color:#f92672">+</span>(
+    <span style="color:#f92672">*</span>(diff(f, x), g, h),
+    <span style="color:#f92672">*</span>(f, diff(g, x), h),
+    <span style="color:#f92672">*</span>(f, g, diff(h, x)))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> differentiate(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>, t<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    <span style="color:#a6e22e">@assert</span> first(ex<span style="color:#f92672">.</span>args) <span style="color:#f92672">==</span> <span style="color:#f92672">:*</span>
+    res_args <span style="color:#f92672">=</span> <span style="color:#66d9ef">Any</span>[<span style="color:#f92672">:+</span>]
+    <span style="color:#66d9ef">for</span> i <span style="color:#66d9ef">in</span> <span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>length(ex<span style="color:#f92672">.</span>args)
+        new_args <span style="color:#f92672">=</span> copy(ex<span style="color:#f92672">.</span>args)
+        new_args[i] <span style="color:#f92672">=</span> differentiate(ex<span style="color:#f92672">.</span>args[i], t)
+        push!(res_args, <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, new_args<span style="color:#f92672">...</span>))
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, res_args<span style="color:#f92672">...</span>)
+<span style="color:#66d9ef">end</span>
+
+f1 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>x)
+f2 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(x<span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>w)
+f3 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(x<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)
+f4 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, f1, <span style="color:#f92672">:</span>x)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, f2, <span style="color:#f92672">:</span>x)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, f3, <span style="color:#f92672">:</span>y)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, f4, <span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">differentiate(Val{:*}, f1, :x) = :(0x + 2 * 1)
+differentiate(Val{:*}, f2, :x) = :(1 * u * w + x * 0 * w + x * u * 0)
+differentiate(Val{:*}, f3, :x) = :(0 * 2 + x * 0)
+differentiate(Val{:*}, f4, :x) = :(0 * 2 + 2 * 0)</code></pre></div>
+<p>Ketjusäännön soveltamisen seurauksena tulee jonkin verran nollalla kertomisia,
+jotka voisi jonkinlaisella <code>simplify</code>-algoritmilla hoitaa pois. Asiaan palataan.
+Seuraavaksi potenssisääntö:</p>
+
+<p><span  class="math">\[
+\frac{\mathrm{d}}{\mathrm{d}x}\left(f\left(x\right)^{a}\right)=af\left(x\right)^{a-1}\frac{df}{dx}
+\]</span></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> differentiate(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>, t<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    op, f, a <span style="color:#f92672">=</span> ex<span style="color:#f92672">.</span>args
+    <span style="color:#66d9ef">return</span> <span style="color:#f92672">:</span>(<span style="color:#f92672">$</span>a <span style="color:#f92672">*</span> <span style="color:#f92672">$</span>f <span style="color:#f92672">^</span> (<span style="color:#f92672">$</span>a <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> <span style="color:#f92672">$</span>(differentiate(f, t)))
+<span style="color:#66d9ef">end</span>
+
+f1 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(x<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+f2 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(x<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+f3 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(y<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+f4 <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(y<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}, f1, <span style="color:#f92672">:</span>x)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}, f2, <span style="color:#f92672">:</span>y)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}, f3, <span style="color:#f92672">:</span>x)
+<span style="color:#a6e22e">@show</span> differentiate(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}, f4, <span style="color:#f92672">:</span>y)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">differentiate(Val{:^}, f1, :x) = :(2 * x ^ (2 - 1))
+differentiate(Val{:^}, f2, :y) = 0
+differentiate(Val{:^}, f3, :x) = 0
+differentiate(Val{:^}, f4, :y) = :(2 * y ^ (2 - 1))</code></pre></div>
+<p>Lopuksi rakennetaan pääfunktio, joka käynnistää minkä tahansa Expr-muodossa
+annetun lausekkeen symbolisen derivoinnin:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> differentiate(ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>, t<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    <span style="color:#66d9ef">if</span> ex<span style="color:#f92672">.</span>head <span style="color:#f92672">==</span> <span style="color:#f92672">:</span>call
+        <span style="color:#66d9ef">return</span> differentiate(<span style="color:#66d9ef">Val</span>{ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">1</span>]}, ex, t)
+    <span style="color:#66d9ef">else</span>
+        <span style="color:#66d9ef">return</span> differentiate(ex<span style="color:#f92672">.</span>head, t)
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+
+f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+<span style="color:#a6e22e">@show</span> differentiate(f, <span style="color:#f92672">:</span>u)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">differentiate(f, :u) = :(0 * w ^ 2 * u * v ^ 2 + 2 * 0 * u * v ^ 2 + 2 * w ^ 2 * 1 * v ^ 2 + 2 * w ^ 2 * u * 0)</code></pre></div>
+<p>Voimme sieventää lauseketta rakentelemalla funktion <code>simplify</code>, joka käy
+Expr-tyypin läpi sekä poistaa sieltä asioita sopivien ehtojen täyttyessä.</p>
+
+<p>Luku ja muuttuja eivät sievene</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(a<span style="color:#f92672">::</span><span style="color:#66d9ef">Int64</span>)
+    <span style="color:#66d9ef">return</span> a
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#ae81ff">1</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">simplify(1) = 1</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(s<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>)
+    <span style="color:#66d9ef">return</span> s
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">simplify(:x) = :x</code></pre></div>
+<p>Kertolaskuissa <span  class="math">\(f \cdot 0 = 0\)</span>, <span  class="math">\(f \cdot 1 \cdot g = f \cdot g\)</span>, ja <span  class="math">\(f \cdot 1 = f\)</span>:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>)
+    args <span style="color:#f92672">=</span> simplify<span style="color:#f92672">.</span>(ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>])
+    <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">in</span> args <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+    filter!(k <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">!</span>(<span style="color:#66d9ef">isa</span>(k, <span style="color:#66d9ef">Number</span>) <span style="color:#f92672">&amp;&amp;</span> k <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>), args)
+    length(args) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">return</span> first(args)
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, <span style="color:#f92672">:*</span>, args<span style="color:#f92672">...</span>)
+<span style="color:#66d9ef">end</span>
+
+f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(a <span style="color:#f92672">*</span> <span style="color:#ae81ff">0</span>)
+g <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(a <span style="color:#f92672">*</span> <span style="color:#ae81ff">1</span>)
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, f)
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:*</span>}, g)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">simplify(Val{:*}, f) = 0
+simplify(Val{:*}, g) = :a</code></pre></div>
+<p>Yhteenlaskuissa, nollatermit voidaan poistaa sekä jos yhteenlaskettavia on vain
+yksi määrä, ei ole mitään yhteenlaskettavaa: <span  class="math">\(a + 0 + b = a + b\)</span> ja <span  class="math">\(a + 0 = a\)</span>.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:+</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>)
+    args <span style="color:#f92672">=</span> simplify<span style="color:#f92672">.</span>(ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>])
+    filter!(k <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">!</span><span style="color:#66d9ef">isa</span>(k, <span style="color:#66d9ef">Number</span>) <span style="color:#f92672">||</span> k <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>, args)
+    length(args) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">return</span> first(args)
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, <span style="color:#f92672">:+</span>, args<span style="color:#f92672">...</span>)
+<span style="color:#66d9ef">end</span>
+
+f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(a <span style="color:#f92672">+</span> b <span style="color:#f92672">+</span> <span style="color:#ae81ff">0</span>)
+g <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(a <span style="color:#f92672">+</span> <span style="color:#ae81ff">0</span>)
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:+</span>}, f)
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:+</span>}, g)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">simplify(Val{:+}, f) = :(a + b)
+simplify(Val{:+}, g) = :a</code></pre></div>
+<p>Sama vähennyslaskuissa</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:-</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>)
+    args <span style="color:#f92672">=</span> simplify<span style="color:#f92672">.</span>(ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>])
+    filter!(k <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">!</span><span style="color:#66d9ef">isa</span>(k, <span style="color:#66d9ef">Number</span>) <span style="color:#f92672">||</span> k <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span>, args)
+    length(args) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">return</span> first(args)
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, <span style="color:#f92672">:-</span>, args<span style="color:#f92672">...</span>)
+<span style="color:#66d9ef">end</span></code></pre></div>
+<p>Potenssilaskussa <code>^(a, b)</code> voidaan yrittää sieventää molempia puolia</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(<span style="color:#f92672">::</span><span style="color:#66d9ef">Type</span>{<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}}, ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>)
+    args <span style="color:#f92672">=</span> simplify<span style="color:#f92672">.</span>(ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">2</span><span style="color:#f92672">:</span><span style="color:#66d9ef">end</span>])
+    <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">Expr</span>(<span style="color:#f92672">:</span>call, <span style="color:#f92672">:^</span>, args<span style="color:#f92672">...</span>)
+<span style="color:#66d9ef">end</span>
+
+f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>((<span style="color:#ae81ff">2</span><span style="color:#f92672">+</span><span style="color:#ae81ff">0</span>)<span style="color:#f92672">^</span>(<span style="color:#ae81ff">1</span><span style="color:#f92672">*</span>a))
+<span style="color:#a6e22e">@show</span> simplify(<span style="color:#66d9ef">Val</span>{<span style="color:#f92672">:^</span>}, f)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">simplify(Val{:^}, f) = :(2 ^ a)</code></pre></div>
+<p>Lopuksi jälleen pääfunktio, jolla lausekkeen sieventäminen aloitetaan</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> simplify(ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>)
+    <span style="color:#66d9ef">return</span> ex<span style="color:#f92672">.</span>head <span style="color:#f92672">==</span> <span style="color:#f92672">:</span>call <span style="color:#f92672">?</span> simplify(<span style="color:#66d9ef">Val</span>{ex<span style="color:#f92672">.</span>args[<span style="color:#ae81ff">1</span>]}, ex) <span style="color:#f92672">:</span> ex
+<span style="color:#66d9ef">end</span>
+
+f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>)
+<span style="color:#a6e22e">@show</span> simplify(differentiate(f, <span style="color:#f92672">:</span>u))</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">simplify(differentiate(f, <span style="color:#f92672">:</span>u)) <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> w <span style="color:#f92672">^</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> v <span style="color:#f92672">^</span> <span style="color:#ae81ff">2</span>)</code></pre></div>
+<p>Tarvitsemme vielä lisäksi jonkinlaisen <code>subs</code>-komennon, jolla symbolin tilalle voidaan sijoittaa numero:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> subs(a<span style="color:#f92672">::</span><span style="color:#66d9ef">Int</span>, <span style="color:#f92672">::</span><span style="color:#66d9ef">Pair</span>{<span style="color:#66d9ef">Symbol</span>, <span style="color:#66d9ef">Int</span>}<span style="color:#f92672">...</span>)
+    <span style="color:#66d9ef">return</span> a
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#66d9ef">function</span> subs(s<span style="color:#f92672">::</span><span style="color:#66d9ef">Symbol</span>, args<span style="color:#f92672">::</span><span style="color:#66d9ef">Pair</span>{<span style="color:#66d9ef">Symbol</span>, <span style="color:#66d9ef">Int</span>}<span style="color:#f92672">...</span>)
+    <span style="color:#66d9ef">for</span> (k, v) <span style="color:#66d9ef">in</span> args
+        s <span style="color:#f92672">==</span> k <span style="color:#f92672">&amp;&amp;</span> <span style="color:#66d9ef">return</span> v
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> s
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#66d9ef">function</span> subs(ex<span style="color:#f92672">::</span><span style="color:#66d9ef">Expr</span>, args<span style="color:#f92672">::</span><span style="color:#66d9ef">Pair</span>{<span style="color:#66d9ef">Symbol</span>, <span style="color:#66d9ef">Int</span>}<span style="color:#f92672">...</span>)
+    ne <span style="color:#f92672">=</span> copy(ex)
+    <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span><span style="color:#f92672">:</span>length(ne<span style="color:#f92672">.</span>args)
+        ne<span style="color:#f92672">.</span>args[i] <span style="color:#f92672">=</span> subs(ne<span style="color:#f92672">.</span>args[i], args<span style="color:#f92672">...</span>)
+    <span style="color:#66d9ef">end</span>
+    <span style="color:#66d9ef">return</span> ne
+<span style="color:#66d9ef">end</span>
+
+d <span style="color:#f92672">=</span> simplify(differentiate(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>), <span style="color:#f92672">:</span>u))
+<span style="color:#a6e22e">@show</span> d
+<span style="color:#a6e22e">@show</span> subs(d, <span style="color:#f92672">:</span>w <span style="color:#f92672">=&gt;</span> <span style="color:#ae81ff">3</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">d = :(2 * w ^ 2 * v ^ 2)
+subs(d, :w =&gt; 3) = :(2 * 3 ^ 2 * v ^ 2)</code></pre></div>
+<p>Loput derivointisäännöt voitaisiin kirjoittaa vastaavanlaisilla säännöillä. Nyt
+derivaattorimme kuitenkin implementoi kaiken tarvittavan FEMBasis.jl:n
+tarpeisiin. Mikäli jotakin puuttuu, tulee vähintäänkin virheilmoitus, esimerkiksi</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(<span style="color:#ae81ff">1</span> <span style="color:#f92672">+</span> x)
+<span style="color:#a6e22e">@show</span> differentiate(f, <span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ERROR: LoadError: MethodError: no method matching differentiate(::Type{Val{:+}}, ::Expr, ::Symbol)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">f <span style="color:#f92672">=</span> <span style="color:#f92672">:</span>(sin(x))
+<span style="color:#a6e22e">@show</span> differentiate(f, <span style="color:#f92672">:</span>x)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">ERROR: LoadError: MethodError: no method matching differentiate(::Type{Val{:sin}}, ::Expr, ::Symbol)</code></pre></div>
+<!--
+Näitä voi sitten tarpeen mukaan implementoida lisää. Tässä valitussa lähestymistavassa on sekin mielenkiintoinen puoli, että myös itse implementoitujen funktioiden derivoinnit voidaan esittää systeemissä. Esimerkiksi neuroverkoissa käytettävä [relu][relu]-funktio:
+
+
+-->
+
+<p>Sitten se mielenkiintoinen kysymys. Nyt kun kehitelty oma symbolinen derivointi,
+niin kuinka sitä voisi käyttää tehokkaasti? Ja nyt makrot esittävät
+hyödyllisyytensä.</p>
+
+<p>Saamme kyllä ajettua koodia ilmankin, rakentamalla korkeamman asteen funktion,
+joka palauttaa funktion derivaatan. Tämä olisi se todennäköinen ratkaisu, mikäli
+käyttäisi Pythonia ja SymPyä.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> diff(f, x)
+    <span style="color:#66d9ef">function</span> diff_(u, v, w)
+        df <span style="color:#f92672">=</span> simplify(differentiate(f, x))
+        res <span style="color:#f92672">=</span> subs(df, <span style="color:#f92672">:</span>u <span style="color:#f92672">=&gt;</span> u, <span style="color:#f92672">:</span>v <span style="color:#f92672">=&gt;</span> v, <span style="color:#f92672">:</span>w <span style="color:#f92672">=&gt;</span> w)
+        <span style="color:#66d9ef">return</span> eval(res)
+    <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+
+df1 <span style="color:#f92672">=</span> diff(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>), <span style="color:#f92672">:</span>u)
+<span style="color:#a6e22e">@show</span> df1(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">df1(1, 2, 3) = 72</code></pre></div>
+<p>Koodi toimii, mutta joka kerta, kun funktiota kutsutaan, joudutaan derivoimaan
+funktio uudelleen. Jos laitetaan &quot;käsin laskettu&quot; derivaatta ja yllä mainittu
+funktio testipenkkiin, niin tulos on aika karu.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">df3 <span style="color:#f92672">=</span> (u, v, w) <span style="color:#f92672">-&gt;</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>
+
+<span style="color:#66d9ef">using</span> BenchmarkTools
+<span style="color:#a6e22e">@btime</span> df1(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)
+<span style="color:#a6e22e">@btime</span> df3(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">231.134 μs (600 allocations: 33.77 KiB)
+ 12.732 ns (0 allocations: 0 bytes)</code></pre></div>
+<p>Nopeusero on karkeasti laskettuna n. 20000-kertainen. On kyllä olemassa eri
+keinoja, joilla tehokkuutta voidaan parantaa. Esimerkiksi derivoinnin voi ottaa
+ulos sisemmästä funktiosta joka parantaa tilannetta hieman. Ratkaisu on joka
+tapauksessa kohtalaisen monimutkainen eikä lähelläkään sitä nopeutta, mitä se
+voisi olla mikäli funktion derivaatta olisi suoraan naputeltu
+lambda-lausekkeeseen.</p>
+
+<p>Jos tiedetään jo ennen ohjelman suorittamista, että tarvitsemme kyseisen
+polynomin derivaatan arvoja, parasta olisi silloin laskea derivaatat jo ohjelman
+esikäsittelyvaiheessa, jolloin nopeat derivaatan laskennat onnistuvat
+suoraviivaisesti ohjelman ajon aikana. Makroilla voidaan saavuttaa ratkaisu,
+jossa ei ole mitään ylimääräistä laskennallista monimutkaisuutta siihen nähden,
+että derivaattafunktio olisi käsin kirjoitettu.</p>
+
+<p>Koska makro kirjoitetaan ennen pääohjelman suorittamista, voimme siirtää kaiken
+symbolisen laskennan esikäsittelyyn ja saada derivaattafunktion, jonka nopeus on
+yhtä nopea, kuin se olisi kirjoitettu manuaalisesti. Makron pitää siis aivan
+konkreettisesti, palauttaa <code>(u, v, w) -&gt; 2 * w^2 * v^2</code>, kun sille annetaan
+argumentteina <code>(:(2*w^2*u*v^2), :u)</code>. Makro tässä tapauksessa on, mikäli
+halutaan säilyttää syntaksi samankaltaisena kuin funktiokutsussa:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">macro</span> diff(f, x)
+    df <span style="color:#f92672">=</span> simplify(differentiate(eval(f), eval(x)))
+    <span style="color:#66d9ef">return</span> <span style="color:#f92672">:</span>((u, v, w) <span style="color:#f92672">-&gt;</span> <span style="color:#f92672">$</span>df)
+<span style="color:#66d9ef">end</span></code></pre></div>
+<p>Tässä kaikki monimutkaisuus on siirretty esikäsittelyyn ja lopputuloksena
+palautetaan funktio, joka on identtinen sen kanssa mitä käsin kirjoitettaisiin.
+Asian voi varmentaa <code>@macroexpand</code>-komennolla.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#a6e22e">@macroexpand</span> <span style="color:#a6e22e">@diff</span>(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>), <span style="color:#f92672">:</span>u)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">:((var&#34;#34#u&#34;, var&#34;#35#v&#34;, var&#34;#36#w&#34;)-&gt;begin
+          2 * var&#34;#36#w&#34; ^ 2 * var&#34;#35#v&#34; ^ 2
+      end)</code></pre></div>
+<p>Julia käyttää sisäisesti <code>gensym()</code>-funktiota uudelleennimeämään muuttujat
+siten, ettei yhteensopivuusongelmia muun ohjelmakoodin kanssa synny. Mutta uusia
+muuttujan nimiä hieman katselemalla näkee, että kyseinen makro kyllä palauttaa
+funktion <code>(u, v, w) -&gt; 2 * w^2 * v^2</code>, kuten pitääkin.</p>
+
+<p>Yhteenvetomaisesti eri tekniikoilla derivointi:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia">df1 <span style="color:#f92672">=</span>  diff(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>), <span style="color:#f92672">:</span>u)
+df2 <span style="color:#f92672">=</span> <span style="color:#a6e22e">@diff</span>(<span style="color:#f92672">:</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>u<span style="color:#f92672">*</span>v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>), <span style="color:#f92672">:</span>u)
+df3 <span style="color:#f92672">=</span> (u, v, w) <span style="color:#f92672">-&gt;</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> w<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> v<span style="color:#f92672">^</span><span style="color:#ae81ff">2</span>
+
+<span style="color:#a6e22e">@btime</span> df1(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)
+<span style="color:#a6e22e">@btime</span> df2(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)
+<span style="color:#a6e22e">@btime</span> df3(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">3</span>)</code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">  266.269 μs (651 allocations: 35.36 KiB)
+  12.735 ns (0 allocations: 0 bytes)
+  12.686 ns (0 allocations: 0 bytes)</code></pre></div>
+<p>Makrot ovat hieman funktioita omituisempia rakenteita. Itse pyrin niitä
+henkilökohtaisesti hieman jopa välttelemään. Jos makroissa tulee bugeja, niiden
+debuggaaminen on hankalampaa ja konsepti on muutenkin vähemmän tunnettu. Mutta
+niille kyllä löytyy omat käyttökohteensa. Tässä nähtiin eräs potentiaalinen
+käyttökohde. Oikeissa paikoissa käytettynä ne ovat varsin tehokas lisätyökalu.
+Viimeistään siinä vaiheessa, kun tuntuu siltä, että haluaisi kirjoittaa
+jonkinlaisen skriptin, joka kirjoittaa Julia-koodia, tietää että ratkaisu löytyy
+makrosta.</p>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/macro">macro</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
+            <time class="has-text-grey-light is-size-7">18 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></h1>
+            <time class="has-text-grey-light is-size-7">16 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
+            <time class="has-text-grey-light is-size-7">5 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden verifioiminen</a></h1>
+            <time class="has-text-grey-light is-size-7">4 June 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+  
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Related posts</h1>
+      
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
+            <time class="has-text-grey-light is-size-7">18 June 2020</time>
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></h1>
+            <time class="has-text-grey-light is-size-7">16 June 2020</time>
+      
+    </div>
+</div>
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (10)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Jukka Aho (@ahojukka5) 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

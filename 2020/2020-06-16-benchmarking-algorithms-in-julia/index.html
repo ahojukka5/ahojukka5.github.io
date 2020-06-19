@@ -5,6 +5,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Jukka Aho (@ahojukka5)  | Algoritmien benchmarkkaaminen Julialla</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+    
 
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -91,7 +106,7 @@ arr3[<span style="color:#66d9ef">end</span><span style="color:#f92672">-</span><
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">find_indices_1(arr1, target) = (4095, 4096)
 find_indices_1(arr2, target) = (8191, 8192)
 find_indices_1(arr3, target) = (16383, 16384)
-</code></pre></div><p>Kaksikin tapausta kyllä riittäisi. Kolmas tuo varmuutta päättelyynn. Lisäksi
+</code></pre></div><p>Kaksikin tapausta kyllä riittäisi. Kolmas tuo varmuutta päättelyyn. Lisäksi
 tehdään sopiva apufunktio, joka ajaa benchmarkin kaikille kolmelle eri
 tapaukselle.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> benchmark(f, name)
@@ -120,13 +135,15 @@ Array 3, size = 16384
 </code></pre></div><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-text" data-lang="text">68.956
 </code></pre></div><p>Johtopäätös tästä on, että toimii hyvin pienillä $N$ arvoilla, mutta skaalautuu
 huonosti. Kaikenkaikkiaan, algoritmin tarkastelu BenchmarkToolsin avulla oli
-varsin suoraviivaista.</p>
-<p>En kuitenkaan malta jättää tätä vielä tähän. Voisiko algoritmia jotenkin
-parantaa? Voisi. Ei ole välttämättä tarpeen tehdä kahta sisäkkäistä
-ohjelmointisilmukkaa, jos tallennetaan listan arvot hajautustaulukon avaimina.
-Silloin on mahdollista tehdä yksinkertainen sanakirjahaku jolla selvittää,
-löytyykö sopiva indeksi hajautustaulusta, koska <code>arr[i] + arr[j] = target</code> mutta
-on myös niin, että <code>arr[j] = target - arr[i]</code>.</p>
+varsin suoraviivaista. Ennen sen suurempia optimointeja on varsin helppoa
+tarkastaa empiirisesti, mikä algoritmin aikakompleksisuus on.</p>
+<h2 id="parempia-algoritmeja">Parempia algoritmeja</h2>
+<p>Voisiko algoritmia sitten jotenkin parantaa? Voisi.</p>
+<p>Ei ole välttämättä tarpeen tehdä kahta sisäkkäistä ohjelmointisilmukkaa, jos
+tallennetaan listan arvot hajautustaulukon avaimina. Silloin on mahdollista
+tehdä yksinkertainen sanakirjahaku jolla selvittää, löytyykö sopiva indeksi
+hajautustaulusta, koska <code>arr[i] + arr[j] = target</code> mutta on myös niin, että
+<code>arr[j] = target - arr[i]</code>.</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-julia" data-lang="julia"><span style="color:#66d9ef">function</span> find_indices_2(arr, target)
     d <span style="color:#f92672">=</span> <span style="color:#66d9ef">Dict</span>{<span style="color:#66d9ef">Int</span>, <span style="color:#66d9ef">Int</span>}()
     <span style="color:#66d9ef">for</span> i<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span><span style="color:#f92672">:</span>length(arr)
@@ -288,6 +305,8 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
         
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
             <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
@@ -322,9 +341,9 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
         
-            <span class="tag"><a href="https://ahojukka5.github.io/tags/verify">verify</a></span>
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
         
@@ -337,6 +356,9 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
             <time class="has-text-grey-light is-size-7">18 June 2020</time>
         
@@ -346,10 +368,7 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
             <time class="has-text-grey-light is-size-7">5 June 2020</time>
         
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden varmentaminen</a></h1>
-            <time class="has-text-grey-light is-size-7">4 June 2020</time>
-        
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-autossh-and-systemd/">SSH-tunnelin pitäminen ylhäällä autossh:lla</a></h1>
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-04-backup-verification/">Varmuuskopioiden verifioiminen</a></h1>
             <time class="has-text-grey-light is-size-7">4 June 2020</time>
         
     </div>
@@ -366,6 +385,9 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
         <h1 class="title is-5">Related posts</h1>
       
       
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+      
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
             <time class="has-text-grey-light is-size-7">18 June 2020</time>
       
@@ -378,7 +400,7 @@ empiirisesti tutkia implementoimalla jollakin toisella ohjelmointikielellä.</p>
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (9)<br>
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (10)<br>
         
             <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
         
