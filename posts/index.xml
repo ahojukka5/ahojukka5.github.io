@@ -17,9 +17,11 @@
       <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</guid>
-      <description>Tarkastellaan differentiaaliyhtälön \( u&#39;&#39; = 12x^2 - 36x + 18 \) ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.
-Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on tiedossa, ja se on \( u\left(x\right) = \left(x - 3\right)^{2} x^{2}. \)
-Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä. Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan differentiaaliyhtälöä testifunktiolla $v \in \mathcal{V}$ sekä integroidaan alueen yli. \( \int u&#39;&#39; \cdot v \, \mathrm{d}x = \int fv \, \mathrm{d}x \)</description>
+      <description>&lt;p&gt;Tarkastellaan differentiaaliyhtälön
+&lt;span  class=&#34;math&#34;&gt;\(
+u&#39;&#39; = 12x^2 - 36x + 18
+\)&lt;/span&gt;
+ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.&lt;/p&gt;</description>
     </item>
     
     <item>
