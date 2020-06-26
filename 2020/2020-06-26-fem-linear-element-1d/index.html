@@ -60,40 +60,46 @@
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
-                <p>Tarkastellaan differentiaaliyhtälön
-<span  class="math">\(
+                <p>Tarkastellaan differentiaaliyhtälön</p>
+
+<p><span  class="math">\[
 u'' = 12x^2 - 36x + 18
-\)</span>
-ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.</p>
+\]</span></p>
+
+<p>ratkaisua reunaehdoilla <span  class="math">\(u(0) = 0\)</span> ja <span  class="math">\(u(3) = 0\)</span>.</p>
 
 <p>Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla
 integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on
-tiedossa, ja se on
-<span  class="math">\(
+tiedossa, ja se on</p>
+
+<p><span  class="math">\[
 u\left(x\right) = \left(x - 3\right)^{2} x^{2}.
-\)</span></p>
+\]</span></p>
 
 <p>Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä.
 Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan
-differentiaaliyhtälöä testifunktiolla $v \in \mathcal{V}$ sekä integroidaan
-alueen yli.
-<span  class="math">\(
-\int u'' \cdot v \, \mathrm{d}x = \int fv \, \mathrm{d}x
-\)</span></p>
+differentiaaliyhtälöä testifunktiolla <span  class="math">\(v \in \mathcal{V}\)</span> sekä integroidaan
+alueen yli.</p>
 
-<p>On hieman makuasia, pitäisikö ratkaista yhtälöä $-u'' = f$ vai $u'' = f$,
-monesti mukavuussyistä käytetään miinusmerkkiä.</p>
+<p><span  class="math">\[
+\int u'' \cdot v \, \mathrm{d}x = \int fv \, \mathrm{d}x
+\]</span></p>
+
+<p>On hieman makuasia, pitäisikö ratkaista yhtälöä <span  class="math">\(-u'' = f\)</span> vai <span  class="math">\(u'' = f\)</span>,
+monesti mukavuussyistä käytetään miinusmerkkiä. Tämä asia tulee ilmi lopussa.</p>
 
 <p>Ratkaisu perustuu osittaisintegrointiin, tai oikeastaan tulon derivointiin. On
-nimittäin niin, että
-<span  class="math">\(
-\left(u'v\right)'=u''\cdot v+u'v'.
-\)</span></p>
+nimittäin niin, että</p>
 
-<p>Tästä nyt huomataan, että
-<span  class="math">\(
+<p><span  class="math">\[
+\left(u'v\right)'=u''\cdot v+u'v'.
+\]</span></p>
+
+<p>Tästä nyt huomataan, että</p>
+
+<p><span  class="math">\[
 u''\cdot v=\left(u'v\right)'-u'v'.
-\)</span></p>
+\]</span></p>
 
 <p>Integroimalla alueen yli saadaan</p>
 
@@ -104,30 +110,44 @@ u''\cdot v=\left(u'v\right)'-u'v'.
 <p>Ensimmäinen termi voidaan integroida</p>
 
 <p><span  class="math">\[
-\int u''\cdot v\,\mathrm{d}x  =\left[u'v\right]_{x=x_{0}}^{x=x_{1}}-\int u'\cdot v'\,\mathrm{d}x
+\int\left[\left(u'v\right)'-u'v'\right]\,\mathrm{d}x = \left[u'v\right]_{x=x_{0}}^{x=x_{1}}-\int u'\cdot v'\,\mathrm{d}x
 \]</span></p>
 
-<p>Testifunktioavaruus $\mathcal{V}$ valitaan yleensä siten, että funktiot saavat
-arvon 0 reunoilla, joka johtaa siihen, että sijoitustermi häviää.</p>
+<p>Testifunktioavaruus <span  class="math">\(\mathcal{V}\)</span> valitaan yleensä siten, että funktioiden
+<span  class="math">\(v_i\)</span> arvot saavat arvon 0 reunoilla, joka johtaa siihen, että sijoitustermi
+häviää.</p>
 
-<p>Saadaan yhtälön heikko muoto eli energiamuoto: määrää $u\in\mathcal{U}$ siten että kaikille $v\in\mathcal{V}$
-<span  class="math">\(
+<p>Saadaan yhtälön heikko muoto eli energiamuoto: määrää <span  class="math">\(u\in\mathcal{U}\)</span> siten että kaikille <span  class="math">\(v\in\mathcal{V}\)</span></p>
+
+<p><span  class="math">\[
 \int u'\cdot v'\,\mathrm{d}x = -\int fv\,\mathrm{d}x
-\)</span></p>
+\]</span></p>
+
+<p>Mikäli ratkaistavana olisi ollut yhtälä <span  class="math">\(-u'' = f\)</span>, ei heikossa muodossa olisi
+tuota miinusmerkkiä. Monesti tämä Poissonin yhtälö kirjallisuudessa esitetäänkin
+muodossa <span  class="math">\(-\Delta u = f\)</span>.</p>
 
 <p>Ratkaisu etenee siten, että diskretoidaan ongelma ja valitaan diskretointiin
-sopiva yriteratkaisu. Esimerkiksi väli $I = [0, 3]$ voidaan diskretoida niin,
-että kuvataan väli $I_1 = [0, 2]$ yhdellä funktiolla ja väli $I_2 = [2, 3]$
+sopiva yriteratkaisu. Esimerkiksi väli <span  class="math">\(I = [0, 3]\)</span> voidaan diskretoida niin,
+että kuvataan väli <span  class="math">\(I_1 = [0, 2]\)</span> yhdellä funktiolla ja väli <span  class="math">\(I_2 = [2, 3]\)</span>
 toisella.</p>
 
-<p>Yriteratkaisun $u<em>h(x)$ pitäisi nyt olla vähintäänkin sellainen, että sen derivaatta on olemassa, muuten tulee pelkkää nollaa. Sama pätee testifunktioihin $v$. Yksinkertaisin valinta on paloittain jatkuva lineaarinen funktio.
-$$
-u</em>{h}\left(x\right)=\begin{cases}
-\alpha_{2}\phi_{2}^{\left(1\right)}\left(x\right) &amp; x\in I_{1}<br>
-\alpha_{2}\phi_{1}^{\left(2\right)}\left(x\right) &amp; x\in I_{2}
+<p>Yritetään keksiä <span  class="math">\(u_h(x)\)</span> joka olisi &quot;suurinpiirtein&quot; sellainen että se
+toteuttaisi differentiaaliyhtälön vahvan muodon, eli siis että se toteuttaisi
+yhtälön heikon muodon. Pitäisi nyt olla vähintäänkin sellainen, että sen
+derivaatta on olemassa, muuten tulee pelkkää nollaa. Sama pätee testifunktioihin
+<span  class="math">\(v\)</span>. Yksinkertaisin valinta on paloittain jatkuva lineaarinen funktio.
+Muotofunktioille on muitakin vaatimuksia mutta niihin ei tässä artikkelissa
+mennä. Approksimoitu ratkaisu alkuperäiseen ongelmaan on</p>
+
+<p><span  class="math">\[
+u_{h}\left(x\right)=\begin{cases}
+\alpha_{2}\phi_{2}^{\left(1\right)}\left(x\right) & x\in I_{1}\\
+\alpha_{2}\phi_{1}^{\left(2\right)}\left(x\right) & x\in I_{2}
 \end{cases},
-$$
-missä</p>
+\]</span></p>
+
+<p>missä muotofunktiot ovat:</p>
 
 <p><span  class="math">\[
 \begin{alignedat}{2}
@@ -136,7 +156,11 @@ missä</p>
 \end{alignedat}
 \]</span></p>
 
-<p>Funktio siis saa arvon $\alpha_2$ kohdassa $x=2$, mitä on jäljellä keksiä mikä tuo tuntematon kerroin olisi. Kantafunktioiden derivaatat ovat</p>
+<p>Muotofunktiot ovat perinteinen &quot;hattufunktio&quot;, joka saa arvon 1 solmupisteessä
+2, siis kohdassa <span  class="math">\(x=2\)</span>. Muotofunktiot kun kertoo tuntemattomalla kertoimella
+<span  class="math">\(\alpha_2\)</span>, on siis niin että differentiaaliyhtälöä approksimoiva funktio
+<span  class="math">\(u_h\)</span> saa arvon <span  class="math">\(\alpha_2\)</span> kohdassa <span  class="math">\(x=2\)</span>. Mitä on jäljellä keksiä mikä
+tuo tuntematon kerroin olisi. Kantafunktioiden derivaatat ovat</p>
 
 <p><span  class="math">\[
 \begin{alignedat}{2}
@@ -145,7 +169,8 @@ missä</p>
 \end{alignedat}
 \]</span></p>
 
-<p>Heikko muoto täytyy integroida kahdessa osassa. Kun sijoitetaan heikkoon muotoon, saadaan</p>
+<p>Heikko muoto täytyy integroida kahdessa osassa. Kun approksimaatiot sijoitetaan
+heikkoon muotoon ja lasketaan integraali, saadaan</p>
 
 <p><span  class="math">\[
 k_{22}^{\left(1\right)}+k_{11}^{\left(2\right)} =-f_{2}^{\left(1\right)}-f_{1}^{\left(2\right)},
@@ -162,10 +187,11 @@ f_{1}^{\left(2\right)}  =\int_{I_{2}}\left(12x^{2}-36x+18\right)\left(3-x\right)
 \end{alignedat}
 \]</span></p>
 
-<p>Tästä voi ratkaista tuntemattoman kertoimen $\alpha<em>2$:
-$$
-\alpha</em>{2}=k_{2}^{-1}f_{2}=\frac{2}{3}\cdot6=4
-$$</p>
+<p>Tästä voi ratkaista tuntematon kerroin <span  class="math">\(\alpha_2\)</span>:</p>
+
+<p><span  class="math">\[
+\alpha_{2}=k_{2}^{-1}f_{2}=\frac{2}{3}\cdot6=4
+\]</span></p>
             </div>
         </div>
     </div>
