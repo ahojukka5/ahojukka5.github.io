@@ -58,6 +58,35 @@
                     <article class="media">
                         <div class="media-content">
                             <div class="content">
+                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></p>
+                                <p class="subtitle is-size-6 has-text-grey-light">
+                                    Published at June 26, 2020 &middot;
+                                    <i class="far fa-clock"></i>&nbsp;2 min read
+                                </p>
+                                <p>Tarkastellaan differentiaaliyhtälön $$ u&rsquo;&rsquo; = 12x^2 - 36x + 18 $$ ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.
+Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on tiedossa, ja se on $$ u\left(x\right) = \left(x - 3\right)^{2} x^{2}. $$
+Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä. Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan differentiaaliyhtälöä testifunktiolla $v \in \mathcal{V}$ sekä integroidaan alueen yli. $$ \int u&rsquo;&rsquo; \cdot v , \mathrm{d}x = \int fv , \mathrm{d}x $$...</p>
+                            </div>
+                        </div>
+                    </article>
+                
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
+                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></p>
+                                <p class="subtitle is-size-6 has-text-grey-light">
+                                    Published at June 23, 2020 &middot;
+                                    <i class="far fa-clock"></i>&nbsp;4 min read
+                                </p>
+                                <p>Koska makrot ovat ennen kaikkea koodin esikäsittelyä, niiden inputit ovat rajalliset, sillä ohjelmakoodia ei ole suoritettu ennen makroa. Makro voi ottaa input argumentteina lähinnä numeroita ja merkkijonoja. Tehdään yksinkertainen makro joka palauttaa inputin tyypin ja sisällön. Tällä voi helposti tutkia minkälaisia asioita makro &ldquo;syö&rdquo;:
+macro showargs(args...) for arg in args @show typeof(arg), arg end return end @showargs(1, 1.0, true, a, &#34;hei&#34;) (typeof(arg), arg) = (Int64, 1) (typeof(arg), arg) = (Float64, 1....</p>
+                            </div>
+                        </div>
+                    </article>
+                
+                    <article class="media">
+                        <div class="media-content">
+                            <div class="content">
                                 <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></p>
                                 <p class="subtitle is-size-6 has-text-grey-light">
                                     Published at June 22, 2020 &middot;
@@ -193,43 +222,6 @@ todella ovat määriteltyjä.</p>...</p>
                         </div>
                     </article>
                 
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="content">
-                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-05-31-pandoc-filters/">Pandocin suodattimien käyttö</a></p>
-                                <p class="subtitle is-size-6 has-text-grey-light">
-                                    Published at May 31, 2020 &middot;
-                                    <i class="far fa-clock"></i>&nbsp;4 min read
-                                </p>
-                                <p><p>Aiemmassa postauksessa tarkastelin Pandocin AST:tä. Siihen voi esimerkiksi
-tallentaa <code>CodeBlock</code>-noden, johon sisältyy ohjelmakoodia. Esittelen tässä
-lyhyesti, kuinka voidaan vaikuttaa yksityiskohtaisesti siihen, miltä AST:stä
-renderöity lopputulos näyttää LaTeXilla. Käytännön tasolla, <code>CodeBlock</code> pitää
-muuttaa <code>RawBlock</code>-nodeksi käyttämällä Pandocin suodattimia.</p>...</p>
-                            </div>
-                        </div>
-                    </article>
-                
-                    <article class="media">
-                        <div class="media-content">
-                            <div class="content">
-                                <p class="title is-4"><a href="https://ahojukka5.github.io/2020/2020-05-29-pandoc-converters-data-types/">Pandoc-konvertoijan datatyypeistä</a></p>
-                                <p class="subtitle is-size-6 has-text-grey-light">
-                                    Published at May 29, 2020 &middot;
-                                    <i class="far fa-clock"></i>&nbsp;9 min read
-                                </p>
-                                <p><p><a href="https://en.wikipedia.org/wiki/Pandoc">Pandoc</a> on universaali dokumenttikonvertoija. Sillä voi kääntää
-dokumentteja eri formaattien väilllä, esimerkiksi blogimaailmasta tutusta
-<a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a>-formaatista <a href="https://en.wikipedia.org/wiki/HTML">HTML</a>-formaattiin, ja toisaalta samasta
-lähteestä myös <a href="https://en.wikipedia.org/wiki/LaTeX">LaTeX</a>-formaattiin, ja niin edelleen. Kuinka se sen
-tekee? Pandoc parsii dokumentin <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">abstraktiksi syntaksipuuksi</a> tai AST:ksi
-(englanniksi &ldquo;abstract syntax tree&rdquo;), jonka jälkeen se kirjoittaa tämän edelleen
-haluttuun formaattiin. Olen tutkiskellut tuota Pandocin AST:tä sekä eri
-dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.</p>...</p>
-                            </div>
-                        </div>
-                    </article>
-                
             </div>
         </div>
     </div>
@@ -296,6 +288,12 @@ dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.<
     <div class="card-content">
         <h1 class="title is-5">Recent posts</h1>
         
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
+            <time class="has-text-grey-light is-size-7">23 June 2020</time>
+        
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
             <time class="has-text-grey-light is-size-7">22 June 2020</time>
         
@@ -305,12 +303,6 @@ dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.<
             <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
             <time class="has-text-grey-light is-size-7">18 June 2020</time>
         
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></h1>
-            <time class="has-text-grey-light is-size-7">16 June 2020</time>
-        
-            <h1><a href="https://ahojukka5.github.io/2020/2020-06-05-get-latest-file-name/">Uusimman tiedoston löytäminen</a></h1>
-            <time class="has-text-grey-light is-size-7">5 June 2020</time>
-        
     </div>
 </div>
     
@@ -319,7 +311,7 @@ dokumenttien välisiä konversioita ja julkaisen löydökseni tässä blogissa.<
     <div class="card-content">
         <h1 class="title is-5">Archives</h1>
         
-            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (11)<br>
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (13)<br>
         
             <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
         

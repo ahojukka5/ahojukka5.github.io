@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Jukka Aho (@ahojukka5)  | About me</title>
+    <title>Jukka Aho (@ahojukka5)  | Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     
@@ -32,7 +32,7 @@
                 <br>
                 <h1 class="title is-size-1">
                     
-                        About me
+                        Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä
                     
                 </h1>
                 
@@ -49,7 +49,91 @@
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
-                <p>Hello. My name is Jukka.</p>
+                <p>Tarkastellaan differentiaaliyhtälön
+$$
+u&rsquo;&rsquo; = 12x^2 - 36x + 18
+$$
+ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.</p>
+<p>Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla
+integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on
+tiedossa, ja se on
+$$
+u\left(x\right) = \left(x - 3\right)^{2} x^{2}.
+$$</p>
+<p>Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä.
+Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan
+differentiaaliyhtälöä testifunktiolla $v \in \mathcal{V}$ sekä integroidaan
+alueen yli.
+$$
+\int u&rsquo;&rsquo; \cdot v , \mathrm{d}x = \int fv , \mathrm{d}x
+$$</p>
+<p>On hieman makuasia, pitäisikö ratkaista yhtälöä $-u&rsquo;&rsquo; = f$ vai $u&rsquo;&rsquo; = f$,
+monesti mukavuussyistä käytetään miinusmerkkiä.</p>
+<p>Ratkaisu perustuu osittaisintegrointiin, tai oikeastaan tulon derivointiin. On
+nimittäin niin, että
+$$
+\left(u&rsquo;v\right)&lsquo;=u&rsquo;'\cdot v+u&rsquo;v&rsquo;.
+$$</p>
+<p>Tästä nyt huomataan, että
+$$
+u&rsquo;'\cdot v=\left(u&rsquo;v\right)'-u&rsquo;v&rsquo;.
+$$</p>
+<p>Integroimalla alueen yli saadaan</p>
+<p>$$
+\int u&rsquo;'\cdot v,\mathrm{d}x =\int\left[\left(u&rsquo;v\right)'-u&rsquo;v&rsquo;\right],\mathrm{d}x
+$$</p>
+<p>Ensimmäinen termi voidaan integroida</p>
+<p>$$
+\int u&rsquo;'\cdot v,\mathrm{d}x  =\left[u&rsquo;v\right]<em>{x=x</em>{0}}^{x=x_{1}}-\int u&rsquo;\cdot v&rsquo;,\mathrm{d}x
+$$</p>
+<p>Testifunktioavaruus $\mathcal{V}$ valitaan yleensä siten, että funktiot saavat
+arvon 0 reunoilla, joka johtaa siihen, että sijoitustermi häviää.</p>
+<p>Saadaan yhtälön heikko muoto eli energiamuoto: määrää $u\in\mathcal{U}$ siten että kaikille $v\in\mathcal{V}$
+$$
+\int u&rsquo;\cdot v&rsquo;,\mathrm{d}x = -\int fv,\mathrm{d}x
+$$</p>
+<p>Ratkaisu etenee siten, että diskretoidaan ongelma ja valitaan diskretointiin
+sopiva yriteratkaisu. Esimerkiksi väli $I = [0, 3]$ voidaan diskretoida niin,
+että kuvataan väli $I_1 = [0, 2]$ yhdellä funktiolla ja väli $I_2 = [2, 3]$
+toisella.</p>
+<p>Yriteratkaisun $u_h(x)$ pitäisi nyt olla vähintäänkin sellainen, että sen derivaatta on olemassa, muuten tulee pelkkää nollaa. Sama pätee testifunktioihin $v$. Yksinkertaisin valinta on paloittain jatkuva lineaarinen funktio.
+$$
+u_{h}\left(x\right)=\begin{cases}
+\alpha_{2}\phi_{2}^{\left(1\right)}\left(x\right) &amp; x\in I_{1}\<br>
+\alpha_{2}\phi_{1}^{\left(2\right)}\left(x\right) &amp; x\in I_{2}
+\end{cases},
+$$
+missä</p>
+<p>$$
+\begin{alignedat}{2}
+\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2}x\<br>
+\phi_{1}^{\left(2\right)} &amp; =3-x
+\end{alignedat}
+$$</p>
+<p>Funktio siis saa arvon $\alpha_2$ kohdassa $x=2$, mitä on jäljellä keksiä mikä tuo tuntematon kerroin olisi. Kantafunktioiden derivaatat ovat</p>
+<p>$$
+\begin{alignedat}{2}
+\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)} &amp;=\frac{1}{2} \<br>
+\frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)} &amp;=-1
+\end{alignedat}
+$$</p>
+<p>Heikko muoto täytyy integroida kahdessa osassa. Kun sijoitetaan heikkoon muotoon, saadaan</p>
+<p>$$
+k_{22}^{\left(1\right)}+k_{11}^{\left(2\right)} =-f_{2}^{\left(1\right)}-f_{1}^{\left(2\right)},
+$$</p>
+<p>missä</p>
+<p>$$
+\begin{alignedat}{2}
+k_{22}^{\left(1\right)}	=\int_{I_{1}}\alpha_{2}\frac{1}{2}\cdot\frac{1}{2},\mathrm{d}x=\frac{1}{2}\alpha_{2} \<br>
+k_{11}^{\left(2\right)}	=\int_{I_{2}}\alpha_{2}\left(-1\right)\cdot\left(-1\right),\mathrm{d}x=\alpha_{2} \<br>
+f_{2}^{\left(1\right)}	=\int_{I_{1}}\left(12x^{2}-36x+18\right)\frac{1}{2}x,\mathrm{d}x=6 \<br>
+f_{1}^{\left(2\right)}	=\int_{I_{2}}\left(12x^{2}-36x+18\right)\left(3-x\right)x,\mathrm{d}x=0
+\end{alignedat}
+$$</p>
+<p>Tästä voi ratkaista tuntemattoman kertoimen $\alpha_2$:
+$$
+\alpha_{2}=k_{2}^{-1}f_{2}=\frac{2}{3}\cdot6=4
+$$</p>
 
             </div>
         </div>

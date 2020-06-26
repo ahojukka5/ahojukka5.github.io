@@ -6,10 +6,31 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Mon, 22 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</guid>
+      <description>Tarkastellaan differentiaaliyhtälön $$ u&amp;rsquo;&amp;rsquo; = 12x^2 - 36x + 18 $$ ratkaisua reunaehdoilla $u(0) = 0$ ja $u(3) = 0$.
+Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on tiedossa, ja se on $$ u\left(x\right) = \left(x - 3\right)^{2} x^{2}. $$
+Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä. Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan differentiaaliyhtälöä testifunktiolla $v \in \mathcal{V}$ sekä integroidaan alueen yli. $$ \int u&amp;rsquo;&amp;rsquo; \cdot v , \mathrm{d}x = \int fv , \mathrm{d}x $$</description>
+    </item>
+    
+    <item>
+      <title>Metaohjelmointia Julialla, tekniikoista</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/</link>
+      <pubDate>Tue, 23 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/</guid>
+      <description>Koska makrot ovat ennen kaikkea koodin esikäsittelyä, niiden inputit ovat rajalliset, sillä ohjelmakoodia ei ole suoritettu ennen makroa. Makro voi ottaa input argumentteina lähinnä numeroita ja merkkijonoja. Tehdään yksinkertainen makro joka palauttaa inputin tyypin ja sisällön. Tällä voi helposti tutkia minkälaisia asioita makro &amp;ldquo;syö&amp;rdquo;:
+macro showargs(args...) for arg in args @show typeof(arg), arg end return end @showargs(1, 1.0, true, a, &amp;#34;hei&amp;#34;) (typeof(arg), arg) = (Int64, 1) (typeof(arg), arg) = (Float64, 1.</description>
+    </item>
     
     <item>
       <title>Metaohjelmointia Julialla, tekniikoista</title>

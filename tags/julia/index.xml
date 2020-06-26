@@ -6,10 +6,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Mon, 22 Jun 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 23 Jun 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/tags/julia/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Metaohjelmointia Julialla, tekniikoista</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/</link>
+      <pubDate>Tue, 23 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-23-julia-metaprogramming-macro-techniques/</guid>
+      <description>Koska makrot ovat ennen kaikkea koodin esikäsittelyä, niiden inputit ovat rajalliset, sillä ohjelmakoodia ei ole suoritettu ennen makroa. Makro voi ottaa input argumentteina lähinnä numeroita ja merkkijonoja. Tehdään yksinkertainen makro joka palauttaa inputin tyypin ja sisällön. Tällä voi helposti tutkia minkälaisia asioita makro &amp;ldquo;syö&amp;rdquo;:
+macro showargs(args...) for arg in args @show typeof(arg), arg end return end @showargs(1, 1.0, true, a, &amp;#34;hei&amp;#34;) (typeof(arg), arg) = (Int64, 1) (typeof(arg), arg) = (Float64, 1.</description>
+    </item>
     
     <item>
       <title>Metaohjelmointia Julialla, tekniikoista</title>
