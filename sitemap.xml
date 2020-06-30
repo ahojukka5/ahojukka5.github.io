@@ -3,7 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://ahojukka5.github.io/tags/basis-functions/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ahojukka5.github.io/tags/finite-element-method/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://ahojukka5.github.io/posts/</loc>
+    <lastmod>2020-06-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://ahojukka5.github.io/tags/</loc>
     <lastmod>2020-06-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -24,11 +39,6 @@
   
   <url>
     <loc>https://ahojukka5.github.io/tags/metaprogramming/</loc>
-    <lastmod>2020-06-22T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://ahojukka5.github.io/tags/</loc>
     <lastmod>2020-06-22T00:00:00+00:00</lastmod>
   </url>
   

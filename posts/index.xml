@@ -17,13 +17,7 @@
       <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
       
       <guid>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</guid>
-      <description>&lt;p&gt;Tarkastellaan differentiaaliyhtälön&lt;/p&gt;
-
-&lt;p&gt;&lt;span  class=&#34;math&#34;&gt;\[
-u&#39;&#39; = 12x^2 - 36x + 18
-\]&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;ratkaisua reunaehdoilla &lt;span  class=&#34;math&#34;&gt;\(u(0) = 0\)&lt;/span&gt; ja &lt;span  class=&#34;math&#34;&gt;\(u(3) = 0\)&lt;/span&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Tarkastellaan toisen kertaluvun differentiaaliyhtälön ratkaisua Galerkinin menetelmällä joka paremmin tunnetaan elementtimenetelmänä. Tarkasteltavana on reuna-arvo-ongelma, jossa yhtälön reunaehtoja esiintyy yhtälön molemmissa päissä ja derivaatat ovat itse asiassa paikkaderivaattoja. Toinen tyyppi olisi alkuarvo-ongelma, jossa derivaatat ovat aikaderivaattoja, mutta siihen tehtävätyyppiin ei tässä nyt mennä.&lt;/p&gt;</description>
     </item>
     
     <item>

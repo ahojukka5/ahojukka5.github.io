@@ -60,141 +60,70 @@
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
-                <p>Tarkastellaan differentiaaliyhtälön</p>
-
-<p><span  class="math">\[
-u'' = 12x^2 - 36x + 18
-\]</span></p>
-
-<p>ratkaisua reunaehdoilla <span  class="math">\(u(0) = 0\)</span> ja <span  class="math">\(u(3) = 0\)</span>.</p>
-
-<p>Tarkka ratkaisu löytyy integroimalla kaksi kertaa ja valitsemalla
-integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis on
-tiedossa, ja se on</p>
-
-<p><span  class="math">\[
-u\left(x\right) = \left(x - 3\right)^{2} x^{2}.
-\]</span></p>
-
-<p>Asian voi varmistaa derivoimalla yhtälö kaksi kertaa sekä tarkastamalla, että
-reunaehdot toteutuvat.</p>
-
-<p>Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä.
-Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan
-differentiaaliyhtälöä testifunktiolla <span  class="math">\(v \in \mathcal{V}\)</span> sekä integroidaan
-alueen yli.</p>
-
-<p><span  class="math">\[
-\int u'' \cdot v \, \mathrm{d}x = \int fv \, \mathrm{d}x
-\]</span></p>
-
-<p>On hieman makuasia, pitäisikö ratkaista yhtälöä <span  class="math">\(-u'' = f\)</span> vai <span  class="math">\(u'' = f\)</span>,
-monesti mukavuussyistä käytetään miinusmerkkiä. Tämä asia tulee ilmi lopussa.</p>
-
-<p>Ratkaisu perustuu osittaisintegrointiin, tai oikeastaan tulon derivointiin. On
-nimittäin niin, että</p>
-
-<p><span  class="math">\[
-\left(u'v\right)'=u''\cdot v+u'v'.
-\]</span></p>
-
-<p>Tästä nyt huomataan, että</p>
-
-<p><span  class="math">\[
-u''\cdot v=\left(u'v\right)'-u'v'.
-\]</span></p>
-
-<p>Integroimalla alueen yli saadaan</p>
-
-<p><span  class="math">\[
-\int u''\cdot v\,\mathrm{d}x =\int\left[\left(u'v\right)'-u'v'\right]\,\mathrm{d}x
-\]</span></p>
-
-<p>Ensimmäinen termi voidaan integroida</p>
-
-<p><span  class="math">\[
-\int\left[\left(u'v\right)'-u'v'\right]\,\mathrm{d}x = \left[u'v\right]_{x=x_{0}}^{x=x_{1}}-\int u'\cdot v'\,\mathrm{d}x
-\]</span></p>
-
-<p>Testifunktioavaruus <span  class="math">\(\mathcal{V}\)</span> valitaan yleensä siten, että funktioiden
-<span  class="math">\(v_i\)</span> arvot saavat arvon 0 reunoilla, joka johtaa siihen, että sijoitustermi
-häviää.</p>
-
-<p>Saadaan yhtälön heikko muoto eli energiamuoto: määrää <span  class="math">\(u\in\mathcal{U}\)</span> siten että kaikille <span  class="math">\(v\in\mathcal{V}\)</span></p>
-
-<p><span  class="math">\[
-\int u'\cdot v'\,\mathrm{d}x = -\int fv\,\mathrm{d}x
-\]</span></p>
-
-<p>Mikäli ratkaistavana olisi ollut yhtälä <span  class="math">\(-u'' = f\)</span>, ei heikossa muodossa olisi
-tuota miinusmerkkiä. Monesti tämä Poissonin yhtälö kirjallisuudessa esitetäänkin
-muodossa <span  class="math">\(-\Delta u = f\)</span>.</p>
-
-<p>Ratkaisu etenee siten, että diskretoidaan ongelma ja valitaan diskretointiin
-sopiva yriteratkaisu. Esimerkiksi väli <span  class="math">\(I = [0, 3]\)</span> voidaan diskretoida niin,
-että kuvataan väli <span  class="math">\(I_1 = [0, 2]\)</span> yhdellä funktiolla ja väli <span  class="math">\(I_2 = [2, 3]\)</span>
-toisella.</p>
-
-<p>Yritetään keksiä <span  class="math">\(u_h(x)\)</span> joka olisi &quot;suurinpiirtein&quot; sellainen että se
-toteuttaisi differentiaaliyhtälön vahvan muodon, eli siis että se toteuttaisi
-yhtälön heikon muodon. Pitäisi nyt olla vähintäänkin sellainen, että sen
-derivaatta on olemassa, muuten tulee pelkkää nollaa. Sama pätee testifunktioihin
-<span  class="math">\(v\)</span>. Yksinkertaisin valinta on paloittain jatkuva lineaarinen funktio.
-Muotofunktioille on muitakin vaatimuksia mutta niihin ei tässä artikkelissa
-mennä. Approksimoitu ratkaisu alkuperäiseen ongelmaan on</p>
-
-<p><span  class="math">\[
-u_{h}\left(x\right)=\begin{cases}
-\alpha_{2}\phi_{2}^{\left(1\right)}\left(x\right) & x\in I_{1}\\
-\alpha_{2}\phi_{1}^{\left(2\right)}\left(x\right) & x\in I_{2}
-\end{cases},
-\]</span></p>
-
-<p>missä muotofunktiot ovat:</p>
-
-<p><span  class="math">\[
-\begin{alignedat}{2}
-\phi_{2}^{\left(1\right)} & =\frac{1}{2}x\\
-\phi_{1}^{\left(2\right)} & =3-x
-\end{alignedat}
-\]</span></p>
-
-<p>Muotofunktiot ovat perinteinen &quot;hattufunktio&quot;, joka saa arvon 1 solmupisteessä
-2, siis kohdassa <span  class="math">\(x=2\)</span>. Muotofunktiot kun kertoo tuntemattomalla kertoimella
-<span  class="math">\(\alpha_2\)</span>, on siis niin että differentiaaliyhtälöä approksimoiva funktio
-<span  class="math">\(u_h\)</span> saa arvon <span  class="math">\(\alpha_2\)</span> kohdassa <span  class="math">\(x=2\)</span>. Mitä on jäljellä keksiä mikä
-tuo tuntematon kerroin olisi. Kantafunktioiden derivaatat ovat</p>
-
-<p><span  class="math">\[
-\begin{alignedat}{2}
-\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)} &=\frac{1}{2} \\
-\frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)} &=-1
-\end{alignedat}
-\]</span></p>
-
-<p>Heikko muoto täytyy integroida kahdessa osassa. Kun approksimaatiot sijoitetaan
-heikkoon muotoon ja lasketaan integraali, saadaan</p>
-
-<p><span  class="math">\[
-k_{22}^{\left(1\right)}+k_{11}^{\left(2\right)} =-f_{2}^{\left(1\right)}-f_{1}^{\left(2\right)},
-\]</span></p>
-
-<p>missä</p>
-
-<p><span  class="math">\[
-\begin{alignedat}{2}
-k_{22}^{\left(1\right)} =\int_{I_{1}}\alpha_{2}\frac{1}{2}\cdot\frac{1}{2}\,\mathrm{d}x=\frac{1}{2}\alpha_{2} \\
-k_{11}^{\left(2\right)} =\int_{I_{2}}\alpha_{2}\left(-1\right)\cdot\left(-1\right)\,\mathrm{d}x=\alpha_{2} \\
-f_{2}^{\left(1\right)}  =\int_{I_{1}}\left(12x^{2}-36x+18\right)\frac{1}{2}x\,\mathrm{d}x=6 \\
-f_{1}^{\left(2\right)}  =\int_{I_{2}}\left(12x^{2}-36x+18\right)\left(3-x\right)x\,\mathrm{d}x=0
-\end{alignedat}
-\]</span></p>
-
-<p>Tästä voi ratkaista tuntematon kerroin <span  class="math">\(\alpha_2\)</span>:</p>
-
-<p><span  class="math">\[
-\alpha_{2}=k_{2}^{-1}f_{2}=\frac{2}{3}\cdot6=4
-\]</span></p>
+                <p>Tarkastellaan toisen kertaluvun differentiaaliyhtälön ratkaisua Galerkinin menetelmällä joka paremmin tunnetaan elementtimenetelmänä. Tarkasteltavana on reuna-arvo-ongelma, jossa yhtälön reunaehtoja esiintyy yhtälön molemmissa päissä ja derivaatat ovat itse asiassa paikkaderivaattoja. Toinen tyyppi olisi alkuarvo-ongelma, jossa derivaatat ovat aikaderivaattoja, mutta siihen tehtävätyyppiin ei tässä nyt mennä.</p>
+<p>Valitaan tarkasteltavaksi differentiaaliyhtälöksi <span class="math display">\[u&#39;&#39;=12x^{2}-36x+18,\qquad u\left(0\right)=u\left(3\right)=0,\]</span> joka on itse asiassa differentiaaliyhtälön <span class="math display">\[
+u&#39;&#39;&#39;&#39;=24,\qquad u\left(0\right)=u&#39;\left(0\right)=u\left(3\right)=u&#39;\left(3\right)
+\]</span> ratkaisu derivoituna kaksi kertaa. Voimme käyttää tätä samaa yhtälö myöhemmissä tutkimuksissa.</p>
+<p>Tarkka ratkaisu löytyy integroimalla differentiaaliyhtälöä kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis tiedetään, ja se on <span class="math display">\[u\left(x\right)=\left(x-3\right)^{2}x^{2}.\]</span></p>
+<p>Tarkka ratkaisu on esitetty kuvassa <a href="#fig:sol_acc" data-reference-type="ref" data-reference="fig:sol_acc">1</a>. Tarkan ratkaisun voi varmistaa derivoimalla yhtälöä kaksi kertaa sekä tarkastamalla, että reunaehdot toteutuvat.</p>
+<figure>
+<img src="sol_acc.svg" alt="Differentiaaliyhtälön tarkka ratkaisu." id="fig:sol_acc" /><figcaption><span id="fig:sol_acc" label="fig:sol_acc"></span>Differentiaaliyhtälön tarkka ratkaisu.</figcaption>
+</figure>
+<p>Haetaan differentiaaliyhtälölle likiratkaisu elementtimenetelmällä. Ratkaisuprosessi lyhyesti kuvattuna menee niin, että kerrotaan differentiaaliyhtälöä testifunktiolla <span class="math inline">\(v\in\mathcal{V}\)</span> sekä integroidaan alueen yli: <span class="math display">\[\int u&#39;&#39;\cdot v\,\mathrm{d}x=\int fv\,\mathrm{d}x.\]</span></p>
+<p>On hieman makuasia, pitäisikö ratkaista yhtälöä <span class="math inline">\(-u&#39;&#39;=f\)</span> vai <span class="math inline">\(u&#39;&#39;=f\)</span>, monesti mukavuussyistä käytetään miinusmerkkiä. Tämä asia tulee ilmi myöhemmin.</p>
+<p>Ratkaisu perustuu osittaisintegrointiin, tai oikeastaan tulon derivointiin. On nimittäin niin, että <span class="math display">\[\left(u&#39;v\right)&#39;=u&#39;&#39;\cdot v+u&#39;v&#39;.\]</span></p>
+<p>Tästä nyt huomataan, että <span class="math display">\[u&#39;&#39;\cdot v=\left(u&#39;v\right)&#39;-u&#39;v&#39;.\]</span></p>
+<p>Integroimalla yhtälöä saadaan <span class="math display">\[\begin{aligned} \int u&#39;&#39;\cdot v\,\mathrm{d}x &amp;
+=\int\left[\left(u&#39;v\right)&#39;-u&#39;v&#39;\right]\,\mathrm{d}x\\
+ &amp; =\left[u&#39;v\right]_{x=x_{0}}^{x=x_{1}}-\int u&#39;\cdot v&#39;\,\mathrm{d}x.\end{aligned}\]</span></p>
+<p>Testifunktioavaruus <span class="math inline">\(\mathcal{V}\)</span> valitaan yleensä siten, että funktiot <span class="math inline">\(v_{i}\in\mathcal{V}\)</span> häviävät reunoilla, ts. <span class="math inline">\(v_{i}\left(x_{0}\right)=v_{i}\left(x_{1}\right)=0\)</span>, joka johtaa siihen, että sijoitustermi häviää.</p>
+<p>Saadaan yhtälön heikko muoto<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> eli energiamuoto: määrää <span class="math inline">\(u\in\mathcal{U}\)</span> siten että kaikille <span class="math inline">\(v\in\mathcal{V}\)</span> <span class="math display">\[\int u&#39;\cdot v&#39;\,\mathrm{d}x=-\int fv\,\mathrm{d}x.\]</span></p>
+<p>Mikäli ratkaistavana olisi ollut yhtälä <span class="math inline">\(-u&#39;&#39;=f\)</span>, ei heikossa muodossa olisi tuota miinusmerkkiä. Monesti tämä Poissonin yhtälö kirjallisuudessa esitetäänkin muodossa <span class="math display">\[-\Delta u=f,\]</span> missä Laplacen operaattori <span class="math inline">\(\Delta\)</span> määritellään <span class="math display">\[\Delta u=\nabla\cdot\nabla u\]</span> ja <span class="math inline">\(\nabla\)</span> on funktion gradientti.</p>
+<p>Lisäksi matemaattisessa kirjallisuudessa heikko muoto esitetään yleensä kanonisessa muodossa: määrää <span class="math inline">\(u\in\mathcal{U}\)</span> siten, että <span class="math display">\[a\left(u,v\right)=l\left(v\right)\qquad\forall v\in\mathcal{V},\]</span> missä <span class="math display">\[\begin{aligned} a\left(u,v\right) &amp; =\int u&#39;\cdot v&#39;\,\mathrm{d}x,\\
+l\left(v\right) &amp; =\int fv\,\mathrm{d}x.\end{aligned}\]</span></p>
+<p>Elementtimenetelmällä ratkaisu etenee siten, että diskretoidaan ongelma ja valitaan diskretointiin sopiva yriteratkaisu. Esimerkiksi väli <span class="math inline">\(\Omega=[0,3]\)</span> voidaan diskretoida niin, että kuvataan väli <span class="math inline">\(\Omega^{\left(1\right)}=[0,2]\)</span> yhdellä funktiolla <span class="math inline">\(\phi_{1}\left(x\right)\)</span> ja väli <span class="math inline">\(\Omega^{\left(2\right)}=[2,3]\)</span> toisella.</p>
+<p>Tavoitteena on keksiä likiratkaisu <span class="math inline">\(u_{h}(x)\)</span> joka toteuttaisi yhtälön heikon muodon. Ratkaisussa käytettävät muotofunktiot pitää olla vähintään <span class="math inline">\(\mathcal{C}^{0}\)</span>-jatkuvia, että heikon muodon vasemman puoleisesta termistä tulee jotakin nollasta poikkeavaa.</p>
+<p>Yksinkertaisin valinta on siis paloittain jatkuva lineaarinen funktio. Likiratkaisu alkuperäiseen ongelmaan on <span class="math display">\[u_{h}\left(x\right)=\begin{cases}
+\alpha_{2}\phi_{2}^{\left(1\right)}\left(x\right) &amp; x\in\Omega^{\left(1\right)},\\
+\alpha_{2}\phi_{1}^{\left(2\right)}\left(x\right) &amp; x\in\Omega^{\left(2\right)},
+\end{cases}\]</span> missä muotofunktiot ovat: <span class="math display">\[\begin{alignedat}{1}\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2}x,\\
+\phi_{1}^{\left(2\right)} &amp; =3-x.
+\end{alignedat}\]</span></p>
+<p>Muotofunktiot ovat perinteinen hattufunktio, joka saa arvon 1 solmupisteessä 2, siis kohdassa <span class="math inline">\(x=2\)</span>. Mitä on jäljellä keksiä mikä tuo tuntematon kerroin <span class="math inline">\(\alpha_{2}\)</span> olisi.</p>
+<p>Kantafunktioiden derivaatat ovat <span class="math display">\[\begin{alignedat}{1}\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2},\\
+\frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)} &amp; =-1.
+\end{alignedat}\]</span></p>
+<p>Heikko muoto täytyy integroida kahdessa osassa. Kun approksimaatiot sijoitetaan heikkoon muotoon ja lasketaan integraali, saadaan <span class="math display">\[k_{22}^{\left(1\right)}+k_{11}^{\left(2\right)}=-f_{2}^{\left(1\right)}-f_{1}^{\left(2\right)},\]</span> missä <span class="math display">\[\begin{aligned}
+k_{22}^{\left(1\right)} &amp; =\int_{\Omega^{\left(1\right)}}\alpha_{2}\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)}\cdot\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)}\,\mathrm{d}x=\frac{1}{2}\alpha_{2,}\\
+k_{11}^{\left(2\right)} &amp; =\int_{\Omega^{\left(2\right)}}\alpha_{2}\frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)}\cdot\frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)}\,\mathrm{d}x=\alpha_{2},\\
+f_{2}^{\left(1\right)} &amp; =\int_{\Omega^{\left(1\right)}}f\phi_{2}^{\left(1\right)}\,\mathrm{d}x=6,\\
+f_{1}^{\left(2\right)} &amp; =\int_{\Omega^{\left(2\right)}}f\phi_{1}^{\left(2\right)}\,\mathrm{d}x=0.\end{aligned}\]</span></p>
+<p>Sijoittelemalla lukuarvoja saadaan <span class="math display">\[\begin{aligned}
+k_{22}^{\left(1\right)} &amp; =\alpha_{2}\int_{0}^{2}\frac{1}{2}\cdot\frac{1}{2}\,\mathrm{d}x=\frac{1}{2}\alpha_{2,}\\
+k_{11}^{\left(2\right)} &amp; =\alpha_{2}\int_{0}^{2}\left(-1\right)\cdot\left(-1\right)\,\mathrm{d}x=\alpha_{2},\\
+f_{2}^{\left(1\right)} &amp; =\int_{2}^{3}\left(12x^{2}-36x+18\right)\frac{1}{2}x\,\mathrm{d}x=6,\\
+f_{1}^{\left(2\right)} &amp; =\int_{2}^{3}\left(12x^{2}-36x+18\right)\left(3-x\right)x\,\mathrm{d}x=0.\end{aligned}\]</span></p>
+<p>Tästä voi nyt ratkaista tuntemattoman kertoimen <span class="math inline">\(\alpha_{2}\)</span>: <span class="math display">\[\alpha_{2}=k_{2}^{-1}f_{2}=\frac{2}{3}\cdot6=4.\]</span></p>
+<p>Niinpä <span class="math inline">\(u\)</span>:n likiratkaisu <span class="math inline">\(u_{h}\)</span> on <span class="math display">\[u_{h}\left(x\right)=\begin{cases}
+2x &amp; x\in\Omega^{\left(1\right)},\\
+12-4x &amp; x\in\Omega^{\left(2\right)}.
+\end{cases}\]</span></p>
+<p>Tarkan ratkaisun ja likiratkaisun vertailua on tehty kuvassa <a href="#fig:sol_fem" data-reference-type="ref" data-reference="fig:sol_fem">2</a>.</p>
+<figure>
+<img src="sol_fem.svg" alt="Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua." id="fig:sol_fem" /><figcaption><span id="fig:sol_fem" label="fig:sol_fem"></span>Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua.</figcaption>
+</figure>
+<p>Elementtimenetelmässä, tai tarkemmin sanottuna Galerkinin menetelmässä<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, keskeinen ominaisuus on, että virhe on kohtisuorassa muotofunktioihin nähden, eli <span class="math display">\[a\left(u-u_{h},v\right)=0\]</span></p>
+<p>Suoraan integroimalla voi todeta että näin todellakin on: <span class="math display">\[\begin{gathered}
+\int_{0}^{2}\frac{\mathrm{d}}{\mathrm{d}x}\left(\left(x-3\right)^{2}x^{2}-2x\right)\cdot\frac{\mathrm{d}}{\mathrm{d}x}\left(\frac{1}{2}x\right)=0,\\
+\int_{2}^{3}\frac{\mathrm{d}}{\mathrm{d}x}\left(\left(x-3\right)^{2}x^{2}-\left(12-4x\right)\right)\cdot\frac{\mathrm{d}}{\mathrm{d}x}\left(3-x\right)=0.\end{gathered}\]</span></p>
+<p>Ratkaisu toimii, mutta siinä on muutamia hankaluuksia numeerista implementointia ajatellen. Eräs mielenkiintoinen kysymys on, kuinka näitä kantafunktioita ja niiden derivaattoja voidaan rakentaa tehokkaasti. Sitä käsitellään tulevissa kirjoituksissa.</p>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://en.wikipedia.org/wiki/Weak_formulation" class="uri">https://en.wikipedia.org/wiki/Weak_formulation</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><a href="https://en.wikipedia.org/wiki/Galerkin_method" class="uri">https://en.wikipedia.org/wiki/Galerkin_method</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+</ol>
+</section>
             </div>
         </div>
     </div>
@@ -212,6 +141,8 @@ f_{1}^{\left(2\right)}  =\int_{I_{2}}\left(12x^{2}-36x+18\right)\left(3-x\right)
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
         
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/basis-functions">basis-functions</a></span>
+        
             <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
@@ -219,6 +150,8 @@ f_{1}^{\left(2\right)}  =\int_{I_{2}}\left(12x^{2}-36x+18\right)\left(3-x\right)
             <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/finite-element-method">finite-element-method</a></span>
         
             <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
         

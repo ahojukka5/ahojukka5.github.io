@@ -1,0 +1,24 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>basis functions on Jukka Aho (@ahojukka5)</title>
+    <link>https://ahojukka5.github.io/tags/basis-functions/</link>
+    <description>Recent content in basis functions on Jukka Aho (@ahojukka5)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Fri, 26 Jun 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/basis-functions/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</title>
+      <link>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</link>
+      <pubDate>Fri, 26 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/</guid>
+      <description>&lt;p&gt;Tarkastellaan toisen kertaluvun differentiaaliyhtälön ratkaisua Galerkinin menetelmällä joka paremmin tunnetaan elementtimenetelmänä. Tarkasteltavana on reuna-arvo-ongelma, jossa yhtälön reunaehtoja esiintyy yhtälön molemmissa päissä ja derivaatat ovat itse asiassa paikkaderivaattoja. Toinen tyyppi olisi alkuarvo-ongelma, jossa derivaatat ovat aikaderivaattoja, mutta siihen tehtävätyyppiin ei tässä nyt mennä.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
