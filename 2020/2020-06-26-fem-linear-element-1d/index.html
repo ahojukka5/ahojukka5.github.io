@@ -89,7 +89,10 @@ l\left(v\right) &amp; =\int fv\,\mathrm{d}x.\end{aligned}\]</span></p>
 \end{cases}\]</span> missä muotofunktiot ovat: <span class="math display">\[\begin{alignedat}{1}\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2}x,\\
 \phi_{1}^{\left(2\right)} &amp; =3-x.
 \end{alignedat}\]</span></p>
-<p>Muotofunktiot ovat perinteinen hattufunktio, joka saa arvon 1 solmupisteessä 2, siis kohdassa <span class="math inline">\(x=2\)</span>. Mitä on jäljellä keksiä mikä tuo tuntematon kerroin <span class="math inline">\(\alpha_{2}\)</span> olisi.</p>
+<p>Muotofunktiot ovat perinteinen hattufunktio, joka saa arvon 1 solmupisteessä 2, siis kohdassa <span class="math inline">\(x=2\)</span>. Muotofunktiot on esitetty kuvassa fig. 2. Mitä on jäljellä keksiä mikä tuo tuntematon kerroin <span class="math inline">\(\alpha_{2}\)</span> olisi.</p>
+<figure>
+<img src="sol_basis.svg" id="fig:sol_basis" alt="" /><figcaption>Figure 2: <span id="fig:sol_basis" label="fig:sol_basis"></span>Ratkaisuun käytettävät kantafunktiot.</figcaption>
+</figure>
 <p>Kantafunktioiden derivaatat ovat <span class="math display">\[\begin{alignedat}{1}\frac{\mathrm{d}}{\mathrm{d}x}\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2},\\
 \frac{\mathrm{d}}{\mathrm{d}x}\phi_{1}^{\left(2\right)} &amp; =-1.
 \end{alignedat}\]</span></p>
@@ -110,7 +113,7 @@ f_{1}^{\left(2\right)} &amp; =\int_{2}^{3}\left(12x^{2}-36x+18\right)\left(3-x\r
 \end{cases}\]</span></p>
 <p>Tarkan ratkaisun ja likiratkaisun vertailua on tehty kuvassa <a href="#fig:sol_fem" data-reference-type="ref" data-reference="fig:sol_fem">2</a>.</p>
 <figure>
-<img src="sol_fem.svg" id="fig:sol_fem" alt="" /><figcaption>Figure 2: <span id="fig:sol_fem" label="fig:sol_fem"></span>Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua.</figcaption>
+<img src="sol_fem.svg" id="fig:sol_fem" alt="" /><figcaption>Figure 3: <span id="fig:sol_fem" label="fig:sol_fem"></span>Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua.</figcaption>
 </figure>
 <p>Elementtimenetelmässä, tai tarkemmin sanottuna Galerkinin menetelmässä<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>, keskeinen ominaisuus on, että virhe on kohtisuorassa muotofunktioihin nähden, eli <span class="math display">\[a\left(u-u_{h},v\right)=0\]</span></p>
 <p>Suoraan integroimalla voi todeta että näin todellakin on: <span class="math display">\[\begin{gathered}
