@@ -61,10 +61,10 @@
         <div class="tile is-child box">
             <div class="content">
                 <p>Tarkastellaan toisen kertaluvun differentiaaliyhtälön ratkaisua Galerkinin menetelmällä joka paremmin tunnetaan elementtimenetelmänä. Tarkasteltavana on reuna-arvo-ongelma, jossa yhtälön reunaehtoja esiintyy yhtälön molemmissa päissä ja derivaatat ovat itse asiassa paikkaderivaattoja. Toinen tyyppi olisi alkuarvo-ongelma, jossa derivaatat ovat aikaderivaattoja, mutta siihen tehtävätyyppiin ei tässä nyt mennä.</p>
-<p>Valitaan tarkasteltavaksi differentiaaliyhtälöksi <span class="math display">\[u&#39;&#39;=12x^{2}-36x+18,\qquad u\left(0\right)=u\left(3\right)=0,\]</span> joka on itse asiassa differentiaaliyhtälön <span class="math display">\[
+<p>Valitaan tarkasteltavaksi differentiaaliyhtälöksi <span class="math display">\[u&#39;&#39;=12x^{2}-36x+18,\qquad u\left(0\right)=u\left(3\right)=0,\]</span> {#eq:strong_form} joka on itse asiassa differentiaaliyhtälön <span class="math display">\[
 u&#39;&#39;&#39;&#39;=24,\qquad u\left(0\right)=u&#39;\left(0\right)=u\left(3\right)=u&#39;\left(3\right)
 \]</span> ratkaisu derivoituna kaksi kertaa. Voimme käyttää tätä samaa yhtälö myöhemmissä tutkimuksissa.</p>
-<p>Tarkka ratkaisu löytyy integroimalla differentiaaliyhtälöä kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis tiedetään, ja se on <span class="math display">\[u\left(x\right)=\left(x-3\right)^{2}x^{2}.\]</span></p>
+<p>Tarkka ratkaisu löytyy integroimalla differentiaaliyhtälöä (<span class="citation" data-cites="eq:strong_form">[@eq:strong_form]</span>) kaksi kertaa ja valitsemalla integrointivakiot siten, että reunaehdot toteutuvat. Tarkka ratkaisu siis tiedetään, ja se on <span class="math display">\[u\left(x\right)=\left(x-3\right)^{2}x^{2}.\]</span> Tässä esimerkkitapauksessa ratkaisun löytäminen integroimalla oli triviaali toimenpide, mutta yleisesti ottaen osittaisdifferentiaaliyhtälöiden analyyttisiä ratkaisuja ei tunneta ja numeerisia menetelmiä pitää käyttää.</p>
 <p>Tarkka ratkaisu on esitetty kuvassa <a href="#fig:sol_acc" data-reference-type="ref" data-reference="fig:sol_acc">1</a>. Tarkan ratkaisun voi varmistaa derivoimalla yhtälöä kaksi kertaa sekä tarkastamalla, että reunaehdot toteutuvat.</p>
 <figure>
 <img src="sol_acc.svg" alt="Differentiaaliyhtälön tarkka ratkaisu." id="fig:sol_acc" /><figcaption><span id="fig:sol_acc" label="fig:sol_acc"></span>Differentiaaliyhtälön tarkka ratkaisu.</figcaption>
@@ -78,7 +78,7 @@ u&#39;&#39;&#39;&#39;=24,\qquad u\left(0\right)=u&#39;\left(0\right)=u\left(3\ri
  &amp; =\left[u&#39;v\right]_{x=x_{0}}^{x=x_{1}}-\int u&#39;\cdot v&#39;\,\mathrm{d}x.\end{aligned}\]</span></p>
 <p>Testifunktioavaruus <span class="math inline">\(\mathcal{V}\)</span> valitaan yleensä siten, että funktiot <span class="math inline">\(v_{i}\in\mathcal{V}\)</span> häviävät reunoilla, ts. <span class="math inline">\(v_{i}\left(x_{0}\right)=v_{i}\left(x_{1}\right)=0\)</span>, joka johtaa siihen, että sijoitustermi häviää.</p>
 <p>Saadaan yhtälön heikko muoto<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> eli energiamuoto: määrää <span class="math inline">\(u\in\mathcal{U}\)</span> siten että kaikille <span class="math inline">\(v\in\mathcal{V}\)</span> <span class="math display">\[\int u&#39;\cdot v&#39;\,\mathrm{d}x=-\int fv\,\mathrm{d}x.\]</span></p>
-<p>Mikäli ratkaistavana olisi ollut yhtälä <span class="math inline">\(-u&#39;&#39;=f\)</span>, ei heikossa muodossa olisi tuota miinusmerkkiä. Monesti tämä Poissonin yhtälö kirjallisuudessa esitetäänkin muodossa <span class="math display">\[-\Delta u=f,\]</span> missä Laplacen operaattori <span class="math inline">\(\Delta\)</span> määritellään <span class="math display">\[\Delta u=\nabla\cdot\nabla u\]</span> ja <span class="math inline">\(\nabla\)</span> on funktion gradientti.</p>
+<p>Mikäli ratkaistavana olisi ollut yhtälä <span class="math inline">\(-u&#39;&#39;=f\)</span>, ei heikossa muodossa olisi tuota miinusmerkkiä. Monesti tämä Poissonin yhtälö kirjallisuudessa esitetäänkin muodossa <span class="math display">\[-\Delta u=f,\]</span> missä Laplacen operaattori<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> <span class="math inline">\(\Delta\)</span> määritellään <span class="math display">\[\Delta u=\nabla\cdot\nabla u\]</span> ja <span class="math inline">\(\nabla\)</span> on funktion gradientti.</p>
 <p>Lisäksi matemaattisessa kirjallisuudessa heikko muoto esitetään yleensä kanonisessa muodossa: määrää <span class="math inline">\(u\in\mathcal{U}\)</span> siten, että <span class="math display">\[a\left(u,v\right)=l\left(v\right)\qquad\forall v\in\mathcal{V},\]</span> missä <span class="math display">\[\begin{aligned} a\left(u,v\right) &amp; =\int u&#39;\cdot v&#39;\,\mathrm{d}x,\\
 l\left(v\right) &amp; =\int fv\,\mathrm{d}x.\end{aligned}\]</span></p>
 <p>Elementtimenetelmällä ratkaisu etenee siten, että diskretoidaan ongelma ja valitaan diskretointiin sopiva yriteratkaisu. Esimerkiksi väli <span class="math inline">\(\Omega=[0,3]\)</span> voidaan diskretoida niin, että kuvataan väli <span class="math inline">\(\Omega^{\left(1\right)}=[0,2]\)</span> yhdellä funktiolla <span class="math inline">\(\phi_{1}\left(x\right)\)</span> ja väli <span class="math inline">\(\Omega^{\left(2\right)}=[2,3]\)</span> toisella.</p>
@@ -112,7 +112,7 @@ f_{1}^{\left(2\right)} &amp; =\int_{2}^{3}\left(12x^{2}-36x+18\right)\left(3-x\r
 <figure>
 <img src="sol_fem.svg" alt="Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua." id="fig:sol_fem" /><figcaption><span id="fig:sol_fem" label="fig:sol_fem"></span>Differentiaaliyhtälön tarkan ratkaisun ja likiratkaisun vertailua.</figcaption>
 </figure>
-<p>Elementtimenetelmässä, tai tarkemmin sanottuna Galerkinin menetelmässä<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>, keskeinen ominaisuus on, että virhe on kohtisuorassa muotofunktioihin nähden, eli <span class="math display">\[a\left(u-u_{h},v\right)=0\]</span></p>
+<p>Elementtimenetelmässä, tai tarkemmin sanottuna Galerkinin menetelmässä<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>, keskeinen ominaisuus on, että virhe on kohtisuorassa muotofunktioihin nähden, eli <span class="math display">\[a\left(u-u_{h},v\right)=0\]</span></p>
 <p>Suoraan integroimalla voi todeta että näin todellakin on: <span class="math display">\[\begin{gathered}
 \int_{0}^{2}\frac{\mathrm{d}}{\mathrm{d}x}\left(\left(x-3\right)^{2}x^{2}-2x\right)\cdot\frac{\mathrm{d}}{\mathrm{d}x}\left(\frac{1}{2}x\right)=0,\\
 \int_{2}^{3}\frac{\mathrm{d}}{\mathrm{d}x}\left(\left(x-3\right)^{2}x^{2}-\left(12-4x\right)\right)\cdot\frac{\mathrm{d}}{\mathrm{d}x}\left(3-x\right)=0.\end{gathered}\]</span></p>
@@ -121,7 +121,8 @@ f_{1}^{\left(2\right)} &amp; =\int_{2}^{3}\left(12x^{2}-36x+18\right)\left(3-x\r
 <hr />
 <ol>
 <li id="fn1"><p><a href="https://en.wikipedia.org/wiki/Weak_formulation" class="uri">https://en.wikipedia.org/wiki/Weak_formulation</a><a href="#fnref1" class="footnote-back">↩</a></p></li>
-<li id="fn2"><p><a href="https://en.wikipedia.org/wiki/Galerkin_method" class="uri">https://en.wikipedia.org/wiki/Galerkin_method</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn2"><p><a href="https://en.wikipedia.org/wiki/Laplace_operator" class="uri">https://en.wikipedia.org/wiki/Laplace_operator</a><a href="#fnref2" class="footnote-back">↩</a></p></li>
+<li id="fn3"><p><a href="https://en.wikipedia.org/wiki/Galerkin_method" class="uri">https://en.wikipedia.org/wiki/Galerkin_method</a><a href="#fnref3" class="footnote-back">↩</a></p></li>
 </ol>
 </section>
             </div>
