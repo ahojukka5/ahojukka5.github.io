@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Jukka Aho (@ahojukka5)  | Elementtimenetelmän kantafunktioiden laskeminen</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Elementtimenetelmän kantafunktioiden laskeminen
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Esitellään toimiva tapa rakentaa elementin kantafunktiot.</p>
+<p>Aiemmin ei juurikaan menty siihen, kuinka päädyttiin esitettyihin kantafunktioihin <span class="math display">\[
+\begin{alignedat}{1}
+\phi_{2}^{\left(1\right)} &amp; =\frac{1}{2}x,\\
+\phi_{1}^{\left(2\right)} &amp; =3-x.
+\end{alignedat}
+\]</span></p>
+<p>Tässä tapauksessa tehtävä on vielä niin helppo, että sen voi jopa päätellä. Katsotaan nyt kuitenkin hieman systemaattisempi tapa hoitaa homma. Lähtökohtana on muodostaa elementin alueelle interpolaatiopolynomit <span class="math inline">\(\phi_i(x)\)</span> sopivien ehtojen mukaisesti. Klassisen interpolaatiopolynomien perheen muodostaa Lagrangen elementit, jotka saavat arvon 1 kyseissä vapausasteessa <span class="math inline">\(x_i\)</span> ja arvon 0 kaikissa muissa vapausasteissa.</p>
+<!--
+Ciarlet'n määritelmän mukaan elementin muodostaa lukukolmikko $(A, B, C)$, missä.
+-->
+<p>Ensimmäisessä lineaarisessa <span class="math inline">\(\mathcal{C}^0\)</span> elementissä laskenta-alue olisi välillä <span class="math inline">\(\Omega^{(1)} = [0, 2]\)</span>. Polynomit ovat joukossa <span class="math inline">\({\{1, x\}}\)</span>. Vapausaste <span class="math inline">\(x_1 = 0\)</span> ja vapausaste <span class="math inline">\(x_2\)</span> = 2. Tästä voidaan rakentaa Vandermonden matriisi <span class="math display">\[
+\boldsymbol{V}_{1}=\left[\begin{array}{cc}
+1 &amp; 0\\
+1 &amp; 2
+\end{array}\right],
+\]</span></p>
+<p>Jonka käänteismatriisista saadaan kertoimet <span class="math display">\[
+\begin{alignedat}{1}
+\boldsymbol{c}_{1}^{\left(1\right)} &amp; =\boldsymbol{V}_{1}^{-1}\left[\begin{array}{c}
+1\\
+0
+\end{array}\right]=\left[\begin{array}{r}
+1\\
+-\frac{1}{2}
+\end{array}\right]\\
+\boldsymbol{c}_{2}^{\left(2\right)} &amp; =\boldsymbol{V}_{1}^{-1}\left[\begin{array}{c}
+0\\
+1
+\end{array}\right]=\left[\begin{array}{c}
+0\\
+\frac{1}{2}
+\end{array}\right]
+\end{alignedat}
+\]</span></p>
+<p>Elementin <span class="math inline">\(\Omega^{(1)}\)</span> muotofunktiot siis ovat <span class="math display">\[
+\begin{alignedat}{1}
+\phi_{1}^{\left(1\right)}\left(x\right) &amp; =1-\frac{1}{2} x\\
+\phi_{2}^{\left(1\right)}\left(x\right) &amp; =\frac{1}{2}x
+\end{alignedat}
+\]</span></p>
+<p>Vastaavasti toiselle elementille saadaan Vandermonden matriisi <span class="math display">\[
+\begin{alignedat}{1}
+\boldsymbol{V}_{2}=\left[\begin{array}{cc}
+1 &amp; 2\\
+1 &amp; 3
+\end{array}\right]
+\end{alignedat}
+\]</span></p>
+<p>Elementin <span class="math inline">\(\Omega^{(2)}\)</span> muotofunktiot ovat siten <span class="math display">\[
+\begin{alignedat}{1}
+\phi_{1}^{\left(2\right)}\left(x\right) &amp; =3-x\\
+\phi_{2}^{\left(2\right)}\left(x\right) &amp; =x-2
+\end{alignedat}
+\]</span></p>
+<p>Muotofunktiot voidaan laskea symbolisesti esimerkiksi SymPy:llä:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="im">from</span> sympy <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>var(<span class="st">&#39;x&#39;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>P1 <span class="op">=</span> Matrix([<span class="dv">1</span>, x])</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>X1 <span class="op">=</span> Matrix([<span class="dv">0</span>, <span class="dv">2</span>])</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>V1 <span class="op">=</span> zeros(<span class="dv">2</span>, <span class="dv">2</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">2</span>):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        V1[i,j] <span class="op">=</span> P[j].subs({x: X1[i]})</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a>c1 <span class="op">=</span> V1.inv() <span class="op">*</span> Matrix([<span class="dv">1</span>, <span class="dv">0</span>])</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>c2 <span class="op">=</span> V1.inv() <span class="op">*</span> Matrix([<span class="dv">0</span>, <span class="dv">1</span>])</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>phi1_1 <span class="op">=</span> (c1.T <span class="op">*</span> P1)[<span class="dv">0</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>phi1_2 <span class="op">=</span> (c2.T <span class="op">*</span> P2)[<span class="dv">0</span>]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a><span class="bu">print</span>(phi1_1)</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a><span class="bu">print</span>(phi1_2)</span></code></pre></div>
+<pre class="text"><code>1 - x/2
+x/2</code></pre>
+<p>Saimme tässä prosessissa oikeastaan neljä muotofunktiota, jotka liittyvät kahteen elementtiin. Kuitenkin kiinnostuksen kohteena oli vain keskimmäinen solmupiste, sillä tehtävässä oli homogeeniset reunaehdot ja siten ensimmäiseen ja viimeiseen solmupisteeseen liittyvät muotofunktiot voitiin poistaa ongelmasta.</p>
+<p>Samanlaisella tekniikalla saamme rakennettua esimerkiksi kuubiset <span class="math inline">\(\mathcal{C}^1\)</span> jatkuvat Hermiten interpolaatiopolynomit. Nyt polynomien joukko on <span class="math display">\[
+P=\left\{ 1,x,x^{2},x^{3}\right\}
+\]</span> Ja vapausasteita tarvitsemme neljä: funktion ja sen derivaatan jatkuvuudet elementin molemmissa päissä. Vandermonden matriisin rakentaminen ja interpolaatiopolynomit ovat</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>P1 <span class="op">=</span> Matrix([<span class="dv">1</span>, x, x<span class="op">**</span><span class="dv">2</span>, x<span class="op">**</span><span class="dv">3</span>])</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>dP1 <span class="op">=</span> P1.diff(x)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>X1 <span class="op">=</span> Matrix([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">2</span>])</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>V1 <span class="op">=</span> Matrix([</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    P1.subs({x: X1[<span class="dv">0</span>]}).T,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    dP1.subs({x: X1[<span class="dv">1</span>]}).T,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    P1.subs({x: X1[<span class="dv">2</span>]}).T,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    dP1.subs({x: X1[<span class="dv">3</span>]}).T</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>])</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>phi1_1 <span class="op">=</span> ((V1.inv() <span class="op">*</span> Matrix([<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>])).T <span class="op">*</span> P1)[<span class="dv">0</span>]</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>phi2_1 <span class="op">=</span> ((V1.inv() <span class="op">*</span> Matrix([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>])).T <span class="op">*</span> P1)[<span class="dv">0</span>]</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>phi3_1 <span class="op">=</span> ((V1.inv() <span class="op">*</span> Matrix([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>])).T <span class="op">*</span> P1)[<span class="dv">0</span>]</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>phi4_1 <span class="op">=</span> ((V1.inv() <span class="op">*</span> Matrix([<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>])).T <span class="op">*</span> P1)[<span class="dv">0</span>]</span></code></pre></div>
+<p><span class="math display">\[
+\begin{alignedat}{1}
+\phi_{1}^{\left(1\right)}\left(x\right) &amp; =\frac{1}{4}x^{3}-\frac{3}{4}x^{2}+1\\
+\phi_{2}^{\left(1\right)}\left(x\right) &amp; =\frac{1}{4}x^{3}-x^{2}+x\\
+\phi_{3}^{\left(1\right)}\left(x\right) &amp; =-\frac{1}{4}x^{3}+\frac{3}{4}x^{2}\\
+\phi_{4}^{\left(1\right)}\left(x\right) &amp; =\frac{1}{4}x^{3}-\frac{1}{2}x^{2}
+\end{alignedat}
+\]</span></p>
+<p>Vastaavasti alueelle <span class="math inline">\(\Omega^{(2)} = [2, 3]\)</span> saadaan</p>
+<p><span class="math display">\[
+\begin{alignedat}{1}
+\phi_{1}^{\left(2\right)}\left(x\right) &amp; =2x^{3}-15x^{2}+36x-27\\
+\phi_{2}^{\left(2\right)}\left(x\right) &amp; =x^{3}-8x^{2}+21x-18\\
+\phi_{3}^{\left(2\right)}\left(x\right) &amp; =-2x^{3}+15x^{2}-36x+28\\
+\phi_{4}^{\left(2\right)}\left(x\right) &amp; =x^{3}-7x^{2}+16x-12
+\end{alignedat}
+\]</span></p>
+<p>Kaikki muotofunktiot eivät ole kinemaattisesti käypiä. Kinemaattisesti käyvät on esitetty kuvassa <a href="#fig:basis_functions_kinematically_admissible" data-reference-type="ref" data-reference="fig:basis_functions_kinematically_admissible">1</a>.</p>
+<figure>
+<img src="basis_functions_kinematically_admissible.svg" id="fig:basis_functions_kinematically_admissible" alt="" /><figcaption>Figure 1: <span id="fig:basis_functions_kinematically_admissible" label="fig:basis_functions_kinematically_admissible"></span>Differentiaaliyhtälön tarkka ratkaisu.</figcaption>
+</figure>
+<p>Sijoittamalla heikkoon muotoon saadaan</p>
+<p><span class="math display">\[
+\boldsymbol{K}=\left[\begin{array}{cc}
+\frac{27}{2} &amp; \frac{9}{2}\\
+\frac{9}{2} &amp; 6
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+\boldsymbol{f}=\left[\begin{array}{r}
+36\\
+-6
+\end{array}\right]
+\]</span></p>
+<p><span class="math display">\[
+\boldsymbol{u}=\left[\begin{array}{c}
+u_{2}\\
+v_{2}
+\end{array}\right]=\boldsymbol{K}^{-1}\boldsymbol{f}=\left[\begin{array}{r}
+4\\
+-4
+\end{array}\right]
+\]</span></p>
+<p>Ratkaisu on esitetty kuvassa <a href="#fig:fem_solution_hermite_c1" data-reference-type="ref" data-reference="fig:fem_solution_hermite_c1">2</a>.</p>
+<figure>
+<img src="fem_solution_hermite_c1.svg" id="fig:fem_solution_hermite_c1" alt="" /><figcaption>Figure 2: <span id="fig:fem_solution_hermite_c1" label="fig:fem_solution_hermite_c1"></span>Differentiaaliyhtälön ratkaisu elementtimenetelmällä ja C1-jatkuvilla Hermiten kuubisilla muotofunktioilla.</figcaption>
+</figure>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/basis-functions">basis-functions</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/finite-element-method">finite-element-method</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/macro">macro</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/metaprogramming">metaprogramming</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-01-fem-hermite-element-1d/">Elementtimenetelmän kantafunktioiden laskeminen</a></h1>
+            <time class="has-text-grey-light is-size-7">1 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
+            <time class="has-text-grey-light is-size-7">22 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
+            <time class="has-text-grey-light is-size-7">18 June 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+  
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Related posts</h1>
+      
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+      
+    </div>
+</div>
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (13)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Jukka Aho (@ahojukka5) 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
