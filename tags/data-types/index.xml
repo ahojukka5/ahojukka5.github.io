@@ -1,0 +1,24 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>data types on Jukka Aho (@ahojukka5)</title>
+    <link>https://ahojukka5.github.io/tags/data-types/</link>
+    <description>Recent content in data types on Jukka Aho (@ahojukka5)</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2020, @ahojukka5</copyright>
+    <lastBuildDate>Sun, 05 Jul 2020 00:00:00 +0000</lastBuildDate>
+    
+        <atom:link href="https://ahojukka5.github.io/tags/data-types/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Konversioita Julian datatyyppien välillä</title>
+      <link>https://ahojukka5.github.io/2020/2020-07-05-julia-type-conversions/</link>
+      <pubDate>Sun, 05 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-07-05-julia-type-conversions/</guid>
+      <description>&lt;p&gt;Juliasta löytyy 8, 16, 32 ja 64-bittiset datatyypit kuten muistakin ohjelmointikelistä. Lisäksi löytyvät merkkijonot ja binääri- sekä heksaesitysmuodot. Käyn tässä kirjoituksessa läpi joitakin tyyppimuunnoksia jotka tulevat joissakin yhteyksissä vastaan mutta eivät ole aivan ilmeisiä.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

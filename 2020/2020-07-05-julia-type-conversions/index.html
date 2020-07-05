@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Jukka Aho (@ahojukka5)  | Konversioita Julian datatyyppien välillä</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css" integrity="sha384-zB1R0rpPzHqg7Kpt0Aljp8JPLqbXI3bhnPWROx27a9N0Ll6ZP/+DiW/UqRcLbRjq" crossorigin="anonymous">
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js" integrity="sha384-y23I5Q6l+B6vatafAwxRu/0oK/79VlbSz7Q9aiSZUvyWYIYsd+qj+o24G5ZU2zJz" crossorigin="anonymous"></script>
+
+
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+
+
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Konversioita Julian datatyyppien välillä
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Juliasta löytyy 8, 16, 32 ja 64-bittiset datatyypit kuten muistakin ohjelmointikelistä. Lisäksi löytyvät merkkijonot ja binääri- sekä heksaesitysmuodot. Käyn tässä kirjoituksessa läpi joitakin tyyppimuunnoksia jotka tulevat joissakin yhteyksissä vastaan mutta eivät ole aivan ilmeisiä.</p>
+<p>Tarkastelen tässä hieman tavanomaisesta poikkeavia tyyppikonversioita Julian tyyppien välillä.</p>
+<p>Kokonaislukujen konversio bittijonoksi onnistuu <code>bitstring</code>-komennolla:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>l <span class="op">=</span> <span class="dt">UInt8</span>(<span class="fl">123</span>)</span></code></pre></div>
+<pre class="text"><code>0x7b</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>b <span class="op">=</span> bitstring(l)</span></code></pre></div>
+<pre class="text"><code>&quot;01111011&quot;</code></pre>
+<p>Takaisin päin päästään <code>parse</code>-komennolla:</p>
+<div class="cell code" data-execution_count="89">
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>l <span class="op">=</span> parse(<span class="dt">UInt8</span><span class="op">,</span> b<span class="op">,</span> base<span class="op">=</span><span class="fl">2</span>)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="89">
+<pre><code>0x7b</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Hieman harvemmin käytetyt operaatiot <code>&lt;&lt;</code> ja <code>&gt;&gt;</code> voivat olla melko käteviä toisinaan. Ne siirtävät luvun bittejä oikealle tai vasemmalle:</p>
+</div>
+<div class="cell code" data-execution_count="90">
+<div class="sourceCode" id="cb7"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>l1 <span class="op">=</span> bitstring(<span class="dt">UInt8</span>(<span class="fl">123</span>) <span class="op">&lt;&lt;</span> <span class="fl">1</span>)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="90">
+<pre><code>&quot;11110110&quot;</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="91">
+<div class="sourceCode" id="cb9"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>l2 <span class="op">=</span> bitstring(<span class="dt">UInt8</span>(<span class="fl">123</span>) <span class="op">&gt;&gt;</span> <span class="fl">1</span>)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="91">
+<pre><code>&quot;00111101&quot;</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Näiden konversio takaisin kokonaisluvuiksi:</p>
+</div>
+<div class="cell code" data-execution_count="92">
+<div class="sourceCode" id="cb11"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>parse(<span class="dt">UInt8</span><span class="op">,</span> l1<span class="op">,</span> base<span class="op">=</span><span class="fl">2</span>) <span class="op">*</span> <span class="fl">1</span></span></code></pre></div>
+<div class="output execute_result" data-execution_count="92">
+<pre><code>246</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="93">
+<div class="sourceCode" id="cb13"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>parse(<span class="dt">UInt8</span><span class="op">,</span> l2<span class="op">,</span> base<span class="op">=</span><span class="fl">2</span>) <span class="op">*</span> <span class="fl">1</span></span></code></pre></div>
+<div class="output execute_result" data-execution_count="93">
+<pre><code>61</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Left shift siis tuplaa kokonaisluvun ja right shift puolittaa sen, ns. integer division.</p>
+</div>
+<div class="cell code" data-execution_count="94">
+<div class="sourceCode" id="cb15"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>div(<span class="fl">123</span><span class="op">,</span> <span class="fl">2</span>) <span class="op">==</span> <span class="fl">123</span> <span class="op">&gt;&gt;</span> <span class="fl">1</span></span></code></pre></div>
+<div class="output execute_result" data-execution_count="94">
+<pre><code>true</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Ohjelmointikielissä kokonaisluku ja liukuluku ovat täysin eri asioita, vaikka niitä voikin sekoittaa keskenään. Esimerkiksi lukujen 1 ja 1.0 binääriesitykset 16-bittisella aritmetiikalla:</p>
+</div>
+<div class="cell code" data-execution_count="95">
+<div class="sourceCode" id="cb17"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>f1 <span class="op">=</span> <span class="dt">Float16</span>(<span class="fl">1.0</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>l1 <span class="op">=</span> <span class="dt">Int16</span>(<span class="fl">1</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>f1<span class="op">,</span> l1</span></code></pre></div>
+<div class="output execute_result" data-execution_count="95">
+<pre><code>(Float16(1.0), 1)</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="96">
+<div class="sourceCode" id="cb19"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>b1 <span class="op">=</span> bitstring(f1)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>b2 <span class="op">=</span> bitstring(l1)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>b1<span class="op">,</span> b2</span></code></pre></div>
+<div class="output execute_result" data-execution_count="96">
+<pre><code>(&quot;0011110000000000&quot;, &quot;0000000000000001&quot;)</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Jos lasketaan <code>1 + 1.0</code>, pitää kokonaisluku ensin muuttaa liukuluvuksi. Nämä binääriesitykset voidaan taas <code>parse</code>-komennolla muuttaa 16-bittisiksi kokonaisluvuiksi:</p>
+</div>
+<div class="cell code" data-execution_count="97">
+<div class="sourceCode" id="cb21"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a>m <span class="op">=</span> parse(<span class="dt">Int16</span><span class="op">,</span> b1<span class="op">,</span> base<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a>n <span class="op">=</span> parse(<span class="dt">Int16</span><span class="op">,</span> b2<span class="op">,</span> base<span class="op">=</span><span class="fl">2</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a>m<span class="op">,</span> n</span></code></pre></div>
+<div class="output execute_result" data-execution_count="97">
+<pre><code>(15360, 1)</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Tässä <code>m</code> on nyt liukuluku 1.0, tosin väärässä tyypissä. Se voidaan tulkita uudelleen liukuluvuksi <code>reinterpret</code>-komennolla:</p>
+</div>
+<div class="cell code" data-execution_count="98">
+<div class="sourceCode" id="cb23"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a>f2 <span class="op">=</span> reinterpret(<span class="dt">Float16</span><span class="op">,</span> m)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="98">
+<pre><code>Float16(1.0)</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Bittitason manipulointiin päästään muuntamalla binääriesitys vaikkapa boolean-vektoriksi:</p>
+</div>
+<div class="cell code" data-execution_count="99">
+<div class="sourceCode" id="cb25"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a>bits <span class="op">=</span> [b <span class="op">==</span> <span class="ch">&#39;1&#39;</span> <span class="kw">for</span> b <span class="kw">in</span> b1]</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a>bits<span class="op">&#39;</span></span></code></pre></div>
+<div class="output execute_result" data-execution_count="99">
+<pre><code>1×16 LinearAlgebra.Adjoint{Bool,Array{Bool,1}}:
+ 0  0  1  1  1  1  0  0  0  0  0  0  0  0  0  0</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p><a href="https://en.wikipedia.org/wiki/Half-precision_floating-point_format" class="uri">https://en.wikipedia.org/wiki/Half-precision_floating-point_format</a></p>
+<p>sign 1 bit, exponent 5 bit, fraction 10 bit</p>
+</div>
+<div class="cell markdown">
+<p>ASCII-merkkijonot voidaan esittää 8-bittisillä unsigned integer tyypeillä. Näin nämä on tyypillisesti tallennettu tiedostoformaateissa.</p>
+</div>
+<div class="cell code" data-execution_count="101">
+<div class="sourceCode" id="cb27"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a>s <span class="op">=</span> <span class="dt">Vector</span>{<span class="dt">UInt8</span>}(<span class="st">&quot;Hello, world!&quot;</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true"></a>s</span></code></pre></div>
+<div class="output execute_result" data-execution_count="101">
+<pre><code>13-element Array{UInt8,1}:
+ 0x48
+ 0x65
+ 0x6c
+ 0x6c
+ 0x6f
+ 0x2c
+ 0x20
+ 0x77
+ 0x6f
+ 0x72
+ 0x6c
+ 0x64
+ 0x21</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Konversio merkkijonoksi tapahtuu <code>String</code>-komennolla:</p>
+</div>
+<div class="cell code" data-execution_count="102">
+<div class="sourceCode" id="cb29"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="dt">String</span>(s)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="102">
+<pre><code>&quot;Hello, world!&quot;</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Merkkijonon muuttaminen kokonaisluvuksi tapahtuu niin, että ensin tehdään heksadesimaaliesitys <code>bytes2hex</code>-funktiolla jonka jälkeen parsitaan <code>BigInt</code>-tyypiksi <code>parse</code>-komennolla:</p>
+</div>
+<div class="cell code" data-execution_count="104">
+<div class="sourceCode" id="cb31"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a>s <span class="op">=</span> <span class="dt">Vector</span>{<span class="dt">UInt8</span>}(<span class="st">&quot;Hello, world!&quot;</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true"></a>h <span class="op">=</span> bytes2hex(s)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="104">
+<pre><code>&quot;48656c6c6f2c20776f726c6421&quot;</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="105">
+<div class="sourceCode" id="cb33"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true"></a>l <span class="op">=</span> parse(<span class="dt">BigInt</span><span class="op">,</span> h<span class="op">,</span> base<span class="op">=</span><span class="fl">16</span>)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="105">
+<pre><code>5735816763073854953388147237921</code></pre>
+</div>
+</div>
+<div class="cell markdown">
+<p>Toiseen suuntaan mennään muuntamalla <code>BigInt</code> ensin heksadesimaaliesitysmuotoon jonka jälkeen <code>hex2bytes</code>-funktiolla takaisin <code>Vector{UInt8}</code>-tyypiksi josta edelleen merkkijonoksi:</p>
+</div>
+<div class="cell code" data-execution_count="106">
+<div class="sourceCode" id="cb35"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a>l2 <span class="op">=</span> string(l<span class="op">,</span> base<span class="op">=</span><span class="fl">16</span>)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="106">
+<pre><code>&quot;48656c6c6f2c20776f726c6421&quot;</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="107">
+<div class="sourceCode" id="cb37"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true"></a>l3 <span class="op">=</span> hex2bytes(l2)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true"></a>l3<span class="op">&#39;</span></span></code></pre></div>
+<div class="output execute_result" data-execution_count="107">
+<pre><code>1×13 LinearAlgebra.Adjoint{UInt8,Array{UInt8,1}}:
+ 0x48  0x65  0x6c  0x6c  0x6f  0x2c  0x20  0x77  0x6f  0x72  0x6c  0x64  0x21</code></pre>
+</div>
+</div>
+<div class="cell code" data-execution_count="108">
+<div class="sourceCode" id="cb39"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true"></a><span class="dt">String</span>(l3)</span></code></pre></div>
+<div class="output execute_result" data-execution_count="108">
+<pre><code>&quot;Hello, world!&quot;</code></pre>
+</div>
+</div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/basis-functions">basis-functions</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/data-types">data-types</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/finite-element-method">finite-element-method</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/macro">macro</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/metaprogramming">metaprogramming</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-05-julia-type-conversions/">Konversioita Julian datatyyppien välillä</a></h1>
+            <time class="has-text-grey-light is-size-7">5 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-01-fem-hermite-element-1d/">Elementtimenetelmän kantafunktioiden laskeminen</a></h1>
+            <time class="has-text-grey-light is-size-7">1 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
+            <time class="has-text-grey-light is-size-7">22 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+  
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Related posts</h1>
+      
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
+            <time class="has-text-grey-light is-size-7">22 June 2020</time>
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></h1>
+            <time class="has-text-grey-light is-size-7">19 June 2020</time>
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></h1>
+            <time class="has-text-grey-light is-size-7">18 June 2020</time>
+      
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></h1>
+            <time class="has-text-grey-light is-size-7">16 June 2020</time>
+      
+    </div>
+</div>
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (14)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Jukka Aho (@ahojukka5) 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>
