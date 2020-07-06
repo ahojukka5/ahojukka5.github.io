@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Jukka Aho (@ahojukka5)  | Neuroverkkojen matematiikkaa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    <script>
+    MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$','$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        svg: {
+            fontCache: 'global'
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        },
+        tex: {
+            tags: 'ams'
+        }
+    };
+</script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script> 
+
+
+    
+    
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Neuroverkkojen matematiikkaa
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Tarkastellaan yksinkertaista lineaarista neuroverkkoa, jolle opetetaan funktio <span class="math inline">\(y = 2x - 1\)</span>. Kirjoituksen huomio on lähinnä matemaattisessa notaatiossa ja verkon optimoinnissa.</p>
+<p>Tarkastellaan funktiota välillä <span class="math inline">\(-1 \leq x \leq 4\)</span>. Diskretoidaan väli siten, että <span class="math inline">\(\Delta x = 1\)</span> ja sovitetaan dataan lineaarinen malli. Datapisteet siis ovat:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>f(x) <span class="op">=</span> <span class="fl">2</span><span class="op">*</span>x <span class="op">-</span> <span class="fl">1</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>x <span class="op">=</span> collect(<span class="op">-</span><span class="fl">1.0</span><span class="op">:</span><span class="fl">4.0</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>y <span class="op">=</span> f.(x)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>x<span class="op">,</span> y</span></code></pre></div>
+<pre><code>([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0], [-3.0, -1.0, 1.0, 3.0, 5.0, 7.0])</code></pre>
+<p>Suoran sovitus dataan ei sinänsä ihmeellinen temppu ole. Tätä voidaan kuitenkin tarkastella koneoppimisen näkökulmasta, jolloin saamme ongelmaan uusia vivahteita. Tässä on nimittäin peruste kaikille monimutkaisemmille neuroverkoille. Malli on</p>
+<p><span class="math display">\[
+    y = wx + b,
+\]</span></p>
+<p>missä, alan termistöä käyttäen, <span class="math inline">\(w\)</span> on painokerroin ja <span class="math inline">\(b\)</span> on bias-termi.</p>
+<p>Nyt pitäisi löytää parametreille <span class="math inline">\((w, b)\)</span> sellaiset luvut, että malli vastaisi parhaimmalla mahdollisella tavalla dataa. Tyypillisesti tämä tapahtuu vaatimalla, että datan <span class="math inline">\(y_i\)</span> ja mallin antaman ennusteen <span class="math inline">\(\hat{y}_i = wx_{i}+b\)</span> välinen virhe kaikille <span class="math inline">\(i\)</span> minimoituu jonkin normin suhteen. Varsin yleinen valinta on <span class="math inline">\(L_2\)</span> normi, ja määritellään “loss-funktio”</p>
+<p><span class="math display">\[
+J\left(w,b\right)=\frac{1}{m}\sum_{i=1}^{m}\mathcal{L}\left(\hat{y}^{\left(i\right)},y^{\left(i\right)}\right),
+\]</span></p>
+<p>missä yhden näytteen virhe on</p>
+<p><span class="math display">\[
+\mathcal{L}\left(\hat{y}^{\left(i\right)},y^{\left(i\right)}\right)=\frac{1}{2}\left(\hat{y}-y\right)^{2}
+\]</span></p>
+<p>Tehtävänä nyt on löytää mallin parametrien <span class="math inline">\(w\)</span> ja <span class="math inline">\(b\)</span> arvot siten, että <span class="math inline">\(J\left(w,b\right)\)</span> minimoituu.</p>
+<p>Tyypillisesti neuroverkoissa parametreja on kymmeniä miljoonia. Päivitys tapahtuu yleensä gradient descent -menetelmällä<a href="https://en.wikipedia.org/wiki/Gradient_descent">1</a> tai jollakin sen variaatiolla. Parametrit alustetaan alussa satunnaisesti, valitaan esimerkiksi lukuja standardinormaalijakaumasta. Tämän jälkeen lasketaan loss-funktion gradientti ja päivitetään parametreja negatiivisen gradientin suuntaan jollakin kertoimella <span class="math inline">\(\alpha\)</span>, jota kutsutaan learning rateksi: <span class="math display">\[\begin{align}
+w*{i+1} =w*{i}-\alpha\frac{dJ}{dw} \\
+b*{i+1} =b*{i}-\alpha\frac{dJ}{db}.
+\end{align}\]</span></p>
+<p>Neuroverkkokirjallisuudessa keskeiset käsitteet ovat forward propagation ja backpropagation. Forward propagationissa edetään neuroverkossa inputista outputtiin päin ja back propagationissa toiseen suuntaa, eli derivoidaan.</p>
+<p>Jotta merkinnät olisivat konsistentteja tulevaisuudessakin, muutetaan hieman merkintöjä. Ensinnäkin <span class="math inline">\(z\)</span> on neuroverkon yksi kerros (layer), tässä tapauksessa <span class="math inline">\(z = wx + b\)</span>. Yhdellä kerroksella <span class="math inline">\(y = z\)</span>. Lisäksi on aktivointifunktio <span class="math inline">\(a\)</span> siten, että</p>
+<p><span class="math display">\[
+\hat{y} = a = I\left(z\right)
+\]</span></p>
+<p>missä <span class="math inline">\(I\)</span> on identiteettifunktio 1 (lineaarinen aktivointifunktio). Näillä merkinnöillä voidaan laajentaa neuroverkkoa useampiin kerroksiin sekä erilaisiin aktivointifunktioihin ja merkinnät pysyvät jokseenkin samoina. Kun mennään verkossa eteenpäin, kaavat siis ovat yhteenvetona <span class="math display">\[\begin{align}
+z &amp; =wx+b\\
+a &amp; =z\\
+\mathcal{L}\left(a,y\right) &amp; =\frac{1}{2}\left(a-y\right)^{2}
+\end{align}\]</span></p>
+<p>Takaisin päin tultaessa pitää derivoida. Ketjusääntöä on käytettävä:</p>
+<p><span class="math display">\[\begin{align}
+\frac{\mathrm{d}\mathcal{L}\left(a\left(z\left(w,b\right)\right),y\right)}{dw} &amp; =\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}a}\cdot\frac{\mathrm{d}a}{\mathrm{d}z}\cdot\frac{\mathrm{d}z}{\mathrm{d}w}\\
+\frac{\mathrm{d}\mathcal{L}\left(a\left(z\left(w,b\right)\right),y\right)}{db} &amp; =\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}a}\cdot\frac{\mathrm{d}a}{\mathrm{d}z}\cdot\frac{\mathrm{d}z}{\mathrm{d}b}
+\end{align}\]</span></p>
+<p>Derivaatat ovat <span class="math display">\[\begin{align}
+\frac{\mathrm{d}\mathcal{L}}{\mathrm{d}a} &amp; =a-y\\
+\frac{\mathrm{d}a}{\mathrm{d}z} &amp; =1\\
+\frac{\mathrm{d}z}{\mathrm{d}w} &amp; =x\\
+\frac{\mathrm{d}z}{\mathrm{d}b} &amp; =1
+\end{align}\]</span></p>
+<p>Joten <span class="math display">\[\begin{align}
+\frac{\mathrm{d}\mathcal{L}}{dw} &amp; =\left(a-y\right)x\\
+\frac{\mathrm{d}\mathcal{L}}{db} &amp; =\left(a-y\right)
+\end{align}\]</span></p>
+<p>Auki kirjoitettuna gradient descent askel siis on: <span class="math display">\[\begin{align}
+w*{i+1} &amp; =w*{i}-\alpha\frac{1}{m}\sum*{i=1}^{m}\left[\left(a^{\left(i\right)}-y^{\left(i\right)}\right)x^{\left(i\right)}\right]\\
+b*{i+1} &amp; =b*{i}-\alpha\frac{1}{m}\sum*{i=1}^{m}\left[\left(a^{\left(i\right)}-y^{\left(i\right)}\right)\right]
+\end{align}\]</span></p>
+<p>Yksinkertainen gradient descent algoritmin implementaatio on:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">function</span> gd(x<span class="op">,</span> y<span class="op">;</span> w<span class="op">=</span>randn()<span class="op">,</span> b<span class="op">=</span>randn()<span class="op">,</span> alpha<span class="op">=</span><span class="fl">0.05</span><span class="op">,</span> epochs<span class="op">=</span><span class="fl">100</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>    <span class="pp">@assert</span> length(x) <span class="op">==</span> length(y)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>    <span class="co"># initialization</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    m <span class="op">=</span> length(x)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    a <span class="op">=</span> zeros(m)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    z <span class="op">=</span> zeros(m)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    J <span class="op">=</span> zeros(epochs)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    <span class="kw">for</span> k<span class="op">=</span><span class="fl">1</span><span class="op">:</span>epochs</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>        <span class="co"># forward propagation</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>        L <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>        <span class="kw">for</span> i<span class="op">=</span><span class="fl">1</span><span class="op">:</span>m</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>            z[i] <span class="op">=</span> w<span class="op">*</span>x[i] <span class="op">+</span> b</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>            a[i] <span class="op">=</span> <span class="fl">1.0</span> <span class="op">*</span> z[i]</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>            L <span class="op">=</span> L <span class="op">+</span> (a[i] <span class="op">-</span> y[i])<span class="op">^</span><span class="fl">2</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>        <span class="kw">end</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>        <span class="co"># backward propagation</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>        dw <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>        db <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>        <span class="kw">for</span> i<span class="op">=</span><span class="fl">1</span><span class="op">:</span>m</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>            dLda <span class="op">=</span> a[i] <span class="op">-</span> y[i]</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>            dadz <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>            dzdw <span class="op">=</span> x[i]</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a>            dzdb <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>            dw <span class="op">=</span> dw <span class="op">+</span> dLda <span class="op">*</span> dadz <span class="op">*</span> dzdw</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true"></a>            db <span class="op">=</span> db <span class="op">+</span> dLda <span class="op">*</span> dadz <span class="op">*</span> dzdb</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true"></a>        <span class="kw">end</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true"></a>        <span class="co"># update parameters</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true"></a>        w <span class="op">=</span> w <span class="op">-</span> alpha <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> m <span class="op">*</span> dw</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true"></a>        b <span class="op">=</span> b <span class="op">-</span> alpha <span class="op">*</span> <span class="fl">1.0</span> <span class="op">/</span> m <span class="op">*</span> db</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true"></a>        J[k] <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> m <span class="op">*</span> L</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true"></a>    <span class="kw">return</span> J<span class="op">,</span> w<span class="op">,</span> b</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true"></a><span class="kw">using</span> <span class="bu">Random</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true"></a><span class="bu">Random</span>.seed<span class="op">!</span>(<span class="fl">0</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true"></a>J<span class="op">,</span> w<span class="op">,</span> b <span class="op">=</span> gd(x<span class="op">,</span> y)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true"></a>J[<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>]</span></code></pre></div>
+<pre><code>10-element Array{Float64,1}:
+ 5.11226131444927
+ 3.663623523618105
+ 2.8653251408411387
+ 2.4044819382652385
+ 2.1198935861229318
+ 1.9284492288999342
+ 1.7872428329353884
+ 1.6740709179246402
+ 1.577393029414151
+ 1.4911633751432603</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">using</span> Plots</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>plot(J<span class="op">,</span> title<span class="op">=</span><span class="st">&quot;Neuroverkon kustannusfunktio&quot;</span><span class="op">,</span> label<span class="op">=</span><span class="st">&quot;J&quot;</span><span class="op">,</span> linewidth<span class="op">=</span><span class="fl">1</span><span class="op">,</span> linecolor<span class="op">=:</span>black)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_14_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb7"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>w<span class="op">,</span> b</span></code></pre></div>
+<pre><code>(1.9517980579111849, -0.8505583310279576)</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>plot(x<span class="op">,</span> y<span class="op">,</span> title<span class="op">=</span><span class="st">&quot;Neuroverkkomallin data ja sovitus&quot;</span><span class="op">,</span> markersize<span class="op">=</span><span class="fl">5</span><span class="op">,</span> marker<span class="op">=:</span>circle<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;data&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>plot<span class="op">!</span>(x<span class="op">,</span> w <span class="op">.*</span> x .<span class="op">+</span> b<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;sovitus&quot;</span><span class="op">,</span> markersize<span class="op">=</span><span class="fl">5</span><span class="op">,</span> marker<span class="op">=:</span>circle<span class="op">,</span> legend<span class="op">=:</span>topleft)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_16_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Vaikka malli oli varsin yksinkertainen, herää jo tästäkin lukuisia kysymyksiä.</p>
+<p>Ensinnäkin, nyt hatusta kiskaisiin learning rate 0.05. Onko se hyvä vai huono? Pienempi learning rate hidastaa tarpeettomasti verkon opettamista, liian suuri taas aiheuttaa että malli ei suppene.</p>
+<p>Hatusta myös kiskaisiin iteraatioiden määrä 100. Iteroitiinko liian vähän, tarpeeksi vai liikaa?</p>
+<p>Onko malli tarkka vai ei. Yleistyykö se?</p>
+<p>Näitä asioita olisi tarkoitus käsitellä tulevissa kirjoituksissa.</p>
+<h2 id="case-study-covid-kuolemat-kiinassa-kriisin-alussa">Case study: Covid-kuolemat Kiinassa kriisin alussa</h2>
+<p>Tarkastelin melko intensiivisesti koronaviruksen leviämistä aivan kriisin alkuaikoina. Keräsin dataa ja yritin päätellä että mihinkä suuntaan tauti lähtee Kiinassa etenemään. Kun data kerran on valmiina, voimme opettaa neuroverkon datalla ja yrittää tehdä sillä estimaatteja.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">using</span> DataFrames<span class="op">,</span> CSV</span></code></pre></div>
+<p>Dataa ei tuolloin ollut juurikaan saatavilla, sillä virallista tietoa oli tullut vasta 18 päivää. Kiinnostuksen kohteena on kuolleisuus.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>data <span class="op">=</span> CSV.File(<span class="st">&quot;2020-02-09-corona.csv&quot;</span>) <span class="op">|&gt;</span> DataFrame</span></code></pre></div>
+<table class="data-frame">
+<thead>
+<tr>
+<th>
+</th>
+<th>
+Column1
+</th>
+<th>
+daily_cases
+</th>
+<th>
+total_cases
+</th>
+<th>
+daily_deaths
+</th>
+<th>
+total_deaths
+</th>
+</tr>
+<tr>
+<th>
+</th>
+<th>
+Dates…
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+</tr>
+</thead>
+<tbody>
+<p>
+18 rows × 5 columns
+</p>
+<tr>
+<th>
+1
+</th>
+<td>
+2020-01-23
+</td>
+<td>
+266
+</td>
+<td>
+845
+</td>
+<td>
+8
+</td>
+<td>
+25
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+2020-01-24
+</td>
+<td>
+472
+</td>
+<td>
+1317
+</td>
+<td>
+16
+</td>
+<td>
+41
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+2020-01-25
+</td>
+<td>
+698
+</td>
+<td>
+2015
+</td>
+<td>
+15
+</td>
+<td>
+56
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+2020-01-26
+</td>
+<td>
+785
+</td>
+<td>
+2800
+</td>
+<td>
+24
+</td>
+<td>
+80
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+2020-01-27
+</td>
+<td>
+1781
+</td>
+<td>
+4581
+</td>
+<td>
+26
+</td>
+<td>
+106
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+2020-01-28
+</td>
+<td>
+1477
+</td>
+<td>
+6058
+</td>
+<td>
+26
+</td>
+<td>
+132
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+2020-01-29
+</td>
+<td>
+1755
+</td>
+<td>
+7813
+</td>
+<td>
+38
+</td>
+<td>
+170
+</td>
+</tr>
+<tr>
+<th>
+8
+</th>
+<td>
+2020-01-30
+</td>
+<td>
+2008
+</td>
+<td>
+9821
+</td>
+<td>
+43
+</td>
+<td>
+213
+</td>
+</tr>
+<tr>
+<th>
+9
+</th>
+<td>
+2020-01-31
+</td>
+<td>
+2127
+</td>
+<td>
+11948
+</td>
+<td>
+46
+</td>
+<td>
+259
+</td>
+</tr>
+<tr>
+<th>
+10
+</th>
+<td>
+2020-02-01
+</td>
+<td>
+2604
+</td>
+<td>
+14552
+</td>
+<td>
+45
+</td>
+<td>
+304
+</td>
+</tr>
+<tr>
+<th>
+11
+</th>
+<td>
+2020-02-02
+</td>
+<td>
+2837
+</td>
+<td>
+17389
+</td>
+<td>
+58
+</td>
+<td>
+362
+</td>
+</tr>
+<tr>
+<th>
+12
+</th>
+<td>
+2020-02-03
+</td>
+<td>
+3239
+</td>
+<td>
+20628
+</td>
+<td>
+64
+</td>
+<td>
+426
+</td>
+</tr>
+<tr>
+<th>
+13
+</th>
+<td>
+2020-02-04
+</td>
+<td>
+3925
+</td>
+<td>
+24553
+</td>
+<td>
+66
+</td>
+<td>
+492
+</td>
+</tr>
+<tr>
+<th>
+14
+</th>
+<td>
+2020-02-05
+</td>
+<td>
+3723
+</td>
+<td>
+28276
+</td>
+<td>
+73
+</td>
+<td>
+565
+</td>
+</tr>
+<tr>
+<th>
+15
+</th>
+<td>
+2020-02-06
+</td>
+<td>
+3163
+</td>
+<td>
+31439
+</td>
+<td>
+73
+</td>
+<td>
+638
+</td>
+</tr>
+<tr>
+<th>
+16
+</th>
+<td>
+2020-02-07
+</td>
+<td>
+3437
+</td>
+<td>
+34876
+</td>
+<td>
+86
+</td>
+<td>
+724
+</td>
+</tr>
+<tr>
+<th>
+17
+</th>
+<td>
+2020-02-08
+</td>
+<td>
+2676
+</td>
+<td>
+37552
+</td>
+<td>
+89
+</td>
+<td>
+813
+</td>
+</tr>
+<tr>
+<th>
+18
+</th>
+<td>
+2020-02-09
+</td>
+<td>
+3001
+</td>
+<td>
+40553
+</td>
+<td>
+97
+</td>
+<td>
+910
+</td>
+</tr>
+</tbody>
+</table>
+<p>Tavoitteena oli mallintaa koronavirukseen kuolleiden määrää. Perushavinto oli tuolloin, että päivittäin kuolleiden määrä vaikutti kasvavan lineaarisesti. Sillä oletuksella tämä meidän neuroverkkomalli itse asiasssa voi antaa ihan tolkullisen ennusteen jollekin lyhyelle aikavälille. Mallin sovitus <code>gd()</code>-funktiolla on suoraviivaista:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>y <span class="op">=</span> data[<span class="op">!,</span> <span class="op">:</span>daily_deaths]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>x <span class="op">=</span> collect(<span class="fl">1.0</span><span class="op">:</span>length(y))</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="bu">Random</span>.seed<span class="op">!</span>(<span class="fl">0</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>J<span class="op">,</span> w<span class="op">,</span> b <span class="op">=</span> gd(x<span class="op">,</span> y)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>J[<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>]</span></code></pre></div>
+<pre><code>10-element Array{Float64,1}:
+  2329.049574848616
+ 55625.00301483141
+     1.3336537170135388e6
+     3.198058444106884e7
+     7.668892390723577e8
+     1.838988501357496e10
+     4.409865956536768e11
+     1.057479029900696e13
+     2.5358183439678866e14
+     6.080853134471482e15</code></pre>
+<p>Mutta eipäs olekaan! Oletuksena annettu learning rate 0.05 on liian iso, joten malli ei suppene. Täytyy kokeilla jotakin muuta parametria. Pienen harjoittelun jälkeen:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>J<span class="op">,</span> w<span class="op">,</span> b <span class="op">=</span> gd(x<span class="op">,</span> y<span class="op">;</span> alpha <span class="op">=</span> <span class="fl">0.0003</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="bu">Random</span>.seed<span class="op">!</span>(<span class="fl">0</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>J[<span class="fl">1</span><span class="op">:</span><span class="fl">10</span>]</span></code></pre></div>
+<pre><code>10-element Array{Float64,1}:
+ 2472.656866335288
+ 2301.463876719181
+ 2142.170718754915
+ 1993.950220729654
+ 1856.032708638312
+ 1727.7020094482361
+ 1608.2917321818022
+ 1497.181807505469
+ 1393.7952678561865
+ 1297.5952513851173</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>plot(J<span class="op">,</span> title<span class="op">=</span><span class="st">&quot;COVID-19-China: neuroverkon kustannusfunktio&quot;</span><span class="op">,</span> label<span class="op">=</span><span class="st">&quot;J&quot;</span><span class="op">,</span> linewidth<span class="op">=</span><span class="fl">1</span><span class="op">,</span> linecolor<span class="op">=:</span>black)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_26_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb17"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>title <span class="op">=</span> <span class="st">&quot;Kiinan covid-kuolleisuus, 23.1.2020 - 9.2.2020, data ja sovitus&quot;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>plot(x<span class="op">,</span> y<span class="op">,</span> title<span class="op">=</span>title<span class="op">,</span> linewidth<span class="op">=</span><span class="fl">0</span><span class="op">,</span> markersize<span class="op">=</span><span class="fl">5</span><span class="op">,</span> marker<span class="op">=:</span>circle<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;data&quot;</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>plot<span class="op">!</span>(x<span class="op">,</span> w <span class="op">.*</span> x .<span class="op">+</span> b<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;sovitus&quot;</span><span class="op">,</span> legend<span class="op">=:</span>topleft)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_27_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Muistaakseni tuolloin ajattelin, että näin karkea malli voisi toimia noin viikon verran eteenpäin. Ekstrapoloidaan siis sinne:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>fit <span class="op">=</span> cumsum(w <span class="op">.*</span> collect(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span>) .<span class="op">+</span> b)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>pred <span class="op">=</span> sum(y) .<span class="op">+</span> cumsum(w <span class="op">.*</span> collect(<span class="fl">19</span><span class="op">:</span><span class="fl">25</span>) .<span class="op">+</span> b)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a>title <span class="op">=</span> <span class="st">&quot;Covid-kuolleisuus Kiinassa 23.1.2020 - 9.2.2020&quot;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a>plot(title<span class="op">=</span>title)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a>scatter<span class="op">!</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span><span class="op">,</span> data[<span class="op">!,</span> <span class="op">:</span>total_deaths]<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;data&quot;</span><span class="op">,</span> title<span class="op">=</span>title)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a>plot<span class="op">!</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span><span class="op">,</span> fit<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;mallin sovitus&quot;</span><span class="op">,</span> legend<span class="op">=:</span>topleft)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a>plot<span class="op">!</span>(<span class="fl">19</span><span class="op">:</span><span class="fl">25</span><span class="op">,</span> pred<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;mallin ennuste&quot;</span>)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_29_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb19"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>round(<span class="dt">Int</span><span class="op">,</span> pred[<span class="kw">end</span>])</span></code></pre></div>
+<pre><code>1670</code></pre>
+<p>Jälkeenpäin tarkasteltuna mallin ennuste oli yllättävänkin hyvä. Viikkoa myöhemmin tilanne oli seuraava:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a>data2 <span class="op">=</span> CSV.File(<span class="st">&quot;2020-02-16-corona.csv&quot;</span>) <span class="op">|&gt;</span> DataFrame</span></code></pre></div>
+<table class="data-frame">
+<thead>
+<tr>
+<th>
+</th>
+<th>
+Column1
+</th>
+<th>
+daily_cases
+</th>
+<th>
+total_cases
+</th>
+<th>
+daily_deaths
+</th>
+<th>
+total_deaths
+</th>
+</tr>
+<tr>
+<th>
+</th>
+<th>
+Dates…
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+<th>
+Int64
+</th>
+</tr>
+</thead>
+<tbody>
+<p>
+7 rows × 5 columns
+</p>
+<tr>
+<th>
+1
+</th>
+<td>
+2020-02-10
+</td>
+<td>
+2546
+</td>
+<td>
+43099
+</td>
+<td>
+108
+</td>
+<td>
+1018
+</td>
+</tr>
+<tr>
+<th>
+2
+</th>
+<td>
+2020-02-11
+</td>
+<td>
+2071
+</td>
+<td>
+45170
+</td>
+<td>
+97
+</td>
+<td>
+1115
+</td>
+</tr>
+<tr>
+<th>
+3
+</th>
+<td>
+2020-02-12
+</td>
+<td>
+14113
+</td>
+<td>
+59283
+</td>
+<td>
+146
+</td>
+<td>
+1261
+</td>
+</tr>
+<tr>
+<th>
+4
+</th>
+<td>
+2020-02-13
+</td>
+<td>
+5154
+</td>
+<td>
+64437
+</td>
+<td>
+122
+</td>
+<td>
+1383
+</td>
+</tr>
+<tr>
+<th>
+5
+</th>
+<td>
+2020-02-14
+</td>
+<td>
+2663
+</td>
+<td>
+67100
+</td>
+<td>
+143
+</td>
+<td>
+1526
+</td>
+</tr>
+<tr>
+<th>
+6
+</th>
+<td>
+2020-02-15
+</td>
+<td>
+2097
+</td>
+<td>
+69197
+</td>
+<td>
+143
+</td>
+<td>
+1669
+</td>
+</tr>
+<tr>
+<th>
+7
+</th>
+<td>
+2020-02-16
+</td>
+<td>
+2132
+</td>
+<td>
+71329
+</td>
+<td>
+106
+</td>
+<td>
+1775
+</td>
+</tr>
+</tbody>
+</table>
+<p>Mallin ennusteen virhe</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a>abs(round(<span class="dt">Int</span><span class="op">,</span> pred[<span class="kw">end</span>]) <span class="op">-</span> data2[<span class="kw">end</span><span class="op">,</span> <span class="op">:</span>total_deaths])</span></code></pre></div>
+<pre><code>105</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a>fit <span class="op">=</span> cumsum(w <span class="op">.*</span> collect(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span>) .<span class="op">+</span> b)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a>pred <span class="op">=</span> sum(y) .<span class="op">+</span> cumsum(w <span class="op">.*</span> collect(<span class="fl">19</span><span class="op">:</span><span class="fl">25</span>) .<span class="op">+</span> b)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a>title <span class="op">=</span> <span class="st">&quot;Covid-kuolleisuus Kiinassa 23.1.2020 - 9.2.2020&quot;</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true"></a>scatter(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span><span class="op">,</span> data[<span class="op">!,</span> <span class="op">:</span>total_deaths]<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;data&quot;</span><span class="op">,</span> title<span class="op">=</span>title)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true"></a>plot<span class="op">!</span>(<span class="fl">1</span><span class="op">:</span><span class="fl">18</span><span class="op">,</span> fit<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;mallin sovitus&quot;</span><span class="op">,</span> legend<span class="op">=:</span>topleft)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true"></a>plot<span class="op">!</span>(<span class="fl">19</span><span class="op">:</span><span class="fl">25</span><span class="op">,</span> pred<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;mallin ennuste&quot;</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true"></a>scatter<span class="op">!</span>(<span class="fl">19</span><span class="op">:</span><span class="fl">25</span><span class="op">,</span> data2[<span class="op">!,</span> <span class="op">:</span>total_deaths]<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;uusi data&quot;</span>)</span></code></pre></div>
+<figure>
+<img src="calc_files/calc_35_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<h2 id="yhteenveto">Yhteenveto</h2>
+<p>Rakennettiin yksinkertaisin mahdollinen neuroverkko <span class="math inline">\(y = wx + b\)</span> sekä sovitettiin malli dataan gradient descent menetelmällä. Tulevissa kirjoituksissa keskityn aiheisiin kuten aktivointifunktiot, useampi neuroni, useampi kerros, piilokerros, syväoppiminen. Tämä olkoon nyt tällainen johdanto aiheeseen.</p>
+
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/basis-functions">basis-functions</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/data-types">data-types</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/finite-element-method">finite-element-method</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/macro">macro</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/metaprogramming">metaprogramming</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/neural-networks">neural-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-07-neural-networks-hello-world/">Neuroverkkojen matematiikkaa</a></h1>
+            <time class="has-text-grey-light is-size-7">6 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-05-julia-type-conversions/">Konversioita Julian datatyyppien välillä</a></h1>
+            <time class="has-text-grey-light is-size-7">5 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-01-fem-hermite-element-1d/">Elementtimenetelmän kantafunktioiden laskeminen</a></h1>
+            <time class="has-text-grey-light is-size-7">1 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></h1>
+            <time class="has-text-grey-light is-size-7">22 June 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (15)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Jukka Aho (@ahojukka5) 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

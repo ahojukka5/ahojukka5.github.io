@@ -6,10 +6,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Sun, 05 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jul 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Neuroverkkojen matematiikkaa</title>
+      <link>https://ahojukka5.github.io/2020/2020-07-07-neural-networks-hello-world/</link>
+      <pubDate>Mon, 06 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-07-07-neural-networks-hello-world/</guid>
+      <description>Tarkastellaan yksinkertaista lineaarista neuroverkkoa, jolle opetetaan funktio \(y = 2x - 1\). Kirjoituksen huomio on lähinnä matemaattisessa notaatiossa ja verkon optimoinnissa.
+Tarkastellaan funktiota välillä \(-1 \leq x \leq 4\). Diskretoidaan väli siten, että \(\Delta x = 1\) ja sovitetaan dataan lineaarinen malli. Datapisteet siis ovat:
+f(x) = 2*x - 1 x = collect(-1.0:4.0) y = f.(x) x, y ([-1.0, 0.0, 1.0, 2.0, 3.0, 4.0], [-3.0, -1.0, 1.0, 3.0, 5.0, 7.0]) Suoran sovitus dataan ei sinänsä ihmeellinen temppu ole.</description>
+    </item>
     
     <item>
       <title>Konversioita Julian datatyyppien välillä</title>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Jukka Aho (@ahojukka5)  | julia</title>
+    <title>Jukka Aho (@ahojukka5)  | neural networks</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
     
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
     <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
-    <link rel="alternate" type="application/rss+xml" href="https://ahojukka5.github.io/tags/julia/index.xml" title="Jukka Aho (@ahojukka5)" />
+    <link rel="alternate" type="application/rss+xml" href="https://ahojukka5.github.io/tags/neural-networks/index.xml" title="Jukka Aho (@ahojukka5)" />
     </head>
 <body>
 
@@ -33,7 +33,7 @@
                 <br>
                 <h1 class="title is-size-1">
                     
-                        #julia
+                        #neural networks
                     
                 </h1>
                 
@@ -52,91 +52,6 @@
     <div class="column is-9">
         <div class="tile is-child box">
             <div class="content">
-
-                <article class="media">
-                    <div class="media-content">
-                        <div class="content">
-                            <p class="title is-4"><a href="/2020/2020-07-05-julia-type-conversions/">Konversioita Julian datatyyppien välillä</a></p>
-                            <p class="subtitle is-size-6 has-text-grey-light">
-                                Published at July 5, 2020 &middot;
-                                <i class="far fa-clock"></i>&nbsp;2 min read
-                            </p>
-                            <p><p>Juliasta löytyy 8, 16, 32 ja 64-bittiset datatyypit kuten muistakin ohjelmointikelistä. Lisäksi löytyvät merkkijonot ja binääri- sekä heksaesitysmuodot. Käyn tässä kirjoituksessa läpi joitakin tyyppimuunnoksia jotka tulevat joissakin yhteyksissä vastaan mutta eivät ole aivan ilmeisiä.</p>...</p>
-                        </div>
-                    </div>
-                </article>
-                <br>
-
-                <article class="media">
-                    <div class="media-content">
-                        <div class="content">
-                            <p class="title is-4"><a href="/2020/2020-06-22-julia-metaprogramming-macro-techniques/">Metaohjelmointia Julialla, tekniikoista</a></p>
-                            <p class="subtitle is-size-6 has-text-grey-light">
-                                Published at June 22, 2020 &middot;
-                                <i class="far fa-clock"></i>&nbsp;4 min read
-                            </p>
-                            <p><p>Koska makrot ovat ennen kaikkea koodin esikäsittelyä, niiden inputit
-ovat rajalliset, sillä ohjelmakoodia ei ole suoritettu ennen makroa.
-Makro voi ottaa input argumentteina lähinnä numeroita ja merkkijonoja.</p>...</p>
-                        </div>
-                    </div>
-                </article>
-                <br>
-
-                <article class="media">
-                    <div class="media-content">
-                        <div class="content">
-                            <p class="title is-4"><a href="/2020/2020-06-19-julia-metaprogramming-symbolic-differentiation/">Metaohjelmointia Julialla: symbolinen derivointi</a></p>
-                            <p class="subtitle is-size-6 has-text-grey-light">
-                                Published at June 19, 2020 &middot;
-                                <i class="far fa-clock"></i>&nbsp;8 min read
-                            </p>
-                            <p><p>Esittelen seuraavaksi erään ihan todellisen käyttötapauksen, missä makrojen
-käytöstä voi olla todellista hyötyä. Kuvitellaan tilannetta, missä meillä on
-olemassa jokin analyyttinen funktio, yksinkertaisuuden vuoksi polynomi. Haluamme
-laskea tämän polynomin analyyttisiä derivaattoja nopeasti. Toteutetaan
-yksinkertainen CAS-laskin, joka osaa derivoida polynomeja. Käytän tässä pohjana
-John Myles Whiten <a href="http://www.johnmyleswhite.com/notebook/2013/01/07/symbolic-differentiation-in-julia/">blogikirjoitusta</a>.</p>...</p>
-                        </div>
-                    </div>
-                </article>
-                <br>
-
-                <article class="media">
-                    <div class="media-content">
-                        <div class="content">
-                            <p class="title is-4"><a href="/2020/2020-06-18-julia-metaprogramming-macros/">Julian makrot</a></p>
-                            <p class="subtitle is-size-6 has-text-grey-light">
-                                Published at June 18, 2020 &middot;
-                                <i class="far fa-clock"></i>&nbsp;4 min read
-                            </p>
-                            <p><p>Eräs hieno ominaisuus Juliassa on sen makrot. Juliassa makro on hieman funktion
-kaltainen rakenne, joka palauttaa Expr-tyypin joka suoritetaan makron päätyttyä.
-Makroa voi ajatella ikääneräänlaisena esikäsittelijänä, jolla voi muokata koodin
-rakennetta ennenkuin se itse asiassa suoritetaan.</p>...</p>
-                        </div>
-                    </div>
-                </article>
-                <br>
-
-                <article class="media">
-                    <div class="media-content">
-                        <div class="content">
-                            <p class="title is-4"><a href="/2020/2020-06-16-benchmarking-algorithms-in-julia/">Algoritmien benchmarkkaaminen Julialla</a></p>
-                            <p class="subtitle is-size-6 has-text-grey-light">
-                                Published at June 16, 2020 &middot;
-                                <i class="far fa-clock"></i>&nbsp;5 min read
-                            </p>
-                            <p><p>Funktioiden benchmarkkaaminen Juliassa on tehty helpoksi erikseen asennttavalla
-BenchmarkTools-paketilla. Tarkastellaan seuraavanlaista ongelmaa: käyttäjälle
-annetaan kokonaislukulista <code>arr</code>, ja yksittäinen luku <code>target</code>. Implementoi
-funktio, joka palauttaa indeksiparin <code>(i, j)</code> siten, että listan alkioiden summa
-on <code>target</code>, siis <code>arr[i] + arr[j] = target</code>. Kannattaa käyttää hetki aikaa ja
-miettiä ratkaisua.</p>...</p>
-                        </div>
-                    </div>
-                </article>
-                <br>
 
             </div>
         </div>
