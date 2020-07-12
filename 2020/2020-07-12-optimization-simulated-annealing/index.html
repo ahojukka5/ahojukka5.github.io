@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Jukka Aho (@ahojukka5)  | Jäähdytysmentelmä</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    
+    <script>
+    MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$','$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        svg: {
+            fontCache: 'global'
+        },
+        options: {
+          skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+        },
+        tex: {
+            tags: 'ams'
+        }
+    };
+</script>
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+</script> 
+
+
+    
+    
+    
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css" />
+    <link rel="stylesheet" href="https://ahojukka5.github.io/css/blog.css" />
+    </head>
+<body>
+
+    
+    <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="https://ahojukka5.github.io">Home</a>
+        </div>
+    </nav>
+    
+
+    
+    <section class="hero is-info is-medium">
+        <div class="hero-body" style="background-image: url(https://ahojukka5.github.io/img/bg-blog.jpg);">
+            <div class="container has-text-centered">
+                <br>
+                <h1 class="title is-size-1">
+                    
+                        Jäähdytysmentelmä
+                    
+                </h1>
+                
+            </div>
+        </div>
+    </section>
+
+
+<div class="container">
+    <div class="section">
+    
+
+<div class="columns">
+    <div class="column is-9">
+        <div class="tile is-child box">
+            <div class="content">
+                <p>Jäähdytysmenetelmä<a href="https://en.wikipedia.org/wiki/Simulated_annealing">1</a> (engl. simulated annealing, SA) on satunnaisuuteen ja todennäköisyyksiin perustuva globaali optimointistrategia. Menetelmän perusajatus on ottaa satunnaisia askelia parametriavaruudessa ja hyväksyä uusi luku minimiksi todennäköisyysfunktion avulla. Todennäköisyysfunktio antaa arvon 1 mikäli uusi arvo on pienempi kuin entinen, mutta antaa myös todennäköisyyden valita huonompi arvo jollakin todennäköisyydellä, joka pienenee iteraatioiden funktiona. Tällä tavalla algoritmi pystyy pakenemaan lokaalista minimistä.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">using</span> Plots</span></code></pre></div>
+<p>Tarkastellaan funktiota <span class="math inline">\(f(x) = x^2 - 10\cos(5x) + 10\)</span>, jolla on lukuisia lokaaleja optimipisteitä sekä tasan yksi globaali optimipiste origossa.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>f <span class="op">=</span> x <span class="op">-&gt;</span> x<span class="op">^</span><span class="fl">2</span> <span class="op">-</span> <span class="fl">10</span><span class="op">*</span>cos(<span class="fl">5</span><span class="op">*</span>x) <span class="op">+</span> <span class="fl">10</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>p <span class="op">=</span> plot(<span class="op">-</span><span class="fl">5</span><span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">5</span><span class="op">,</span> f)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/function_1d.svg&quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_3_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Kaikki gradienttipohjaiset optimointimenetelmät epäonnistuvat tällaisen funktion optimoinnissa, mikäli alkuarvaus ei ole todella hyvä.</p>
+<p>Lähdetään naputtelemaan SA koodi. Ensin tarvitaan transitiomalli, eli mitenkä tässä parametriavaruudessa olisi tarkoitus tepastella. Valitaan esimerkiksi normaalijakaumasta satunnainen luku.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">using</span> Distributions</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">function</span> transition_model(x)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a>    <span class="kw">return</span> x <span class="op">+</span> rand(Normal())</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>transition_model (generic function with 1 method)</code></pre>
+<p>Sen lisäksi tarvitaan todennäköisyysfunktio. Yleensä <span class="math inline">\(P(e, e&#39;, T)\)</span> määritellään niin että <span class="math inline">\(P = 1\)</span>, jos <span class="math inline">\(e&#39; &lt; e\)</span> ja muutoin <span class="math inline">\(\exp(-(e&#39;-e)/T)\)</span>, joten menemme sillä. Tässä <span class="math inline">\(e\)</span> on “energia” joka minimoituu.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">function</span> acceptance_probability(f<span class="op">,</span> f_new<span class="op">,</span> T)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    <span class="kw">if</span> f_new <span class="op">&lt;</span> f</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>        <span class="kw">return</span> <span class="fl">1.0</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>    <span class="kw">return</span> exp(<span class="op">-</span>(f_new<span class="op">-</span>f)<span class="op">/</span>T)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>acceptance_probability (generic function with 1 method)</code></pre>
+<p>Lisäksi tarvitaan jäähtymismalli, joka pienentää lämpötilaa iteraatioiden funktiona. Otetaan tässä yksinkertaisin mahdollinen, eli lämpötila pienenee lineaarisesti.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">function</span> temperature(fraction)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="fl">1</span> <span class="op">-</span> fraction</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>temperature (generic function with 1 method)</code></pre>
+<p>Eli: transitiomallin ehdottama uusi <span class="math inline">\(x\)</span> valitaan uudeksi minimiksi, mikäli <span class="math inline">\(f(x_{new}) &lt; f(x)\)</span>, mutta myös siinä tapauksessa, että funktion arvo pisteessä <span class="math inline">\(x_{new}\)</span> on isompi, jollakin todennäköisyydellä joka pienenee iteraatioiden funktiona.</p>
+<p>Varsinainen pääalgoritmi tekee satunnaisia siirtymiä parametriavaruudessa ja hyväksyy tai hylkää uuden minimin perustuen todennäköisyysmalliin. Tallennetaan trace jotta voidaan tutkia konvergenssia:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">function</span> optimize_sa(f<span class="op">,</span> x0<span class="op">::</span>T<span class="op">,</span> acceptance_probability<span class="op">,</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>        transition_model<span class="op">,</span> temperature<span class="op">;</span> k_max<span class="op">=</span><span class="fl">10</span>) <span class="kw">where</span> T</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a>    x <span class="op">=</span> x0</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a>    accepted <span class="op">=</span> <span class="dt">Int</span>[]</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a>    rejected <span class="op">=</span> <span class="dt">Int</span>[]</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>    trace <span class="op">=</span> T[]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a>    <span class="kw">for</span> k<span class="op">=</span><span class="fl">1</span><span class="op">:</span>k_max</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a>        x_new <span class="op">=</span> transition_model(x)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a>        push<span class="op">!</span>(trace<span class="op">,</span> x_new)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a>        temp <span class="op">=</span> temperature(k<span class="op">/</span>k_max)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a>        <span class="kw">if</span> acceptance_probability(f(x)<span class="op">,</span> f(x_new)<span class="op">,</span> temp) <span class="op">&gt;</span> rand()</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a>            x <span class="op">=</span> x_new</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a>            push<span class="op">!</span>(accepted<span class="op">,</span> k)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a>        <span class="kw">else</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a>            push<span class="op">!</span>(rejected<span class="op">,</span> k)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a>        <span class="kw">end</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a>    <span class="kw">return</span> trace<span class="op">,</span> accepted<span class="op">,</span> rejected</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>optimize_sa (generic function with 1 method)</code></pre>
+<p>Ajetaan optimointialgoritmia esimerkiksi 300 iteraatiota esimerkkifunktiolle:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">using</span> <span class="bu">Random</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="bu">Random</span>.seed<span class="op">!</span>(<span class="fl">0</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>trace<span class="op">,</span> accepted<span class="op">,</span> rejected <span class="op">=</span> optimize_sa(f<span class="op">,</span> <span class="fl">5.0</span><span class="op">,</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>    acceptance_probability<span class="op">,</span> transition_model<span class="op">,</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a>    temperature<span class="op">;</span> k_max<span class="op">=</span><span class="fl">300</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a>iters <span class="op">=</span> <span class="fl">1</span><span class="op">:</span>length(trace)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a>ia <span class="op">=</span> iters[accepted]</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a>ir <span class="op">=</span> iters[rejected]</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a>xa <span class="op">=</span> trace[accepted]</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a>xr <span class="op">=</span> trace[rejected]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a>xa[<span class="kw">end</span>]</span></code></pre></div>
+<pre><code>0.012187171992082857</code></pre>
+<p>Vaikuttaisi että optimi on löytynyt. Algoritmille ominaista on että se ei anna tarkkaa ratkaisua vaan jotakin sen läheltä. Loput voidaan sitten hoitaa esimerkiksi Newtonin menetelmällä.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>scatter(ia<span class="op">,</span> xa<span class="op">,</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a>    marker<span class="op">=:</span>o<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Accepted&quot;</span><span class="op">,</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a>    title<span class="op">=</span><span class="st">&quot;Trace of x&quot;</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(ir<span class="op">,</span> xr<span class="op">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a>    marker<span class="op">=:</span>x<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Rejected&quot;</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/trace_x.svg&quot;</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_16_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb15"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a>scatter(ia<span class="op">,</span> f.(xa)<span class="op">,</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>    marker<span class="op">=:</span>o<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Accepted&quot;</span><span class="op">,</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>    title<span class="op">=</span><span class="st">&quot;Function f&quot;</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(ir<span class="op">,</span> f.(xr)<span class="op">,</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true"></a>    marker<span class="op">=:</span>x<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Rejected&quot;</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/function_f.svg&quot;</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_17_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Jäljestä näkee että optimi on löytynyt aika lyhyen iteroinnin jälkeen, alle 50 iteraatiossa. Optimoinnin puolessa välissä näkee kuinka algoritmi on ottanut pienen satunnaishypyn joka ei ole itse asiassa parantanut tulosta.</p>
+<h2 id="case-study-challengerin-katastrofi.">Case study: Challengerin katastrofi.</h2>
+<p><a href="https://tieku.fi/maailmankaikkeus/avaruuslennot/challengerin-katastrofi-astronautit-tiesivat-kuolevansa" class="uri">https://tieku.fi/maailmankaikkeus/avaruuslennot/challengerin-katastrofi-astronautit-tiesivat-kuolevansa</a> 28. tammikuuta 1986 avaruussukkula Challenger muuttui taivaalla jättimäiseksi tulipalloksi.</p>
+<p>Räjähdyksen syyksi selvisi yksinkertainen virhe – ja pian myös tiedettiin, että mukana olleet seitsemän astronauttia olivat vielä hengissä sekunteja ensimmäisten räjähdysten vavisuttaessa sukkulaa.</p>
+<p>Vian syyksi paljastui O-renkaat, jotka eivät kestäneet Floridan hyyviä pakkaskelejä. Analysoidaan nyt tuosta saatua dataa logistisella mallilla.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>data <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="st">6 0 66  50  1</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a><span class="st">6 1 70  50  2</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a><span class="st">6 0 69  50  3</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a><span class="st">6 0 68  50  4</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a><span class="st">6 0 67  50  5</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a><span class="st">6 0 72  50  6</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a><span class="st">6 0 73 100  7</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a><span class="st">6 0 70 100  8</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a><span class="st">6 1 57 200  9</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true"></a><span class="st">6 1 63 200 10</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true"></a><span class="st">6 1 70 200 11</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true"></a><span class="st">6 0 78 200 12</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true"></a><span class="st">6 0 67 200 13</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true"></a><span class="st">6 2 53 200 14</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true"></a><span class="st">6 0 67 200 15</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true"></a><span class="st">6 0 75 200 16</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true"></a><span class="st">6 0 70 200 17</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true"></a><span class="st">6 0 81 200 18</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true"></a><span class="st">6 0 76 200 19</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true"></a><span class="st">6 0 79 200 20</span></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true"></a><span class="st">6 2 75 200 21</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true"></a><span class="st">6 0 76 200 22</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true"></a><span class="st">6 1 58 200 23</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true"></a><span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true"></a><span class="kw">function</span> read_data(data)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true"></a>    lines <span class="op">=</span> split(strip(data)<span class="op">,</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true"></a>    N <span class="op">=</span> length(lines)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true"></a>    x <span class="op">=</span> zeros(N)</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true"></a>    y <span class="op">=</span> zeros(N)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true"></a>    <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true"></a>        vals <span class="op">=</span> split(lines[i]<span class="op">,</span> <span class="st">&quot; &quot;</span>)</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true"></a>        x[i] <span class="op">=</span> parse(<span class="dt">Int</span><span class="op">,</span> vals[<span class="fl">3</span>])</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true"></a>        y[i] <span class="op">=</span> parse(<span class="dt">Int</span><span class="op">,</span> vals[<span class="fl">2</span>])</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true"></a>    <span class="kw">return</span> x<span class="op">,</span> y</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true"></a></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true"></a>x<span class="op">,</span> y <span class="op">=</span> read_data(data)</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true"></a><span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>length(y)</span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true"></a>    <span class="kw">if</span> y[i] <span class="op">!=</span> <span class="fl">0.0</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true"></a>        y[i] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<p>Todennäköisyys, että O-rengas on vaurioitunut, on</p>
+<p><span class="math display">\[\begin{equation}
+p\left(x\right)=\frac{1}{1+\exp\left(-k\left(x-x\_{0}\right)\right)}
+\end{equation}\]</span></p>
+<p>Logistinen kustannus on <span class="math display">\[\begin{equation}
+L\left(\theta\right)=-\frac{1}{m}\sum\_{i=1}^{m}\left[\hat{y}^{\left(i\right)}\log\left(p\left(\theta\right)\right)+\left(1-\hat{y}^{\left(i\right)}\right)\log\left(1-p\left(\theta\right)\right)\right]
+\end{equation}\]</span></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="kw">function</span> loss(θ<span class="op">;</span> x<span class="op">=</span>x<span class="op">,</span> y<span class="op">=</span>y)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>    k<span class="op">,</span> x0 <span class="op">=</span> θ</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>    <span class="pp">@assert</span> length(x) <span class="op">==</span> length(y)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>    J <span class="op">=</span> <span class="fl">0.0</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>    N <span class="op">=</span> length(x)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>    <span class="kw">for</span> i <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span>N</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a>        z <span class="op">=</span> k<span class="op">*</span>(x[i] <span class="op">-</span> x0)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a>        a <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> exp(<span class="op">-</span>z))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a>        L <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span> <span class="op">*</span> (y[i] <span class="op">*</span> log(a) <span class="op">+</span> (<span class="fl">1.0</span> <span class="op">-</span> y[i]) <span class="op">*</span> log(<span class="fl">1.0</span> <span class="op">-</span> a))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a>        J <span class="op">+=</span> L</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a>    <span class="kw">return</span> J <span class="op">/</span> N</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>loss (generic function with 1 method)</code></pre>
+<p>Kevyt visualisointi jotta nähdään miltä funktio näyttää:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="kw">function</span> do_plot()</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>    ks <span class="op">=</span> <span class="op">-</span><span class="fl">3.0</span><span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">0.0</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true"></a>    ws <span class="op">=</span> collect(<span class="fl">50.0</span> <span class="op">:</span> <span class="fl">0.1</span> <span class="op">:</span> <span class="fl">100.0</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true"></a>    px <span class="op">=</span> []</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true"></a>    py <span class="op">=</span> []</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true"></a>    <span class="kw">for</span> ki <span class="kw">in</span> ks</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true"></a>        <span class="kw">for</span> wi <span class="kw">in</span> ws</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true"></a>            l <span class="op">=</span> loss((ki<span class="op">,</span> wi))</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true"></a>            <span class="kw">if</span> (isnan(l) <span class="op">||</span> isinf(l))</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true"></a>                push<span class="op">!</span>(px<span class="op">,</span> ki)</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true"></a>                push<span class="op">!</span>(py<span class="op">,</span> wi)</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true"></a>                <span class="kw">break</span></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true"></a>            <span class="kw">end</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true"></a>        <span class="kw">end</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true"></a>    <span class="kw">end</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true"></a></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true"></a>    p <span class="op">=</span> contour(ks<span class="op">,</span> ws<span class="op">,</span> (x<span class="op">,</span> y) <span class="op">-&gt;</span> loss((x<span class="op">,</span> y)))</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true"></a>    plot<span class="op">!</span>(px<span class="op">,</span> py<span class="op">,</span> color<span class="op">=:</span>black<span class="op">,</span> lw<span class="op">=</span><span class="fl">1.5</span><span class="op">,</span> label<span class="op">=</span><span class="cn">nothing</span>)</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true"></a>    xlims<span class="op">!</span>(<span class="op">-</span><span class="fl">3.0</span><span class="op">,</span> <span class="fl">0.0</span>)</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true"></a>    ylims<span class="op">!</span>(<span class="fl">50.0</span><span class="op">,</span> <span class="fl">90.0</span>)</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true"></a>    xlabel<span class="op">!</span>(<span class="st">&quot;Parameter k&quot;</span>)</span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true"></a>    ylabel<span class="op">!</span>(<span class="st">&quot;Parameter x0&quot;</span>)</span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true"></a>    title<span class="op">!</span>(<span class="st">&quot;Logistic cost&quot;</span>)</span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true"></a>    <span class="kw">return</span> p</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true"></a><span class="kw">end</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true"></a></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true"></a>p <span class="op">=</span> do_plot()</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/logistic_loss.svg&quot;</span>)</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_25_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Nyt sitten optimoidaan. Eli minimoidaan logistista kustannusfunktiota. Jäähdytysmenetelmällä.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="kw">function</span> transition_model(θ)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a>    k<span class="op">,</span> x0 <span class="op">=</span> θ</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a>    k_new <span class="op">=</span> k <span class="op">+</span> <span class="fl">1</span><span class="op">/</span>π <span class="op">*</span> rand(Normal())</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a>    x0_new <span class="op">=</span> x0 <span class="op">+</span> π <span class="op">*</span> rand(Normal())</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a>    <span class="kw">return</span> (k<span class="op">=</span>k_new<span class="op">,</span> x0<span class="op">=</span>x0_new)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a><span class="kw">end</span></span></code></pre></div>
+<pre><code>transition_model (generic function with 1 method)</code></pre>
+<div class="sourceCode" id="cb22"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a><span class="kw">using</span> <span class="bu">Random</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a><span class="bu">Random</span>.seed<span class="op">!</span>(<span class="fl">0</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true"></a>trace<span class="op">,</span> accepted<span class="op">,</span> rejected <span class="op">=</span> optimize_sa(loss<span class="op">,</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true"></a>    (k<span class="op">=-</span><span class="fl">3.0</span><span class="op">,</span> x0<span class="op">=</span><span class="fl">50.0</span>)<span class="op">,</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true"></a>    acceptance_probability<span class="op">,</span> transition_model<span class="op">,</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true"></a>    temperature<span class="op">;</span> k_max<span class="op">=</span><span class="fl">1000</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true"></a>trace_k <span class="op">=</span> [o.k <span class="kw">for</span> o <span class="kw">in</span> trace]</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true"></a>trace_x0 <span class="op">=</span> [o.x0 <span class="kw">for</span> o <span class="kw">in</span> trace]</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true"></a>iters <span class="op">=</span> <span class="fl">1</span><span class="op">:</span>length(trace)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true"></a>ia <span class="op">=</span> iters[accepted]</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true"></a>ir <span class="op">=</span> iters[rejected]</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true"></a>ka <span class="op">=</span> trace_k[accepted]</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true"></a>x0a <span class="op">=</span> trace_x0[accepted]</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true"></a>kr <span class="op">=</span> trace_k[rejected]</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true"></a>x0r <span class="op">=</span> trace_x0[rejected]</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true"></a>trace[accepted][<span class="kw">end</span>]</span></code></pre></div>
+<pre><code>(k = -0.23451914148538833, x0 = 65.48773395385525)</code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true"></a>scatter(ia<span class="op">,</span> x0a<span class="op">,</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true"></a>    marker<span class="op">=:</span>o<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Accepted&quot;</span><span class="op">,</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true"></a>    title<span class="op">=</span><span class="st">&quot;Trace of x0&quot;</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(ir<span class="op">,</span> x0r<span class="op">,</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true"></a>    marker<span class="op">=:</span>x<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Rejected&quot;</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/trace_x0.svg&quot;</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_29_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb25"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a>scatter(ia<span class="op">,</span> ka<span class="op">,</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true"></a>    marker<span class="op">=:</span>o<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Accepted&quot;</span><span class="op">,</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true"></a>    title<span class="op">=</span><span class="st">&quot;Trace of k&quot;</span><span class="op">,</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true"></a>    legend<span class="op">=:</span>topleft)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(ir<span class="op">,</span> kr<span class="op">,</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true"></a>    marker<span class="op">=:</span>x<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Rejected&quot;</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/trace_k.svg&quot;</span>)</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_30_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb26"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a>do_plot()</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true"></a>plot<span class="op">!</span>(ka<span class="op">,</span> x0a<span class="op">,</span> color<span class="op">=:</span>blue<span class="op">,</span> markercolor<span class="op">=:</span>blue<span class="op">,</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true"></a>    marker<span class="op">=:</span>o<span class="op">,</span> alpha<span class="op">=</span><span class="fl">0.3</span><span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Accepted&quot;</span>)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true"></a>p <span class="op">=</span> plot<span class="op">!</span>(kr<span class="op">,</span> x0r<span class="op">,</span> color<span class="op">=:</span>red<span class="op">,</span> markercolor<span class="op">=:</span>red<span class="op">,</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true"></a>    marker<span class="op">=:</span>x<span class="op">,</span> alpha<span class="op">=</span><span class="fl">0.3</span><span class="op">,</span> label<span class="op">=</span><span class="st">&quot;Rejected&quot;</span><span class="op">,</span> legend<span class="op">=:</span>topleft)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/trace_x0_and_k.svg&quot;</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_31_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<p>Lyhyen konvergenssin jälkeen jää algoritmi pyörimään minimin tuntumaan. Valitulla menetelmällä ratkaisuksi saadaan</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a>opt <span class="op">=</span> trace[accepted][<span class="kw">end</span>]</span></code></pre></div>
+<pre><code>(k = -0.23451914148538833, x0 = 65.48773395385525)</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a>opt2 <span class="op">=</span> (k <span class="op">=</span> <span class="op">-</span><span class="fl">0.23</span><span class="op">,</span> x0 <span class="op">=</span> <span class="fl">64.75</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a>xc <span class="op">=</span> collect(minimum(x) <span class="op">:</span> <span class="fl">0.1</span> <span class="op">:</span> maximum(x))</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true"></a>val(x) <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> exp(<span class="op">-</span>opt.k<span class="op">*</span>(x <span class="op">-</span> opt.x0)))</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true"></a>yc <span class="op">=</span> val.(xc)</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true"></a>plot(xc<span class="op">,</span> yc<span class="op">,</span> lw<span class="op">=</span><span class="fl">1.5</span><span class="op">,</span> color<span class="op">=:</span>black<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;fitted model&quot;</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(x<span class="op">,</span> y<span class="op">,</span> color<span class="op">=:</span>white<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;data&quot;</span>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true"></a>title<span class="op">!</span>(<span class="st">&quot;Challenger space shuttle O-ring failures&quot;</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true"></a>xlabel<span class="op">!</span>(<span class="st">&quot;Ambient temperature (Fahrenheit)&quot;</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true"></a>ylabel<span class="op">!</span>(<span class="st">&quot;Probability to damage&quot;</span>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true"></a>ylims<span class="op">!</span>(<span class="op">-</span><span class="fl">0.1</span><span class="op">,</span> <span class="fl">1.1</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/challenger_model.svg&quot;</span>)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true"></a>p</span></code></pre></div>
+<figure>
+<img src="notebook_files/notebook_34_0.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<div class="sourceCode" id="cb30"><pre class="sourceCode julia"><code class="sourceCode julia"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a>p <span class="op">=</span> do_plot()</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true"></a>ks <span class="op">=</span> <span class="op">-</span><span class="fl">3.0</span><span class="op">:</span><span class="fl">0.01</span><span class="op">:</span><span class="fl">0.0</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true"></a>ws <span class="op">=</span> collect(<span class="fl">50.0</span> <span class="op">:</span> <span class="fl">0.1</span> <span class="op">:</span> <span class="fl">100.0</span>)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true"></a>p <span class="op">=</span> contour<span class="op">!</span>(p<span class="op">,</span> ks<span class="op">,</span> ws<span class="op">,</span> (x<span class="op">,</span>y) <span class="op">-&gt;</span> loss((x<span class="op">,</span> y))<span class="op">,</span> levels<span class="op">=</span>[<span class="fl">0.45</span><span class="op">,</span> <span class="fl">0.48</span><span class="op">,</span> <span class="fl">0.55</span><span class="op">,</span> <span class="fl">0.70</span><span class="op">,</span> <span class="fl">1.0</span>])</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true"></a>p <span class="op">=</span> scatter<span class="op">!</span>(p<span class="op">,</span> [opt.k]<span class="op">,</span> [opt.x0]<span class="op">,</span> color<span class="op">=:</span>red<span class="op">,</span> label<span class="op">=</span><span class="st">&quot;minimum&quot;</span><span class="op">,</span> legend<span class="op">=:</span>topleft)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true"></a>savefig(<span class="st">&quot;figs/challenger_logistic_cost_optimized.svg&quot;</span>)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true"></a>p</span></code></pre></div>
+<pre><code>┌ Warning: Multiple series with different levels share a colorbar. Colorbar may not reflect all series correctly.
+└ @ Plots /home/jukka/.julia/packages/Plots/7U0ob/src/backends/gr.jl:514</code></pre>
+<figure>
+<img src="notebook_files/notebook_35_1.svg" alt="" /><figcaption>svg</figcaption>
+</figure>
+<pre><code>┌ Warning: Multiple series with different levels share a colorbar. Colorbar may not reflect all series correctly.
+└ @ Plots /home/jukka/.julia/packages/Plots/7U0ob/src/backends/gr.jl:514</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode julia"><code class="sourceCode julia"></code></pre></div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Tags</h1>
+        <div class="tags">
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/algorithms">algorithms</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/autossh">autossh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/backup">backup</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/bash">bash</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/basis-functions">basis-functions</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/c&#43;&#43;">c&#43;&#43;</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/data-types">data-types</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/deep-learning">deep-learning</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/duplicity">duplicity</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/filters">filters</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/finite-element-method">finite-element-method</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/gmsh">gmsh</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/julia">julia</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/juliafem">juliafem</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/jupyter-notebook">jupyter-notebook</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/linux">linux</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/lstm-networks">lstm-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/macro">macro</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/metaprogramming">metaprogramming</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/neural-networks">neural-networks</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/optimization">optimization</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/pandoc">pandoc</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/parametric-simulations">parametric-simulations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/partial-differential-equations">partial-differential-equations</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/performance">performance</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/simulated-annealing">simulated-annealing</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/ssh-tunnel">ssh-tunnel</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/symbolic-differentiation">symbolic-differentiation</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/systemd">systemd</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/vibration-data">vibration-data</a></span>
+        
+            <span class="tag"><a href="https://ahojukka5.github.io/tags/wrapping">wrapping</a></span>
+        
+        </div>          
+    </div>
+</div><br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Recent posts</h1>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-12-optimization-simulated-annealing/">Jäähdytysmentelmä</a></h1>
+            <time class="has-text-grey-light is-size-7">12 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-07-neural-networks-hello-world/">Neuroverkkojen matematiikkaa</a></h1>
+            <time class="has-text-grey-light is-size-7">6 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-05-julia-type-conversions/">Konversioita Julian datatyyppien välillä</a></h1>
+            <time class="has-text-grey-light is-size-7">5 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-07-01-fem-hermite-element-1d/">Elementtimenetelmän kantafunktioiden laskeminen</a></h1>
+            <time class="has-text-grey-light is-size-7">1 July 2020</time>
+        
+            <h1><a href="https://ahojukka5.github.io/2020/2020-06-26-fem-linear-element-1d/">Toisen kertaluvun differentiaaliyhtälön ratkaisu elementtimenetelmällä</a></h1>
+            <time class="has-text-grey-light is-size-7">26 June 2020</time>
+        
+    </div>
+</div>
+    
+<br>
+                
+
+
+    
+<br>
+        <div class="card">
+    <div class="card-content">
+        <h1 class="title is-5">Archives</h1>
+        
+            <a href="https://ahojukka5.github.io/archives/2020">2020</a> (16)<br>
+        
+            <a href="https://ahojukka5.github.io/archives/2019">2019</a> (4)<br>
+        
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<footer class="footer has-background-grey-darker has-text-white">
+    <div class="content has-text-centered">
+        <p>
+            <span class="icon is-large"><a href="https://twitter.com/" class="mysocial" rel="me"><i class="fab fa-twitter fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://www.youtube.com/" class="mysocial" rel="me"><i class="fab fa-youtube fa-3x"></i></a></span>&nbsp;&nbsp;
+            <span class="icon is-large"><a href="https://github.com/" class="mysocial" rel="me"><i class="fab fa-github fa-3x"></i></a></span>&nbsp;&nbsp;
+            <br><br>
+            Copyright &copy; Jukka Aho (@ahojukka5) 2020 - Theme by <a href="https://jeffprod.com" class="mysocial">JeffProd.com</a>
+            - <a class="mysocial" href="https://ahojukka5.github.io/about">About</a>
+        </p>
+    </div>
+</footer>
+
+<script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js"></script>
+</body>
+</html>

@@ -6,10 +6,19 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright © 2020, @ahojukka5</copyright>
-    <lastBuildDate>Mon, 06 Jul 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Jul 2020 00:00:00 +0000</lastBuildDate>
     
         <atom:link href="https://ahojukka5.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Jäähdytysmentelmä</title>
+      <link>https://ahojukka5.github.io/2020/2020-07-12-optimization-simulated-annealing/</link>
+      <pubDate>Sun, 12 Jul 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ahojukka5.github.io/2020/2020-07-12-optimization-simulated-annealing/</guid>
+      <description>&lt;p&gt;Jäähdytysmenetelmä&lt;a href=&#34;https://en.wikipedia.org/wiki/Simulated_annealing&#34;&gt;1&lt;/a&gt; (engl. simulated annealing, SA) on satunnaisuuteen ja todennäköisyyksiin perustuva globaali optimointistrategia. Menetelmän perusajatus on ottaa satunnaisia askelia parametriavaruudessa ja hyväksyä uusi luku minimiksi todennäköisyysfunktion avulla. Todennäköisyysfunktio antaa arvon 1 mikäli uusi arvo on pienempi kuin entinen, mutta antaa myös todennäköisyyden valita huonompi arvo jollakin todennäköisyydellä, joka pienenee iteraatioiden funktiona. Tällä tavalla algoritmi pystyy pakenemaan lokaalista minimistä.&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Neuroverkkojen matematiikkaa</title>
